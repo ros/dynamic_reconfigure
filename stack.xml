@@ -1,4 +1,4 @@
-<stack name="driver_common" version="0.1.0">
+<stack>
   <description brief="driver_common">
 
   driver_common contains:
@@ -28,7 +28,7 @@
   <license>BSD</license>  
   <review status="unreviewed" notes=""/>
   <url>http://ros.org/wiki/driver_common</url>
-  <depend stack="ros"/> <!-- rospy, roscpp --> 
-  <depend stack="diagnostics"/> <!-- self_test, diagnostic_updater --> 
+  <depend stack="diagnostics" /> <!-- self_test, diagnostic_updater -->
+  <depend stack="ros" /> <!-- roslib, rospy, roscpp, rosservice -->
 
 </stack>
