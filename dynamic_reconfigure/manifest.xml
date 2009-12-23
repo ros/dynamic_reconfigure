@@ -1,0 +1,21 @@
+<package>
+  <description brief="dynamic_reconfigure">
+    This package provides a class to facilitate dynamic node
+    reconfiguration. 
+  </description>
+  <author>Blaise Gassend</author>
+  <license>BSD</license>
+  <review status="unreviewed" notes=""/>
+  <url>http://www.ros.org/wiki/dynamic_reconfigure</url>
+  <depend package="rospy" />
+  <depend package="roscpp" />
+  <depend package="rosservice" />
+  <rosdep name="wxpython" />
+  <export>
+      <rosdoc config="rosdoc.yaml" />
+      <cpp cflags="`rosboost-cfg --cflags` -I${prefix}/include -I${prefix}/msg/cpp -I${prefix}/srv/cpp"
+         lflags="`rosboost-cfg --lflags thread`"/>
+  </export>
+</package>
+
+

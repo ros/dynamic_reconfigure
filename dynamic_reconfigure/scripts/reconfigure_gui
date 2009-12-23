@@ -1,0 +1,447 @@
+#! /usr/bin/env python
+#
+# Software License Agreement (BSD License)
+#
+# Copyright (c) 2009, Willow Garage, Inc.
+# All rights reserved.
+#
+# Redistribution and use in source and binary forms, with or without
+# modification, are permitted provided that the following conditions
+# are met:
+#
+#  * Redistributions of source code must retain the above copyright
+#    notice, this list of conditions and the following disclaimer.
+#  * Redistributions in binary form must reproduce the above
+#    copyright notice, this list of conditions and the following
+#    disclaimer in the documentation and/or other materials provided
+#    with the distribution.
+#  * Neither the name of Willow Garage, Inc. nor the names of its
+#    contributors may be used to endorse or promote products derived
+#    from this software without specific prior written permission.
+#
+# THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
+# "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT
+# LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS
+# FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE
+# COPYRIGHT OWNER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT,
+# INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING,
+# BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES;
+# LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER
+# CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT
+# LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN
+# ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
+# POSSIBILITY OF SUCH DAMAGE.
+#
+# Revision $Id$
+
+from __future__ import with_statement
+
+import roslib; roslib.load_manifest('dynamic_reconfigure')
+import rospy
+
+import math
+import threading
+import time
+import unicodedata
+import wx
+
+import dynamic_reconfigure.client
+
+class MainWindow(wx.Frame):
+    def __init__(self, node=None):
+        if node is not None:
+            title = 'Reconfigure %s' % node
+        else:
+            title = 'Reconfigure'
+           
+        wx.Frame.__init__(self, None, wx.ID_ANY, title)
+
+        # Create menu
+        self.menubar = wx.MenuBar()
+        self.filemenu = wx.Menu()
+        self.filemenu.Append(wx.ID_EXIT, "E&xit", 'Exit the program')
+        wx.EVT_MENU(self, wx.ID_EXIT, self.on_exit)
+        self.menubar.Append(self.filemenu, "&File")
+        self.SetMenuBar(self.menubar)
+
+        # Add reconfigure control
+        if node:
+            try:
+                reconf = dynamic_reconfigure.client.Client(node, timeout=5.0)
+            except:
+                print 'Can\'t connect to node %s' % node
+                self.Close()
+                return
+                
+            control = DynamicReconfigurePanel(self, reconf)
+        else:
+            control = DynamicReconfigureSelector(self)
+
+        sizer = wx.BoxSizer(wx.VERTICAL)
+        sizer.Add(control, 1, wx.EXPAND | wx.ALL, 5)
+        self.SetSizer(sizer)
+
+        # Check every 1s if node has shutdown (and close GUI)
+        self.timer = wx.Timer(self, wx.ID_ANY)
+        self.Bind(wx.EVT_TIMER, self.on_timer, self.timer)
+        self.timer.Start(1000, False)
+
+    def on_timer(self, event):
+        if rospy.is_shutdown():
+            self.Close(True)
+            self.Refresh()
+
+    def on_exit(self, e):
+        self.Close(True)
+        self.Refresh()
+            
+    def on_error(self):
+        self.Raise()
+
+## Dropdown to choose which node to reconfigure
+class DynamicReconfigureSelector(wx.Panel):
+    def __init__(self, parent):
+        wx.Panel.__init__(self, parent, wx.ID_ANY)
+
+        self.parent       = parent
+        self.reconf_panel = None
+
+        self.combobox = wx.ComboBox(self, wx.ID_ANY, style=wx.CB_READONLY)
+        self.update_combobox()
+        self.Bind(wx.EVT_COMBOBOX, self.on_combobox)
+
+        self.sizer = wx.BoxSizer(wx.VERTICAL)
+        self.sizer.Add(self.combobox, flag=wx.EXPAND)
+        self.SetSizer(self.sizer)
+
+        # Refresh node list periodically
+        self.timer = wx.Timer(self, wx.ID_ANY)
+        self.Bind(wx.EVT_TIMER, self.on_timer, self.timer)
+        self.timer.Start(5000, False)
+
+    def update_combobox(self):
+        self.combobox.SetItems(dynamic_reconfigure.find_reconfigure_services())
+
+    def on_timer(self, event):
+        self.update_combobox()
+        
+    def on_combobox(self, event):
+        node = str(self.combobox.GetValue())
+        
+        try:
+            reconf = dynamic_reconfigure.client.Client(node, timeout=5.0)
+        except:
+            if self.reconf_panel is None:
+                self.combobox.SetValue('')
+            else:
+                self.combobox.SetValue(self.reconf_panel.reconf.name)
+            return
+
+        # Remove the existing reconfigure panel (and close the client)
+        if self.reconf_panel is not None:
+            self.reconf_panel.close()
+            self.sizer.Remove(self.reconf_panel)
+        
+        # Add the new panel
+        self.reconf_panel = DynamicReconfigurePanel(self, reconf)
+        
+        self.sizer.Add(self.reconf_panel, 1, wx.EXPAND | wx.ALL, 5)
+        self.sizer.Layout()
+
+class DynamicReconfigurePanel(wx.ScrolledWindow):
+    def __init__(self, parent, reconf):
+        wx.ScrolledWindow.__init__(self, parent, wx.ID_ANY, style=wx.VSCROLL)
+
+        self.reconf = reconf
+        
+        config = self.reconf.get_configuration()
+        descr  = self.reconf.get_parameter_descriptions()
+        
+        # Create the editors
+        self.editors = {}
+        
+        self._editor_types = {
+            'bool':   DynamicReconfigurePanel.BooleanEditor,
+            'int':    DynamicReconfigurePanel.IntegerEditor,
+            'double': DynamicReconfigurePanel.DoubleEditor,
+            'str':    DynamicReconfigurePanel.StringEditor
+        }
+        flags = {
+            'bool':   wx.ALIGN_LEFT,
+            'int':    wx.EXPAND,
+            'str':    wx.EXPAND,
+            'double': wx.EXPAND,
+        }
+        
+        sizer = wx.FlexGridSizer(0, 2)
+        sizer.SetFlexibleDirection(wx.BOTH)
+        sizer.AddGrowableCol(1, 1)
+
+        for param_descr in descr:
+            name = param_descr['name']
+            type, val, min, max, description = param_descr['type'], config[name], param_descr['min'], param_descr['max'], param_descr['description']
+
+            # Label
+            label = wx.StaticText(self, wx.ID_ANY, name + ":")
+            sizer.Add(label, 1, wx.ALIGN_CENTER_VERTICAL | wx.ALIGN_RIGHT)
+
+            # Editor
+            try:
+                enum = eval(param_descr['edit_method'])['enum']
+                editor = self.EnumEditor(self, name, val, enum)
+            except:
+                editor = self._editor_types[type](self, name, val, min, max)
+            self.editors[name] = editor
+            sizer.Add(editor, 0, flags[type])
+
+            tooltip_text = description
+            min_max_text = editor.get_min_max_text(min, max)
+            if min_max_text is not None:
+                tooltip_text += ' ' + min_max_text
+            tooltip = wx.ToolTip(tooltip_text)
+            tooltip.SetDelay(2000)
+            label.SetToolTip(tooltip)
+
+        self.Bind(wx.EVT_SIZE, self.on_size)
+
+        self.SetSizer(sizer)
+
+        self.reconf.config_callback = self._config_callback
+
+        self.updater = self.BatchUpdater(self.reconf)
+        self.updater.start()
+
+    def on_size(self, event):
+        w, h = self.GetClientSize()
+        
+        self.SetScrollbars(0, 1, 0, h)
+        self.Refresh()
+
+    def _config_callback(self, config):
+        for name, editor in self.editors.iteritems():
+            wx.CallAfter(editor.update_value, config[name])
+
+    def close(self):
+        self.updater.stop()
+        self.reconf.close()
+
+    class BatchUpdater(threading.Thread):
+        def __init__(self, reconf):
+            threading.Thread.__init__(self)
+            self.setDaemon(True)
+
+            self._reconf         = reconf
+            self._cv             = threading.Condition()
+            self._pending_config = {}
+            self._last_pending   = None
+            self._stop_flag      = False
+
+        def run(self):
+            last_commit = None
+
+            while not self._stop_flag:
+                if last_commit > self._last_pending:
+                    with self._cv:
+                        self._cv.wait()                 
+                        
+                last_commit = time.time()
+                
+                update = self._pending_config.copy()
+                self._pending_config = {}
+
+                updated = self._reconf.update_configuration(update)
+
+        def update(self, config):
+            with self._cv:
+                for name, value in config.items():
+                    self._pending_config[name] = value
+
+                self._last_pending = time.time()
+
+                self._cv.notify()
+
+        def stop(self):
+            self._stop_flag = True
+            with self._cv:
+                self._cv.notify()
+
+    class Editor:
+        def __init__(self, name):
+            self.name = name
+
+        def update_value(self, value):
+            pass
+
+        def _update(self, event):
+            new_value = self.get_value() 
+            if new_value != self.old_value:
+                self.update_configuration(new_value)
+
+        def update_configuration(self, value):
+            self.GetParent().updater.update({ self.name : value })
+
+        def get_min_max_text(self, min, max):
+            return None
+
+    class EnumEditor(Editor, wx.ComboBox):
+        def __init__(self, parent, name, val, enum):
+            DynamicReconfigurePanel.Editor.__init__(self, name)
+            wx.ComboBox.__init__(self, parent, wx.ID_ANY, style=wx.CB_READONLY)
+            
+            names  = [item['name']+" ("+repr(item['value'])+")"  for item in enum]
+            values = [item['value'] for item in enum] 
+            self.to_value = dict(zip(names, values))
+            self.to_name  = dict(zip(values, names))
+            
+            self.SetItems(names)
+
+            self.update_value(val)
+            
+            self.Bind(wx.EVT_COMBOBOX, self._update)
+
+        def get_value(self):
+            return self.to_value[self.GetValue()]
+
+        def update_value(self, value):
+            self.old_value = value
+            self.SetValue(self.to_name.get(value, ""))
+
+    class BooleanEditor(Editor, wx.CheckBox):
+        def __init__(self, parent, name, value, min, max):
+            DynamicReconfigurePanel.Editor.__init__(self, name)
+            wx.CheckBox.__init__(self, parent, wx.ID_ANY)
+    
+            self.update_value(value)
+            
+            self.Bind(wx.EVT_CHECKBOX, self._update)
+                                             
+        def get_value(self):
+            return self.GetValue()
+
+        def update_value(self, value):
+            self.old_value = value
+            self.SetValue(value) 
+    
+    class StringEditor(Editor, wx.TextCtrl):
+        def __init__(self, parent, name, value, min, max):
+            DynamicReconfigurePanel.Editor.__init__(self, name)
+            wx.TextCtrl.__init__(self, parent, wx.ID_ANY, style=wx.TE_PROCESS_ENTER)
+    
+            self.old_value = value
+            
+            self.SetValue(value)
+            self.Bind(wx.EVT_TEXT_ENTER, self._update)
+            self.Bind(wx.EVT_KILL_FOCUS, self._update)
+        
+        def get_value(self):
+            return unicodedata.normalize('NFKD', self.GetValue()).encode('ascii', 'ignore')
+
+        def update_value(self, value):
+            self.old_value = value
+            self.SetValue(value)
+        
+    class IntegerEditor(Editor, wx.Panel):
+        def __init__(self, parent, name, value, min, max):
+            DynamicReconfigurePanel.Editor.__init__(self, name)
+            wx.Panel.__init__(self, parent, wx.ID_ANY)
+    
+            self.min = min
+            self.max = max
+            
+            self.min_label = wx.StaticText(self, wx.ID_ANY, str(min))
+            self.slider    = wx.Slider(self, wx.ID_ANY, minValue=self._slider_value(self.min), maxValue=self._slider_value(self.max), style=wx.SL_AUTOTICKS | wx.SL_HORIZONTAL)
+            self.max_label = wx.StaticText(self, wx.ID_ANY, str(max))
+            self.text      = wx.TextCtrl(self, wx.ID_ANY, style=wx.TE_PROCESS_ENTER)
+
+            sizer = wx.BoxSizer()
+            sizer.Add(self.min_label)
+            sizer.Add(self.slider, wx.EXPAND)
+            sizer.Add(self.max_label)
+            sizer.Add(self.text)
+            self.SetSizer(sizer)
+    
+            self.slider.Bind(wx.EVT_SCROLL, self._slider_update)
+            self.text.Bind(wx.EVT_TEXT_ENTER, self._text_update)
+            self.text.Bind(wx.EVT_KILL_FOCUS, self._text_update)
+
+            self.update_value(value)
+
+        def update_value(self, value):
+            self.value = value
+
+            self.slidervalue = self._slider_value(self.value)
+            self.slider.SetValue(self.slidervalue)
+
+            self.textvalue = str(self.value)
+            self.text.SetValue(self.textvalue)
+        
+        def _slider_update(self, event):
+            new_slidervalue = self.slider.GetValue()
+            if self.slidervalue != new_slidervalue:
+                self._change_value(self._inv_slider_value(new_slidervalue))
+    
+        def _text_update(self, event):
+            new_textvalue = self.text.GetValue()
+            if self.textvalue != new_textvalue:
+                self._change_value(self._inv_bound_text_value(new_textvalue))
+    
+        def _change_value(self, new_value):
+            if new_value != self.value:
+                self.update_configuration(new_value)
+
+        def _slider_value(self, val):     return val
+        def _inv_slider_value(self, val): return val
+        def _text_value(self, val):       return str(val)
+        def _inv_text_value(self, val):   return int(val)
+
+        def _inv_bound_text_value(self, val):
+            try:
+                return min(max(self._inv_text_value(val), self.min), self.max)
+            except Exception, e:
+                return self.value
+
+        def get_min_max_text(self, min, max):
+            return 'min: %d max: %d' % (min, max)
+    
+    class DoubleEditor(IntegerEditor):
+        def __init__(self, parent, name, value, min, max):
+            self.func   = lambda x: math.atan(x)
+            self.ifunc  = lambda x: math.tan(x)
+            self.scale  = (self.func(max) - self.func(min)) / 100
+            self.offset = self.func(min)
+
+            DynamicReconfigurePanel.IntegerEditor.__init__(self, parent, name, value, min, max)
+        
+        def _slider_value(self, val):     return int(round((self.func(val) - self.offset) / self.scale))
+        def _inv_slider_value(self, val): return self.ifunc(self.offset + val * self.scale)
+        def _text_value(self, val):       return str(val)
+        def _inv_text_value(self, val):   return float(val)
+
+        def get_min_max_text(self, min, max):
+            return 'min: %f max: %f' % (min, max)
+
+if __name__ == '__main__':
+    argv = rospy.myargv()
+    if len(argv) > 2:
+        print "usage: reconfigure_gui <node_name>"
+        exit(1)
+
+    app = wx.PySimpleApp(clearSigInt=False)
+    rospy.init_node("reconfigure_gui", anonymous=True)
+    if len(argv) == 2:
+        frame = MainWindow(argv[1])
+    else:
+        frame = MainWindow()
+    frame.Show()
+    try:
+        ## @todo This try-except block is a temporary work around for
+        # karmic, in which GetEffectiveMinSize apparently no longer exists.
+        frame.SetMinSize(frame.GetEffectiveMinSize())
+    except AttributeError:
+        pass 
+
+    try:
+        app.MainLoop()
+    except KeyboardInterrupt, e:
+        pass
+    print "exiting"

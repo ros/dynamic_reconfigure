@@ -1,0 +1,25 @@
+GUI
+- Allow a GUI to be made from a list of parameters that are not necessarily all with the same node
+- Add support for GUI hints
+  - Advanced parameters
+  - Enum for integers
+
+Dynparam
+- Support enums
+
+General
+- Add support for lists of primitive types
+- Add support for yaml parameters
+- Add test server/client for Python (and client for C++)
+
+C++ Server
+- The current error message when an unexpected parameter is found is
+  useless. It should just say which parameter is bad and why (unknown/bad
+  type)
+
+C++ client
+- Make it exist
+
+Generator
+- Generate documentation in wiki format (let's wait for the format to stabilize)
+- Check that enums don't contain the same value twice.

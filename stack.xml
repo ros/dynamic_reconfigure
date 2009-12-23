@@ -1,0 +1,34 @@
+<stack name="driver_common" version="0.1.0">
+  <description brief="driver_common">
+
+  driver_common contains:
+ 
+  <ul>
+   <li>
+     Classes for helping to publish consistent diagnostics (each topic
+   will publish certain diagnostics, each driver will publish certain
+   diagnostics, etc.), and to make diagnostics less tedious to write.
+   </li>
+   <li>
+     Classes for helping to run self-tests and publish their results.
+   </li>
+   <li>
+     A dynamic reconfiguration system to allow driver parameters to be
+   changed without taking down the driver, and to autogenerate parameter
+   documentation.
+   </li>
+   <li>
+     A base class for sensors to provide a consistent state machine
+   (retries, error handling, etc.) and interface.
+   </li>
+  </ul>
+
+  </description>
+  <author>Blaise Gassend</author>
+  <license>BSD</license>  
+  <review status="unreviewed" notes=""/>
+  <url>http://ros.org/wiki/driver_common</url>
+  <depend stack="ros"/> <!-- rospy, roscpp --> 
+  <depend stack="diagnostics"/> <!-- self_test, diagnostic_updater --> 
+
+</stack>
