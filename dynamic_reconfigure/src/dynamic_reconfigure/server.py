@@ -54,7 +54,7 @@ class Server(object):
         self.mutex = threading.Lock()
         self.type = type
         self.config = type.defaults
-        self.description = _encode_description(type)
+        self.description = encode_description(type)
         self._copy_from_parameter_server()
         self.callback = callback
         self._clamp(self.config) 
@@ -94,7 +94,7 @@ class Server(object):
         
         self._copy_to_parameter_server()
         
-        self.update_topic.publish(_encode_config(config))
+        self.update_topic.publish(encode_config(config))
 
         return self.config
    
@@ -117,4 +117,4 @@ class Server(object):
                 config[param['name']] = minval 
 
     def _set_callback(self, req):
-        return _encode_config(self.update_configuration(_decode_config(req.config)))
+        return encode_config(self.update_configuration(decode_config(req.config)))
