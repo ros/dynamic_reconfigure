@@ -5,7 +5,7 @@
   </description>
   <author>Blaise Gassend</author>
   <license>BSD</license>
-  <review status="unreviewed" notes=""/>
+  <review status="API cleared" notes=""/>
   <url>http://www.ros.org/wiki/dynamic_reconfigure</url>
   <depend package="rospy" />
   <depend package="roscpp" />
@@ -17,5 +17,3 @@
          lflags="`rosboost-cfg --lflags thread`"/>
   </export>
 </package>
-
-
