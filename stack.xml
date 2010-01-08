@@ -1,25 +1,20 @@
 <stack>
-  <description brief="driver_common">
+  <description brief="Classes and tools useful to many driver stacks.">
 
-  driver_common contains:
+  The driver_common stack contains classes and tools that are useful
+  throughout the driver stacks. It currentyl contains:
  
   <ul>
    <li>
-     Classes for helping to publish consistent diagnostics (each topic
-   will publish certain diagnostics, each driver will publish certain
-   diagnostics, etc.), and to make diagnostics less tedious to write.
+     dynamic_reconfigure: A dynamic reconfiguration system to allow node 
+     parameters to be changed without restarting the node.
    </li>
    <li>
-     Classes for helping to run self-tests and publish their results.
-   </li>
-   <li>
-     A dynamic reconfiguration system to allow driver parameters to be
-   changed without taking down the driver, and to autogenerate parameter
-   documentation.
-   </li>
-   <li>
-     A base class for sensors to provide a consistent state machine
+     driver_base: A base class for sensors to provide a consistent state machine
    (retries, error handling, etc.) and interface.
+   </li>
+   <li>
+     timestamp_tools: Classes to help timpstamp hardware events.
    </li>
   </ul>
 
@@ -30,5 +25,4 @@
   <url>http://ros.org/wiki/driver_common</url>
   <depend stack="diagnostics" /> <!-- self_test, diagnostic_updater -->
   <depend stack="ros" /> <!-- roslib, rospy, roscpp, rosservice -->
-
 </stack>
