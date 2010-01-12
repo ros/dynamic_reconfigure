@@ -40,7 +40,7 @@ import rospy
 import optparse 
 import sys
 import yaml
-import dynamic_reconfigure
+import dynamic_reconfigure.client
 
 def do_list():
     connect()
