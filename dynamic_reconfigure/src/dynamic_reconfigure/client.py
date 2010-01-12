@@ -96,7 +96,7 @@ class Client(object):
                         return None
                     self._cv.wait()
         else:
-            start_time = time.time()      
+            start_time = time.time()
             with self._cv:
                 while self.config is None:
                     if rospy.is_shutdown():
@@ -209,9 +209,11 @@ class Client(object):
 
     def _get_service_proxy(self, suffix, timeout):
         service_name = rospy.resolve_name(self.name + '/' + suffix)
-        rospy.wait_for_service(service_name, timeout)
+        if timeout != 0.0:
+            rospy.wait_for_service(service_name, timeout)
+
         return rospy.ServiceProxy(service_name, ReconfigureSrv)
-    
+
     def _get_subscriber(self, suffix, type, callback):
         topic_name = rospy.resolve_name(self.name + '/' + suffix)
         return rospy.Subscriber(topic_name, type, callback=callback)
