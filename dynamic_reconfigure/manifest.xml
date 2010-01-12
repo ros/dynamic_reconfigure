@@ -1,9 +1,11 @@
 <package>
   <description brief="dynamic_reconfigure">
     This package provides a class to facilitate dynamic node
-    reconfiguration. 
+    reconfiguration. This package is still under development, and should be
+    considered unstable except for features that are explicitely marked as
+    stable in the documentation.
   </description>
-  <author>Blaise Gassend</author>
+  <author>Blaise Gassend, Tim Field</author>
   <license>BSD</license>
   <review status="API cleared" notes=""/>
   <url>http://www.ros.org/wiki/dynamic_reconfigure</url>
