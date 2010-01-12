@@ -56,7 +56,7 @@ class DynamicReconfigureCallbackException(DynamicReconfigureException):
     pass
 
 def find_reconfigure_services():
-    return [s[:-len('/set_parameters')] for s in rosservice.get_service_list() if s.endswith('/set_parameters')] 
+    return sorted([s[:-len('/set_parameters')] for s in rosservice.get_service_list() if s.endswith('/set_parameters')]) 
 
 def get_parameter_names(descr):
     return descr.defaults.keys()
