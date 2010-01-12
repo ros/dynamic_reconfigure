@@ -66,7 +66,7 @@ def do_paramset():
     set_params(node, params, timeout=options.timeout)
 
 def do_set():
-    parser = optparse.OptionParser(usage="usage: %prog set [options] node parameter value\nexample: dynparam set wge100_camera _camera_url foo", prog=NAME)
+    parser = optparse.OptionParser(usage="usage: %prog set [options] node parameter value\nexample: dynparam set wge100_camera camera_url foo", prog=NAME)
     add_timeout_option(parser)
     options, args = parser.parse_args(myargv[2:])
     if len(args) < 3:
