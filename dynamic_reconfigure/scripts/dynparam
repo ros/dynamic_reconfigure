@@ -48,8 +48,23 @@ def do_list():
     for s in list:
         print s
 
-def do_paramset():
-    parser = optparse.OptionParser(usage="usage: %prog paramset [options] node\nexample: dynparam paramset wge100_camera _camera_url:=foo", prog=NAME)
+def do_set_from_parameters():
+    usage = """Usage: %prog set_from_parameters [options] node
+    
+  Example command line:
+
+    dynparam set_from_parameters wge100_camera _camera_url:=foo
+
+  Example launch file:
+
+    <launch>
+      <node name="$(anon adjust-wge100_camera)" pkg="dynamic_reconfigure" type="dynparam" args="set_from_parameters wge100_camera">
+        <param name="camera_url" value="foo" />
+        <param name="brightness" value="58" />
+      </node>
+    </launch>"""
+
+    parser = optparse.OptionParser(usage=usage, prog=NAME)
     add_timeout_option(parser)
     options, args = parser.parse_args(myargv[2:])
     if len(args) == 0:
@@ -162,12 +177,12 @@ def print_usage():
 deleting parameters of a dynamically configurable node.
 
 Commands:
-\tdynparam set       configure node
-\tdynparam paramset  copy dynparam parameters to node
-\tdynparam get       get node configuration
-\tdynparam load      load configuration from file
-\tdynparam dump      dump configuration to file
-\tdynparam list      list configurable nodes
+\tdynparam set                  configure node
+\tdynparam set_from_parameters  copy configuration from parameter server
+\tdynparam get                  get node configuration
+\tdynparam load                 load configuration from file
+\tdynparam dump                 dump configuration to file
+\tdynparam list                 list configurable nodes
 
 Type dynparam <command> -h for more detailed usage, e.g. 'dynparam get -h'
 """
@@ -181,10 +196,10 @@ if __name__ == '__main__':
         print_usage()
     else:
         cmd = myargv[1]       
-        if   cmd == "list":     do_list()
-        elif cmd == "paramset": do_paramset()
-        elif cmd == "set":      do_set()
-        elif cmd == "get":      do_get()
-        elif cmd == "load":     do_load()
-        elif cmd == "dump":     do_dump()
-        else:                   print_usage()
+        if   cmd == 'list':                do_list()
+        elif cmd == 'set_from_parameters': do_set_from_parameters()
+        elif cmd == 'set':                 do_set()
+        elif cmd == 'get':                 do_get()
+        elif cmd == 'load':                do_load()
+        elif cmd == 'dump':                do_dump()
+        else:                              print_usage()
