@@ -356,9 +356,9 @@ class DynamicReconfigurePanel(wx.ScrolledWindow):
             self.min = min
             self.max = max
             
-            self.min_label = wx.StaticText(self, wx.ID_ANY, str(min))
+            self.min_label = wx.StaticText(self, wx.ID_ANY, ' ' + str(min))
             self.slider    = wx.Slider(self, wx.ID_ANY, minValue=self._slider_value(self.min), maxValue=self._slider_value(self.max), style=wx.SL_AUTOTICKS | wx.SL_HORIZONTAL)
-            self.max_label = wx.StaticText(self, wx.ID_ANY, str(max))
+            self.max_label = wx.StaticText(self, wx.ID_ANY, str(max) + ' ')
             self.text      = wx.TextCtrl(self, wx.ID_ANY, style=wx.TE_PROCESS_ENTER)
 
             sizer = wx.BoxSizer()

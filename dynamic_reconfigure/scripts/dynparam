@@ -51,18 +51,16 @@ def do_list():
 def do_set_from_parameters():
     usage = """Usage: %prog set_from_parameters [options] node
     
-  Example command line:
+Example command line:
+  dynparam set_from_parameters wge100_camera _camera_url:=foo
 
-    dynparam set_from_parameters wge100_camera _camera_url:=foo
-
-  Example launch file:
-
-    <launch>
-      <node name="$(anon adjust-wge100_camera)" pkg="dynamic_reconfigure" type="dynparam" args="set_from_parameters wge100_camera">
-        <param name="camera_url" value="foo" />
-        <param name="brightness" value="58" />
-      </node>
-    </launch>"""
+Example launch file:
+  <launch>
+    <node name="$(anon adjust-wge100_camera)" pkg="dynamic_reconfigure" type="dynparam" args="set_from_parameters wge100_camera">
+      <param name="camera_url" value="foo" />
+      <param name="brightness" value="58" />
+    </node>
+  </launch>"""
 
     parser = optparse.OptionParser(usage=usage, prog=NAME)
     add_timeout_option(parser)
@@ -81,25 +79,42 @@ def do_set_from_parameters():
     set_params(node, params, timeout=options.timeout)
 
 def do_set():
-    parser = optparse.OptionParser(usage="usage: %prog set [options] node parameter value\nexample: dynparam set wge100_camera camera_url foo", prog=NAME)
+    usage = """Usage: %prog set [options] node parameter value
+
+Examples:
+  dynparam set wge100_camera camera_url foo
+  dynparam set wge100_camera "{'camera_url':'foo', 'brightness':58}" """
+
+    parser = optparse.OptionParser(usage=usage, prog=NAME)
     add_timeout_option(parser)
     options, args = parser.parse_args(myargv[2:])
-    if len(args) < 3:
-        parser.error("invalid arguments. Please specify a node name, parameter name and parameter value")
-    elif len(args) > 3:
+    if len(args) > 3:
         parser.error("too many arguments")
-    node, parameter, value = args[0], args[1], args[2]
+    elif len(args) < 2:
+        parser.error("invalid arguments. Please specify either a node name, parameter name and parameter value, or a node name and a YAML dictionary")
+
+    node = args[0]
+    if len(args) == 2:
+        node, value = args[0], args[1]
+        values_dict = yaml.load(value)
+        if type(values_dict) != dict:
+            parser.error('invalid arguments. Please specify either a node name, parameter name and parameter value, or a node name and a YAML dictionary')
+    elif len(args) == 3:
+        node, parameter, value = args[0], args[1], args[2]
+        values_dict = { parameter : value }
 
     connect()
     try:
-        set_params(node, { parameter : value }, timeout=options.timeout)
+        set_params(node, values_dict, timeout=options.timeout)
     except rospy.service.ServiceException:
         print 'couldn\'t set parameters at node %s' % node
     except rospy.exceptions.ROSException:
         print 'couldn\'t set parameters at node %s' % node
 
 def do_get():
-    parser = optparse.OptionParser(usage="usage: %prog get [options] node", prog=NAME)
+    usage = "Usage: %prog get [options] node"
+    
+    parser = optparse.OptionParser(usage=usage, prog=NAME)
     add_timeout_option(parser)
     options, args = parser.parse_args(myargv[2:])
     if len(args) == 0:
@@ -114,7 +129,9 @@ def do_get():
         print params
 
 def do_load():
-    parser = optparse.OptionParser(usage="usage: %prog load [options] node file", prog=NAME)
+    usage = "Usage: %prog load [options] node file"
+    
+    parser = optparse.OptionParser(usage=usage, prog=NAME)
     add_timeout_option(parser)
     options, args = parser.parse_args(myargv[2:])
     if len(args) == 0:
@@ -138,7 +155,9 @@ def do_load():
         set_params(node, params[node], timeout=options.timeout)
 
 def do_dump():
-    parser = optparse.OptionParser(usage="usage: %prog dump [options] node file", prog=NAME)
+    usage = "Usage: %prog dump [options] node file"
+    
+    parser = optparse.OptionParser(usage=usage, prog=NAME)
     add_timeout_option(parser)
     options, args = parser.parse_args(myargv[2:])
     if len(args) == 0:
