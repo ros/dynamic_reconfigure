@@ -40,6 +40,7 @@ from __future__ import with_statement
 import roslib; roslib.load_manifest('dynamic_reconfigure')
 import rospy
 import rosservice                  
+import sys
 import threading
 import time
 from dynamic_reconfigure import DynamicReconfigureParameterException
@@ -89,12 +90,15 @@ class Client(object):
         @return: dictionary mapping parameter names to values or None if unable to retrieve config.
         @rtype: {str: value}
         """
-        if timeout is None:
-            with self._cv:
-                while self.config is None:
-                    if rospy.is_shutdown():
-                        return None
-                    self._cv.wait()
+        if timeout is None or timeout == 0.0:
+            if self.get_configuration(timeout=1.0) is None:
+                print >> sys.stderr, 'Waiting for configuration...'
+                
+                with self._cv:
+                    while self.config is None:
+                        if rospy.is_shutdown():
+                            return None
+                        self._cv.wait()
         else:
             start_time = time.time()
             with self._cv:
@@ -116,7 +120,7 @@ class Client(object):
         @param timeout: time to wait before giving up
         @type  timeout: float
         """
-        if timeout is None:
+        if timeout is None or timeout == 0.0:
             with self._cv:
                 while self.param_description is None:
                     if rospy.is_shutdown():
@@ -209,13 +213,20 @@ class Client(object):
 
     def _get_service_proxy(self, suffix, timeout):
         service_name = rospy.resolve_name(self.name + '/' + suffix)
-        if timeout != 0.0:
+        if timeout is None or timeout == 0.0:
+            try:
+                rospy.wait_for_service(service_name, 1.0)
+            except rospy.exceptions.ROSException:
+                print >> sys.stderr, 'Waiting for service %s...' % service_name
+                rospy.wait_for_service(service_name, timeout)
+        else:
             rospy.wait_for_service(service_name, timeout)
 
         return rospy.ServiceProxy(service_name, ReconfigureSrv)
 
     def _get_subscriber(self, suffix, type, callback):
         topic_name = rospy.resolve_name(self.name + '/' + suffix)
+        
         return rospy.Subscriber(topic_name, type, callback=callback)
 
     def _updates_msg(self, msg):

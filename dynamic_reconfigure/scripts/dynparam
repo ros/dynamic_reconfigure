@@ -80,6 +80,7 @@ Example launch file:
 
 def do_set():
     usage = """Usage: %prog set [options] node parameter value
+   or: %prog set [options] node values
 
 Examples:
   dynparam set wge100_camera camera_url foo
@@ -173,7 +174,7 @@ def do_dump():
     if params is not None:
         f = file(path, 'w')
         try:
-            yaml.dump({ node : params }, f)
+            yaml.dump(params, f)
             return
         finally:
             f.close()
@@ -207,7 +208,7 @@ Type dynparam <command> -h for more detailed usage, e.g. 'dynparam get -h'
 """
 
 def connect():
-    rospy.init_node("dynparam", anonymous=True)
+    rospy.init_node('dynparam', anonymous=True)
 
 if __name__ == '__main__':
     myargv = rospy.myargv()
@@ -215,10 +216,13 @@ if __name__ == '__main__':
         print_usage()
     else:
         cmd = myargv[1]       
-        if   cmd == 'list':                do_list()
-        elif cmd == 'set_from_parameters': do_set_from_parameters()
-        elif cmd == 'set':                 do_set()
-        elif cmd == 'get':                 do_get()
-        elif cmd == 'load':                do_load()
-        elif cmd == 'dump':                do_dump()
-        else:                              print_usage()
+        try:
+            if   cmd == 'list':                do_list()
+            elif cmd == 'set_from_parameters': do_set_from_parameters()
+            elif cmd == 'set':                 do_set()
+            elif cmd == 'get':                 do_get()
+            elif cmd == 'load':                do_load()
+            elif cmd == 'dump':                do_dump()
+            else:                              print_usage()
+        except rospy.exceptions.ROSInterruptException:
+            pass
