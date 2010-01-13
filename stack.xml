@@ -14,7 +14,7 @@
    (retries, error handling, etc.) and interface.
    </li>
    <li>
-     timestamp_tools: Classes to help timpstamp hardware events.
+     timestamp_tools: Classes to help timestamp hardware events.
    </li>
   </ul>
 
