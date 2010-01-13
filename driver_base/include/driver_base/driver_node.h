@@ -212,7 +212,7 @@ private:
 
   void prepareDiagnostics()
   {
-    diagnostic_.add(ros::this_node::getName() + ": Driver Status", this, &DriverNode::statusDiagnostic);
+    diagnostic_.add("Driver Status", this, &DriverNode::statusDiagnostic);
     addDiagnostics();
   }
 
