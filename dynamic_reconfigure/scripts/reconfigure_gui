@@ -44,7 +44,7 @@ import wxversion
 if wxversion.checkInstalled(WXVER):
     wxversion.select(WXVER)
 else:
-    print >> sys.stderr, "This application requires wxPython version %s"%(WXVER)
+    print >> sys.stderr, 'This application requires wxPython version %s' % (WXVER)
     sys.exit(1)
 
 import math
@@ -431,22 +431,19 @@ class DynamicReconfigurePanel(wx.ScrolledWindow):
 if __name__ == '__main__':
     argv = rospy.myargv()
     if len(argv) > 2:
-        print "usage: reconfigure_gui <node_name>"
+        print 'Usage: reconfigure_gui <node_name>'
         exit(1)
 
     app = wx.PySimpleApp(clearSigInt=False)
-    rospy.init_node("reconfigure_gui", anonymous=True)
+    rospy.init_node('reconfigure_gui', anonymous=True)
     if len(argv) == 2:
         frame = MainWindow(argv[1])
     else:
         frame = MainWindow()
     frame.Show()
-    try:
-        ## @todo This try-except block is a temporary work around for
-        # karmic, in which GetEffectiveMinSize apparently no longer exists.
-        frame.SetMinSize(frame.GetEffectiveMinSize())
-    except AttributeError:
-        pass 
+    frame.SetMinSize(frame.GetEffectiveMinSize())
+
+    print 'reconfigure_gui started'
 
     try:
         app.MainLoop()
