@@ -65,19 +65,19 @@ class Server
 {
 public:
   Server(const ros::NodeHandle &nh = ros::NodeHandle("~")) :
-    node_handle_(nh)
+    node_handle_(nh),
+    mutex_(own_mutex_),
+    own_mutex_warn_(true)
   {
-    set_service_ = node_handle_.advertiseService("set_parameters",
-        &Server<ConfigType>::setConfigCallback, this);
-    
-    descr_pub_ = node_handle_.advertise<dynamic_reconfigure::ConfigDescription>("parameter_descriptions", 1, true);
-    descr_pub_.publish(ConfigType::__getDescriptionMessage__());
-    
-    update_pub_ = node_handle_.advertise<dynamic_reconfigure::Config>("parameter_updates", 1, true);
-    ConfigType init_config = ConfigType::__getDefault__();
-    init_config.__fromServer__(node_handle_);
-    init_config.__clamp__();
-    updateConfig(init_config);
+    init();
+  }
+
+  Server(boost::recursive_mutex &mutex, const ros::NodeHandle &nh = ros::NodeHandle("~")) :
+    node_handle_(nh),
+    mutex_(mutex),
+    own_mutex_warn_(false)
+  {
+    init();
   }
 
   typedef boost::function<void(ConfigType &, uint32_t level)> CallbackType;
@@ -100,12 +100,12 @@ public:
 
   void updateConfig(const ConfigType &config)
   {
-    boost::recursive_mutex::scoped_lock lock(mutex_);
-    config_ = config;
-    config_.__toServer__(node_handle_);
-    dynamic_reconfigure::Config msg;
-    config_.__toMessage__(msg);
-    update_pub_.publish(msg);
+    if (own_mutex_warn_)
+    {
+      ROS_WARN("updateConfig() called on a dynamic_reconfigure::Server that provides its own mutex. This can lead to deadlocks if updateConfig() is called during an update. Providing a mutex to the constructor is highly recommended in this case. Please forward this message to the node author.");
+      own_mutex_warn_ = false;
+    }
+    updateConfigInternal(config);
   }
 
 private:
@@ -115,7 +115,24 @@ private:
   ros::Publisher descr_pub_;
   CallbackType callback_;
   ConfigType config_;
-  boost::recursive_mutex mutex_;
+  boost::recursive_mutex &mutex_;
+  boost::recursive_mutex own_mutex_; // Used only if an external one isn't specified.
+  bool own_mutex_warn_;
+
+  void init()
+  {
+    set_service_ = node_handle_.advertiseService("set_parameters",
+        &Server<ConfigType>::setConfigCallback, this);
+    
+    descr_pub_ = node_handle_.advertise<dynamic_reconfigure::ConfigDescription>("parameter_descriptions", 1, true);
+    descr_pub_.publish(ConfigType::__getDescriptionMessage__());
+    
+    update_pub_ = node_handle_.advertise<dynamic_reconfigure::Config>("parameter_updates", 1, true);
+    ConfigType init_config = ConfigType::__getDefault__();
+    init_config.__fromServer__(node_handle_);
+    init_config.__clamp__();
+    updateConfig(init_config);
+  }
 
   bool setConfigCallback(dynamic_reconfigure::Reconfigure::Request &req, 
           dynamic_reconfigure::Reconfigure::Response &rsp)
@@ -133,6 +150,16 @@ private:
     updateConfig(new_config);
     new_config.__toMessage__(rsp.config);
     return true;
+  }
+  
+  void updateConfigInternal(const ConfigType &config)
+  {
+    boost::recursive_mutex::scoped_lock lock(mutex_);
+    config_ = config;
+    config_.__toServer__(node_handle_);
+    dynamic_reconfigure::Config msg;
+    config_.__toMessage__(msg);
+    update_pub_.publish(msg);
   }
 };
 

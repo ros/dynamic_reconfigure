@@ -90,9 +90,11 @@ protected:
   ros::NodeHandle private_node_handle_;
   self_test::TestRunner self_test_;
   diagnostic_updater::Updater diagnostic_;
-  dynamic_reconfigure::Server<Config> reconfigure_server_;
   
   Driver driver_;
+  dynamic_reconfigure::Server<Config> reconfigure_server_; 
+  // driver_ declaration must precede reconfigure_server_ for constructor
+  // calling order reasons.
 
 private:
   // Subscriber tracking
@@ -407,7 +409,7 @@ public:
     private_node_handle_("~"), 
     self_test_(node_handle_), 
     diagnostic_(), 
-    reconfigure_server_(ros::NodeHandle("~"))
+    reconfigure_server_(driver_.mutex_, ros::NodeHandle("~"))
   {
     num_subscribed_topics_ = 0; /// @fixme this variable is hokey.
     exit_status_ = 0;
