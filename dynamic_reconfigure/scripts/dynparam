@@ -151,9 +151,8 @@ def do_load():
     finally:
         f.close()
 
-    if node in params:
-        connect()
-        set_params(node, params[node], timeout=options.timeout)
+    connect()
+    set_params(node, params, timeout=options.timeout)
 
 def do_dump():
     usage = "Usage: %prog dump [options] node file"
@@ -184,10 +183,13 @@ def do_dump():
 def get_params(node, timeout=None):
     client = dynamic_reconfigure.client.Client(node, timeout=timeout)
     return client.get_configuration(timeout=timeout)
-    
+
 def set_params(node, params, timeout=None):
     client = dynamic_reconfigure.client.Client(node, timeout=timeout)
-    config = client.update_configuration(params)
+    try:
+        client.update_configuration(params)
+    except dynamic_reconfigure.DynamicReconfigureParameterException, e:
+        print 'error updating parameters: ' + str(e)
 
 def add_timeout_option(parser):
     parser.add_option('-t', '--timeout', action='store', type='float', default=None, help='timeout in secs')   

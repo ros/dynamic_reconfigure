@@ -155,9 +155,12 @@ class Client(object):
             for name, value in changes.items()[:]:
                 dest_type = self._param_types.get(name)
                 if dest_type is None:
-                    raise DynamicReconfigureParameterException('don\'t know type for parameter: %s' % name)
+                    raise DynamicReconfigureParameterException('don\'t know parameter: %s' % name)
                 
-                changes[name] = dest_type(value)
+                try:
+                    changes[name] = dest_type(value)
+                except ValueError, e:
+                    raise DynamicReconfigureParameterException('can\'t set parameter \'%s\' of %s: %s' % (name, str(dest_type), e))
         
         config = encode_config(changes)
         msg    = self._set_service(config).config
