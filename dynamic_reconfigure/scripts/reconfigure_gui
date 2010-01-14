@@ -52,6 +52,7 @@ import threading
 import time
 import unicodedata
 import wx
+import wx.lib.scrolledpanel
 
 import dynamic_reconfigure.client
 
@@ -61,33 +62,45 @@ class MainWindow(wx.Frame):
             title = 'Reconfigure %s' % node
         else:
             title = 'Reconfigure'
-           
-        wx.Frame.__init__(self, None, wx.ID_ANY, title)
+
+        wx.Frame.__init__(self, None, wx.ID_ANY, title, pos=(200, 200), size=(400, 400))
 
         # Create menu
         self.menubar = wx.MenuBar()
         self.filemenu = wx.Menu()
-        self.filemenu.Append(wx.ID_EXIT, "E&xit", 'Exit the program')
+        self.filemenu.Append(wx.ID_EXIT, 'E&xit', 'Exit the program')
         wx.EVT_MENU(self, wx.ID_EXIT, self.on_exit)
-        self.menubar.Append(self.filemenu, "&File")
+        self.menubar.Append(self.filemenu, '&File')
         self.SetMenuBar(self.menubar)
 
         # Add reconfigure control
         if node:
             try:
+                wx.SetCursor(wx.StockCursor(wx.CURSOR_WAIT))
+                wx.Yield()
+
                 reconf = dynamic_reconfigure.client.Client(node, timeout=5.0)
             except:
                 print 'Can\'t connect to node %s' % node
                 self.Close()
                 return
+            finally:
+                wx.SetCursor(wx.StockCursor(wx.CURSOR_ARROW))
+                wx.Yield()
                 
             control = DynamicReconfigurePanel(self, reconf)
+
+            control.SetMinSize((control.GetSize()[0] + 30, control.GetSize()[1]))
         else:
             control = DynamicReconfigureSelector(self)
 
-        sizer = wx.BoxSizer(wx.VERTICAL)
-        sizer.Add(control, 1, wx.EXPAND | wx.ALL, 5)
-        self.SetSizer(sizer)
+        self.sizer = wx.BoxSizer(wx.VERTICAL)
+        self.sizer.Add(control, 1, wx.EXPAND | wx.ALL, 0)
+        self.SetSizer(self.sizer)
+
+        if node:
+            self.Fit()
+            self.SetMinSize(self.GetSize())
 
         # Check every 1s if node has shutdown (and close GUI)
         self.timer = wx.Timer(self, wx.ID_ANY)
@@ -102,7 +115,7 @@ class MainWindow(wx.Frame):
     def on_exit(self, e):
         self.Close(True)
         self.Refresh()
-            
+
     def on_error(self):
         self.Raise()
 
@@ -119,7 +132,7 @@ class DynamicReconfigureSelector(wx.Panel):
         self.Bind(wx.EVT_COMBOBOX, self.on_combobox)
 
         self.sizer = wx.BoxSizer(wx.VERTICAL)
-        self.sizer.Add(self.combobox, flag=wx.EXPAND)
+        self.sizer.Add(self.combobox, 0, wx.EXPAND)
         self.SetSizer(self.sizer)
 
         # Refresh node list periodically
@@ -136,32 +149,46 @@ class DynamicReconfigureSelector(wx.Panel):
     def on_combobox(self, event):
         node = str(self.combobox.GetValue())
         
+        self.set_node(node)
+        
+    def set_node(self, node):
         try:
+            wx.SetCursor(wx.StockCursor(wx.CURSOR_WAIT))
+            wx.Yield()
+            
             reconf = dynamic_reconfigure.client.Client(node, timeout=5.0)
-        except:
+
+            if self.reconf_panel is not None:
+                self.reconf_panel.close()
+                self.reconf_panel.Destroy()
+                self.reconf_panel = None
+
+            self.reconf_panel = DynamicReconfigurePanel(self, reconf)
+
+            self.sizer.Add(self.reconf_panel, 1, wx.EXPAND | wx.ALL, 0)
+            self.sizer.Layout()
+
+            self.parent.Fit()
+            w = self.parent.GetSize()[0]
+            h = self.reconf_panel.hbox.GetMinSize()[1] + self.reconf_panel.GetPosition()[1] + (self.parent.GetSize()[1] - self.parent.GetClientSize()[1])
+            self.parent.SetMinSize((w, 100))
+            self.parent.SetSize((w, h))
+            
             if self.reconf_panel is None:
                 self.combobox.SetValue('')
             else:
                 self.combobox.SetValue(self.reconf_panel.reconf.name)
-            return
+        finally:
+            wx.SetCursor(wx.StockCursor(wx.CURSOR_ARROW))
+            wx.Yield()
 
-        # Remove the existing reconfigure panel (and close the client)
-        if self.reconf_panel is not None:
-            self.reconf_panel.close()
-            self.sizer.Remove(self.reconf_panel)
-        
-        # Add the new panel
-        self.reconf_panel = DynamicReconfigurePanel(self, reconf)
-        
-        self.sizer.Add(self.reconf_panel, 1, wx.EXPAND | wx.ALL, 5)
-        self.sizer.Layout()
-
-class DynamicReconfigurePanel(wx.ScrolledWindow):
+class DynamicReconfigurePanel(wx.lib.scrolledpanel.ScrolledPanel):
     def __init__(self, parent, reconf):
-        wx.ScrolledWindow.__init__(self, parent, wx.ID_ANY, style=wx.VSCROLL)
+        wx.lib.scrolledpanel.ScrolledPanel.__init__(self, parent, wx.ID_ANY)
 
+        self.parent = parent
         self.reconf = reconf
-        
+
         config = self.reconf.get_configuration()
         descr  = self.reconf.get_parameter_descriptions()
         
@@ -181,7 +208,9 @@ class DynamicReconfigurePanel(wx.ScrolledWindow):
             'double': wx.EXPAND,
         }
         
-        sizer = wx.FlexGridSizer(0, 2)
+        self.hbox = wx.BoxSizer(wx.HORIZONTAL)
+        
+        sizer = wx.FlexGridSizer(0, 2, vgap=1, hgap=4)
         sizer.SetFlexibleDirection(wx.BOTH)
         sizer.AddGrowableCol(1, 1)
 
@@ -190,7 +219,7 @@ class DynamicReconfigurePanel(wx.ScrolledWindow):
             type, val, min, max, description = param_descr['type'], config[name], param_descr['min'], param_descr['max'], param_descr['description']
 
             # Label
-            label = wx.StaticText(self, wx.ID_ANY, name + ":")
+            label = wx.StaticText(self, wx.ID_ANY, name + ':')
             sizer.Add(label, 1, wx.ALIGN_CENTER_VERTICAL | wx.ALIGN_RIGHT)
 
             # Editor
@@ -210,20 +239,16 @@ class DynamicReconfigurePanel(wx.ScrolledWindow):
             tooltip.SetDelay(2000)
             label.SetToolTip(tooltip)
 
-        self.Bind(wx.EVT_SIZE, self.on_size)
+        self.hbox.Add(sizer, 1, wx.ALL | wx.EXPAND, 4)
 
-        self.SetSizer(sizer)
+        self.SetSizerAndFit(self.hbox)
+        self.SetMinSize((self.GetSize()[0] + 30, 10))
+        self.SetupScrolling()
 
         self.reconf.config_callback = self._config_callback
 
         self.updater = self.BatchUpdater(self.reconf)
         self.updater.start()
-
-    def on_size(self, event):
-        w, h = self.GetClientSize()
-        
-        self.SetScrollbars(0, 1, 0, h)
-        self.Refresh()
 
     def _config_callback(self, config):
         for name, editor in self.editors.iteritems():
@@ -232,7 +257,7 @@ class DynamicReconfigurePanel(wx.ScrolledWindow):
     def close(self):
         self.updater.stop()
         self.reconf.close()
-
+        
     class BatchUpdater(threading.Thread):
         def __init__(self, reconf):
             threading.Thread.__init__(self)
@@ -296,7 +321,7 @@ class DynamicReconfigurePanel(wx.ScrolledWindow):
             DynamicReconfigurePanel.Editor.__init__(self, name)
             wx.ComboBox.__init__(self, parent, wx.ID_ANY, style=wx.CB_READONLY)
             
-            names  = [item['name']+" ("+repr(item['value'])+")"  for item in enum]
+            names  = [item['name'] + ' (' + repr(item['value']) + ')' for item in enum]
             values = [item['value'] for item in enum] 
             self.to_value = dict(zip(names, values))
             self.to_name  = dict(zip(values, names))
@@ -312,7 +337,7 @@ class DynamicReconfigurePanel(wx.ScrolledWindow):
 
         def update_value(self, value):
             self.old_value = value
-            self.SetValue(self.to_name.get(value, ""))
+            self.SetValue(self.to_name.get(value, ''))
 
     class BooleanEditor(Editor, wx.CheckBox):
         def __init__(self, parent, name, value, min, max):
@@ -352,42 +377,68 @@ class DynamicReconfigurePanel(wx.ScrolledWindow):
         def __init__(self, parent, name, value, min, max):
             DynamicReconfigurePanel.Editor.__init__(self, name)
             wx.Panel.__init__(self, parent, wx.ID_ANY)
-    
+
             self.min = min
             self.max = max
-            
-            self.min_label = wx.StaticText(self, wx.ID_ANY, ' ' + str(min))
-            self.slider    = wx.Slider(self, wx.ID_ANY, minValue=self._slider_value(self.min), maxValue=self._slider_value(self.max), style=wx.SL_AUTOTICKS | wx.SL_HORIZONTAL)
-            self.max_label = wx.StaticText(self, wx.ID_ANY, str(max) + ' ')
-            self.text      = wx.TextCtrl(self, wx.ID_ANY, style=wx.TE_PROCESS_ENTER)
 
-            sizer = wx.BoxSizer()
+            self.delay_slider_updates = False
+            self.pending_update_value = None
+
+            self.min_label = wx.StaticText(self, wx.ID_ANY, str(min))
+            self.slider    = wx.Slider(self, wx.ID_ANY, minValue=self._slider_value(self.min), maxValue=self._slider_value(self.max), style=wx.SL_AUTOTICKS | wx.SL_HORIZONTAL)
+            self.max_label = wx.StaticText(self, wx.ID_ANY, str(max))
+            self.text      = wx.TextCtrl(self, wx.ID_ANY, style=wx.TE_PROCESS_ENTER)
+            
+            self.slider.SetMinSize((60, -1))
+
+            sizer = wx.BoxSizer(wx.HORIZONTAL)
+            sizer.Add((2, -1))
             sizer.Add(self.min_label)
+            sizer.Add((2, -1))
             sizer.Add(self.slider, wx.EXPAND)
+            sizer.Add((2, -1))
             sizer.Add(self.max_label)
+            sizer.Add((4, -1))
             sizer.Add(self.text)
             self.SetSizer(sizer)
     
+            self.slider.Bind(wx.EVT_LEFT_DOWN, self._slider_left_down)
             self.slider.Bind(wx.EVT_SCROLL, self._slider_update)
+            self.slider.Bind(wx.EVT_LEFT_UP, self._slider_left_up)
             self.text.Bind(wx.EVT_TEXT_ENTER, self._text_update)
             self.text.Bind(wx.EVT_KILL_FOCUS, self._text_update)
-
+            
             self.update_value(value)
 
         def update_value(self, value):
+            self.textvalue = str(value)
+            self.text.SetValue(self.textvalue)
+        
+            if self.delay_slider_updates:
+                self.pending_update_value = value
+                return
+
             self.value = value
 
             self.slidervalue = self._slider_value(self.value)
             self.slider.SetValue(self.slidervalue)
 
-            self.textvalue = str(self.value)
-            self.text.SetValue(self.textvalue)
-        
         def _slider_update(self, event):
             new_slidervalue = self.slider.GetValue()
             if self.slidervalue != new_slidervalue:
                 self._change_value(self._inv_slider_value(new_slidervalue))
-    
+
+        def _slider_left_down(self, event):
+            self.delay_slider_updates = True
+            event.Skip()
+
+        def _slider_left_up(self, event):
+            self.delay_slider_updates = False
+            if self.pending_update_value is not None:
+                self.update_value(self.pending_update_value)
+                self.pending_update_value = None
+            event.Skip()
+
         def _text_update(self, event):
             new_textvalue = self.text.GetValue()
             if self.textvalue != new_textvalue:
@@ -441,7 +492,6 @@ if __name__ == '__main__':
     else:
         frame = MainWindow()
     frame.Show()
-    frame.SetMinSize(frame.GetEffectiveMinSize())
 
     print 'reconfigure_gui started'
 
@@ -449,4 +499,4 @@ if __name__ == '__main__':
         app.MainLoop()
     except KeyboardInterrupt, e:
         pass
-    print "exiting"
+    print 'exiting'
