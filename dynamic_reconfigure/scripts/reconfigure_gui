@@ -140,28 +140,33 @@ class DynamicReconfigureSelector(wx.Panel):
         self.Bind(wx.EVT_TIMER, self.on_timer, self.timer)
         self.timer.Start(5000, False)
 
-    def update_combobox(self):
-        self.combobox.SetItems(dynamic_reconfigure.find_reconfigure_services())
-
     def on_timer(self, event):
         self.update_combobox()
-        
+
+    def update_combobox(self):
+        nodes = dynamic_reconfigure.find_reconfigure_services()
+        self.combobox.SetItems(nodes)
+
+        selected_node = self.get_selected_node()
+        if selected_node not in nodes:
+            self.close_node()               # node has stopped
+        elif self.reconf_panel is None:
+            self.view_node(selected_node)   # node has restarted
+
+    def get_selected_node(self):
+        return str(self.combobox.GetValue())
+
     def on_combobox(self, event):
-        node = str(self.combobox.GetValue())
+        self.view_node(self.get_selected_node())
         
-        self.set_node(node)
-        
-    def set_node(self, node):
+    def view_node(self, node):
         try:
             wx.SetCursor(wx.StockCursor(wx.CURSOR_WAIT))
             wx.Yield()
             
             reconf = dynamic_reconfigure.client.Client(node, timeout=5.0)
-
-            if self.reconf_panel is not None:
-                self.reconf_panel.close()
-                self.reconf_panel.Destroy()
-                self.reconf_panel = None
+            
+            self.close_node()
 
             self.reconf_panel = DynamicReconfigurePanel(self, reconf)
 
@@ -181,6 +186,12 @@ class DynamicReconfigureSelector(wx.Panel):
         finally:
             wx.SetCursor(wx.StockCursor(wx.CURSOR_ARROW))
             wx.Yield()
+
+    def close_node(self):
+        if self.reconf_panel is not None:
+            self.reconf_panel.close()
+            self.reconf_panel.Destroy()
+            self.reconf_panel = None
 
 class DynamicReconfigurePanel(wx.lib.scrolledpanel.ScrolledPanel):
     def __init__(self, parent, reconf):
@@ -282,7 +293,10 @@ class DynamicReconfigurePanel(wx.lib.scrolledpanel.ScrolledPanel):
                 update = self._pending_config.copy()
                 self._pending_config = {}
 
-                updated = self._reconf.update_configuration(update)
+                try:
+                    updated = self._reconf.update_configuration(update)
+                except:
+                    pass
 
         def update(self, config):
             with self._cv:
