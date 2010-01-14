@@ -163,11 +163,14 @@ class DynamicReconfigureSelector(wx.Panel):
         try:
             wx.SetCursor(wx.StockCursor(wx.CURSOR_WAIT))
             wx.Yield()
-            
-            reconf = dynamic_reconfigure.client.Client(node, timeout=5.0)
-            
-            self.close_node()
 
+            try:
+                reconf = dynamic_reconfigure.client.Client(node, timeout=5.0)
+            except rospy.exceptions.ROSException:
+                return
+            finally:
+                self.close_node()
+            
             self.reconf_panel = DynamicReconfigurePanel(self, reconf)
 
             self.sizer.Add(self.reconf_panel, 1, wx.EXPAND | wx.ALL, 0)
