@@ -376,7 +376,7 @@ public:
           std::string new_status_message = driver_.getStatusMessage();
           if (last_status_message != new_status_message)
           {
-            ROS_ERROR(new_status_message.c_str());
+            ROS_ERROR("%s", new_status_message.c_str());
             last_status_message = new_status_message;
           }
           ros::WallDuration(1).sleep();
