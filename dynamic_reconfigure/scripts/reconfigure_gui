@@ -400,10 +400,10 @@ class DynamicReconfigurePanel(wx.lib.scrolledpanel.ScrolledPanel):
 
             self.delay_slider_updates = False
             self.pending_update_value = None
-
-            self.min_label = wx.StaticText(self, wx.ID_ANY, str(min))
+            
+            self.min_label = wx.StaticText(self, wx.ID_ANY, self._text_value(min))
             self.slider    = wx.Slider(self, wx.ID_ANY, minValue=self._slider_value(self.min), maxValue=self._slider_value(self.max), style=wx.SL_AUTOTICKS | wx.SL_HORIZONTAL)
-            self.max_label = wx.StaticText(self, wx.ID_ANY, str(max))
+            self.max_label = wx.StaticText(self, wx.ID_ANY, self._text_value(max))
             self.text      = wx.TextCtrl(self, wx.ID_ANY, style=wx.TE_PROCESS_ENTER)
             
             self.slider.SetMinSize((60, -1))
@@ -428,9 +428,9 @@ class DynamicReconfigurePanel(wx.lib.scrolledpanel.ScrolledPanel):
             self.update_value(value)
 
         def update_value(self, value):
-            self.textvalue = str(value)
+            self.textvalue = self._text_value(value)
             self.text.SetValue(self.textvalue)
-        
+
             if self.delay_slider_updates:
                 self.pending_update_value = value
                 return
@@ -475,9 +475,9 @@ class DynamicReconfigurePanel(wx.lib.scrolledpanel.ScrolledPanel):
                 return min(max(self._inv_text_value(val), self.min), self.max)
             except Exception, e:
                 return self.value
-
+            
         def get_min_max_text(self, min, max):
-            return 'min: %d max: %d' % (min, max)
+            return 'min: %s max: %s' % (self._text_value(min), self._text_value(max))
     
     class DoubleEditor(IntegerEditor):
         def __init__(self, parent, name, value, min, max):
@@ -490,11 +490,8 @@ class DynamicReconfigurePanel(wx.lib.scrolledpanel.ScrolledPanel):
         
         def _slider_value(self, val):     return int(round((self.func(val) - self.offset) / self.scale))
         def _inv_slider_value(self, val): return self.ifunc(self.offset + val * self.scale)
-        def _text_value(self, val):       return str(val)
+        def _text_value(self, val):       return '%.5g' % val
         def _inv_text_value(self, val):   return float(val)
-
-        def get_min_max_text(self, min, max):
-            return 'min: %f max: %f' % (min, max)
 
 if __name__ == '__main__':
     argv = rospy.myargv()
