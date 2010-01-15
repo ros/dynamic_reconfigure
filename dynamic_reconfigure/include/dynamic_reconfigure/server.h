@@ -86,10 +86,7 @@ public:
   {
     boost::recursive_mutex::scoped_lock lock(mutex_);
     callback_ = callback;
-    if (callback) // At startup we need to load the configuration with all level bits set. (Everything has changed.)
-      callback(config_, ~0);
-    else
-      ROS_INFO("setCallback did not call callback because it was zero."); /// @todo kill this line.
+    callCallback(config_, ~0); // At startup we need to load the configuration with all level bits set. (Everything has changed.)
   }
 
   void clearCallback()
@@ -134,6 +131,24 @@ private:
     updateConfig(init_config);
   }
 
+  void callCallback(ConfigType &config, int level)
+  {
+    if (callback_) // At startup we need to load the configuration with all level bits set. (Everything has changed.)
+      try {
+        callback_(config, level);
+      }
+      catch (std::exception &e)
+      {
+        ROS_WARN("Reconfigure callback failed with exception %s: ", e.what());
+      }
+      catch (...)
+      {
+        ROS_WARN("Reconfigure callback failed with unprintable exception.");
+      }
+    else
+      ROS_DEBUG("setCallback did not call callback because it was zero."); /// @todo kill this line.
+  }
+
   bool setConfigCallback(dynamic_reconfigure::Reconfigure::Request &req, 
           dynamic_reconfigure::Reconfigure::Response &rsp)
   {
@@ -144,10 +159,9 @@ private:
     new_config.__clamp__();
     uint32_t level = config_.__level__(new_config);
     
-    if (callback_)
-      callback_(new_config, level);
+    callCallback(new_config, level);
 
-    updateConfig(new_config);
+    updateConfigInternal(new_config);
     new_config.__toMessage__(rsp.config);
     return true;
   }
