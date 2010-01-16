@@ -481,8 +481,12 @@ class DynamicReconfigurePanel(wx.lib.scrolledpanel.ScrolledPanel):
     
     class DoubleEditor(IntegerEditor):
         def __init__(self, parent, name, value, min, max):
-            self.func   = lambda x: math.atan(x)
-            self.ifunc  = lambda x: math.tan(x)
+            if min is not None and max is not None:
+                self.func  = lambda x: x
+                self.ifunc = lambda x: x
+            else:
+                self.func  = lambda x: math.atan(x)
+                self.ifunc = lambda x: math.tan(x)
             self.scale  = (self.func(max) - self.func(min)) / 100
             self.offset = self.func(min)
 
