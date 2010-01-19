@@ -72,7 +72,7 @@ int main(int argc, char **argv, std::string name)
   //ros::init(argc, argv, name, ros::init_options::NoSigintHandler);
   //signal(SIGINT, &AbstractDriverNode::sigCalled);
   //signal(SIGTERM, &AbstractDriverNode::sigCalled);
-  signal(SIGUHP, &AbstractDriverNode::hupCalled);
+  signal(SIGHUP, &AbstractDriverNode::hupCalled);
   ros::NodeHandle nh;
   DriverType driver(nh);
   return driver.spin();
