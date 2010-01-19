@@ -188,9 +188,9 @@ private:
   void statusDiagnostic(diagnostic_updater::DiagnosticStatusWrapper& stat)
   {
     if (driver_.isRunning())
-      stat.summary(0, "Driver is running.");
+      stat.summary(0, "OK");
     else
-      stat.summary(2, "Driver is not running.");
+      stat.summary(2, "not running");
     
     stat.add("Driver state:", driver_.getStateName());
     stat.add("Latest status message:", driver_.getStatusMessage());
