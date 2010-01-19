@@ -21,7 +21,7 @@
   </description>
   <author>Blaise Gassend</author>
   <license>BSD</license>  
-  <review status="unreviewed" notes=""/>
+  <review status="Doc reviewed" notes="2010/1/18"/>
   <url>http://ros.org/wiki/driver_common</url>
   <depend stack="diagnostics" /> <!-- self_test, diagnostic_updater -->
   <depend stack="ros" /> <!-- roslib, rospy, roscpp, rosservice -->
