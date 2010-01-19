@@ -61,9 +61,12 @@ class AbstractDriverNode
 template <class DriverType>
 int main(int argc, char **argv, std::string name)
 {
-  ros::init(argc, argv, name, ros::init_options::NoSigintHandler);
-  signal(SIGINT, &AbstractDriverNode::sigCalled);
-  signal(SIGTERM, &AbstractDriverNode::sigCalled);
+  /// @todo put SIGINT handling back in at some point. Out for now because
+  /// it prevents proper handling of SIGINT when there is no master.
+  ros::init(argc, argv, name);
+  //ros::init(argc, argv, name, ros::init_options::NoSigintHandler);
+  //signal(SIGINT, &AbstractDriverNode::sigCalled);
+  //signal(SIGTERM, &AbstractDriverNode::sigCalled);
   ros::NodeHandle nh;
   DriverType driver(nh);
   return driver.spin();
@@ -155,44 +158,6 @@ private:
     
     ROS_DEBUG("Reconfigure completed.");
   }
-
-  /*
-
-  void diagnosticsLoop()
-  {
-    //int frameless_updates = 0;
-
-    bool have_started = false;
-
-    cam_pub_.clear_window(); // Avoids having an error until the window fills up.
-    while (node_handle_.ok())
-    {
-      if (!started_video_)
-      {
-        stop();
-        close();
-        if (have_started && config_.exit_on_fault)
-        {
-          node_handle_.shutdown();
-          break;
-        }
-        open();
-        start();
-        have_started = true;
-      }
-
-      {
-        boost::mutex::scoped_lock lock(diagnostics_lock_);
-        diagnostic_.update();
-        self_test_.checkTest();
-      }
-      sleep(1);
-    }
-
-    ROS_DEBUG("Diagnostic thread exiting.");
-  }
-
-   */
 
 private:
 /*  void connectCallback(const ros::PublisherPtr &pub)
