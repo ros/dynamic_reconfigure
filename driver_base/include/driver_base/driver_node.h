@@ -52,6 +52,11 @@ class AbstractDriverNode
 {
   static int ctrl_c_hit_count_; 
   
+  static void hupCalled(int sig)
+  {
+    ROS_WARN("Unexpected SIGHUP caught. Ignoring it.");
+  }
+  
   static void sigCalled(int sig)
   {
     ctrl_c_hit_count_++;
@@ -67,6 +72,7 @@ int main(int argc, char **argv, std::string name)
   //ros::init(argc, argv, name, ros::init_options::NoSigintHandler);
   //signal(SIGINT, &AbstractDriverNode::sigCalled);
   //signal(SIGTERM, &AbstractDriverNode::sigCalled);
+  signal(SIGUHP, &AbstractDriverNode::hupCalled);
   ros::NodeHandle nh;
   DriverType driver(nh);
   return driver.spin();
