@@ -79,7 +79,7 @@ public:
  
 protected:
   // Hooks
-  virtual void addDiagnostics() = 0;
+  virtual void addDiagnostics() = 0; 
   virtual void addStoppedTests() = 0;
   virtual void addOpenedTests() = 0;
   virtual void addRunningTests() = 0;
@@ -93,6 +93,7 @@ protected:
   
   Driver driver_;
   dynamic_reconfigure::Server<Config> reconfigure_server_; 
+  diagnostic_updater::CompositeDiagnosticTask driver_status_diagnostic_;
   // driver_ declaration must precede reconfigure_server_ for constructor
   // calling order reasons.
 
@@ -116,6 +117,8 @@ private:
   typedef typename Driver::state_t drv_state_t;
 
   drv_state_t pre_self_test_driver_state_;
+    
+  diagnostic_updater::FunctionDiagnosticTask driver_status_standard_diagnostic_;
 
   void reconfigure(Config &config, uint32_t level)
   {
@@ -212,7 +215,8 @@ private:
 
   void prepareDiagnostics()
   {
-    diagnostic_.add("Driver Status", this, &DriverNode::statusDiagnostic);
+    driver_status_diagnostic_.addTask(&driver_status_standard_diagnostic_);
+    diagnostic_.add(driver_status_diagnostic_);
     addDiagnostics();
   }
 
@@ -374,9 +378,11 @@ public:
         if (!driver_.isRunning())
         {             
           std::string new_status_message = driver_.getStatusMessage();
-          if (last_status_message != new_status_message)
+          if ((last_status_message != new_status_message || driver_.getRecoveryComplete()) 
+              && !driver_.getStatusOk())
           {
-            ROS_ERROR("%s", new_status_message.c_str());
+            ROS_ERROR("%s", new_status_message.c_str()); 
+            driver_.clearRecoveryComplete();
             last_status_message = new_status_message;
           }
           ros::WallDuration(1).sleep();
@@ -409,7 +415,9 @@ public:
     private_node_handle_("~"), 
     self_test_(node_handle_), 
     diagnostic_(), 
-    reconfigure_server_(driver_.mutex_, ros::NodeHandle("~"))
+    reconfigure_server_(driver_.mutex_, ros::NodeHandle("~")),
+    driver_status_diagnostic_("Driver Status"),
+    driver_status_standard_diagnostic_("Driver Status", boost::bind(&DriverNode::statusDiagnostic, this, _1))
   {
     num_subscribed_topics_ = 0; /// @fixme this variable is hokey.
     exit_status_ = 0;

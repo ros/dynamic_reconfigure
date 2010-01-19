@@ -84,6 +84,8 @@ protected:
 private:  
   std::string status_message_;
   boost::mutex status_message_mutex_;
+  bool status_ok_;
+  bool status_recovery_complete_;
 
 public:
   void setPostOpenHook(hookFunction f)
@@ -239,20 +241,40 @@ public:
       return names[3];
   }
 
-  Driver() : state_(CLOSED) {}
+  Driver() : state_(CLOSED), status_ok_(false), status_recovery_complete_(false) {}
   virtual ~Driver() {}
 
+  bool getStatusOk()
+  {
+    return status_ok_;
+  }
+  
+  bool getRecoveryComplete()
+  {
+    return status_recovery_complete_;
+  }
+
+  void clearRecoveryComplete()
+  {
+    status_recovery_complete_ = false;
+  }
+  
   const std::string getStatusMessage()
   { // Not returning by reference for thread safety.
     boost::mutex::scoped_lock lock_(status_message_mutex_);
     return status_message_;
   }
 
-  void setStatusMessage(const std::string &msg)
+  // Set ok to true if the status message is not an error.
+  // Set recovery_complete if the device is now fully functioning, and any
+  // subsequent error should be considered as an error.
+  void setStatusMessage(const std::string &msg, bool ok = false, bool recovery_complete = false)
   {
     boost::mutex::scoped_lock lock_(status_message_mutex_);
     ROS_DEBUG("%s", msg.c_str());
     status_message_ = msg;
+    status_ok_ = ok;
+    status_recovery_complete_ |= recovery_complete;
   }
 
   void setStatusMessagef(const char *format, ...)
