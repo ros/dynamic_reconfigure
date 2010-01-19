@@ -7,7 +7,8 @@
   </description>
   <author>Blaise Gassend, Tim Field</author>
   <license>BSD</license>
-  <review status="API cleared" notes=""/>
+  <review status="Doc Reviewed" note="Jan 18 2010, rosparam and Python
+    client API only."/>
   <url>http://www.ros.org/wiki/dynamic_reconfigure</url>
   <depend package="rospy" />
   <depend package="roscpp" />

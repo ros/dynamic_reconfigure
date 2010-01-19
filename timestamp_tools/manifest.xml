@@ -15,7 +15,7 @@
   </description>
   <author>Blaise Gassend</author>
   <license>BSD</license>
-  <review status="unreviewed" notes=""/>
+  <review status="Doc Reviewed" note="Jan 18 2010, empty API"/>
   <url>http://www.ros.org/wiki/timestamp_tools</url>
   <depend package="roslib" />
   <depend package="roscpp" />

@@ -7,7 +7,7 @@
   </description>
   <author>Blaise Gassend</author>
   <license>BSD</license>
-  <review status="unreviewed"/>
+  <review status="Doc Reviewed" note="Jan 18 2010, empty API"/>
   <depend package="roscpp" />
   <depend package="self_test" />
   <depend package="diagnostic_updater" />
