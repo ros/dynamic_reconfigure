@@ -128,7 +128,7 @@ private:
     ConfigType init_config = ConfigType::__getDefault__();
     init_config.__fromServer__(node_handle_);
     init_config.__clamp__();
-    updateConfig(init_config);
+    updateConfigInternal(init_config);
   }
 
   void callCallback(ConfigType &config, int level)
