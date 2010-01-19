@@ -151,10 +151,13 @@ private:
   
     driver_.goState(orig_state);
 
+    /* Other errors will show up when this happens. No need to have it
+     * here.
     if (driver_.getState() != orig_state)
     {
       ROS_ERROR("Failed to resume original device state after reconfiguring. The requested configuration may contain errors.");
     }
+    */
     
     ROS_DEBUG("Reconfigure completed.");
   }
