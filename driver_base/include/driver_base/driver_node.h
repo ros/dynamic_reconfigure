@@ -389,11 +389,10 @@ public:
           driver_.goClosed(); 
           driver_.goRunning();
         }
-      }
 
-      /// Will need some locking here or in diagnostic_updater?
-      diagnostic_.update();
-      self_test_.checkTest();
+        diagnostic_.update();
+        self_test_.checkTest();
+      }
       ros::WallDuration(0.1).sleep();
     }
   
