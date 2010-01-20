@@ -1,5 +1,5 @@
 <package>
-  <description brief="dynamic_reconfigure">
+  <description brief="Dynamically reconfigure driver parameters">
     This package provides a class to facilitate dynamic node
     reconfiguration. This package is still under development, and should be
     considered unstable except for features that are explicitely marked as

@@ -1,5 +1,5 @@
 <package>
-  <description brief="Classes to facilitate timestamping of sensor data.">
+  <description brief="Classes to facilitate timestamping of sensor data">
     This package is currently for internal use only. Its API may change
     without warning in the future.
     
