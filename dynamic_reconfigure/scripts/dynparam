@@ -210,6 +210,7 @@ Commands:
 
 Type dynparam <command> -h for more detailed usage, e.g. 'dynparam get -h'
 """
+    sys.exit(1)
 
 def connect():
     rospy.init_node('dynparam', anonymous=True)
