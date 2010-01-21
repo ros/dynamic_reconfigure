@@ -118,6 +118,7 @@ private:
 
   void init()
   {
+    boost::recursive_mutex::scoped_lock lock(mutex_);
     set_service_ = node_handle_.advertiseService("set_parameters",
         &Server<ConfigType>::setConfigCallback, this);
     
