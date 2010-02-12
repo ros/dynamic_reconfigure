@@ -50,14 +50,15 @@ macro(gencfg_cpp)
     string(REPLACE ".cfg" "" _cfg_bare ${_cfg})
 
     set(_output_cpp ${PROJECT_SOURCE_DIR}/cfg/cpp/${PROJECT_NAME}/${_cfg_bare}Config.h)
-    set(_output_dox ${PROJECT_SOURCE_DIR}/dox/${_cfg_bare}Config.dox)
-    set(_output_usage ${PROJECT_SOURCE_DIR}/dox/${_cfg_bare}Config-usage.dox)
+    set(_output_dox ${PROJECT_SOURCE_DIR}/docs/${_cfg_bare}Config.dox)
+    set(_output_wikidoc ${PROJECT_SOURCE_DIR}/docs/${_cfg_bare}Config.wikidoc)
+    set(_output_usage ${PROJECT_SOURCE_DIR}/docs/${_cfg_bare}Config-usage.dox)
     set(_output_py ${PROJECT_SOURCE_DIR}/src/${PROJECT_NAME}/cfg/${_cfg_bare}Config.py)
 
     # Add the rule to build the .h the .cfg and the .msg
     # FIXME Horrible hack. Can't get CMAKE to add dependencies for anything
     # but the first output in add_custom_command.
-    add_custom_command(OUTPUT ${_output_cpp} ${_output_dox} ${_output_usage} ${_output_py}
+    add_custom_command(OUTPUT ${_output_cpp} ${_output_dox} ${_output_usage} ${_output_py} ${_output_wikidoc}
                        COMMAND ${gencfg_cpp_exe} ${_input}
                        DEPENDS ${_input} ${gencfg_cpp_exe} ${ROS_MANIFEST_LIST} ${gencfg_build_files} ${gencfg_extra_deps})
     list(APPEND _autogen ${_output_cpp} ${_output_msg} ${_output_getsrv} ${_output_setsrv} 
