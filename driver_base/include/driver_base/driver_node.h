@@ -83,7 +83,7 @@ template <class Driver>
 class DriverNode : public AbstractDriverNode
 {
 public:
-  typedef char state_t;
+  //typedef char state_t;
   typedef typename Driver::Config Config;
  
 protected:
@@ -110,13 +110,13 @@ private:
   // Subscriber tracking
   int num_subscribed_topics_; // Number of topics that have subscribers.
   
-  static const state_t DISABLED = 0;
-  static const state_t LAZY_ON = 1;
-  static const state_t ALWAYS_ON = 2;
-  static const state_t SELF_TEST = 3;
-  static const state_t EXITING = 4;
+  //static const state_t DISABLED = 0;
+  //static const state_t LAZY_ON = 1;
+  //static const state_t ALWAYS_ON = 2;
+  //static const state_t SELF_TEST = 3;
+  //static const state_t EXITING = 4;
 
-  state_t state_;
+  //state_t state_;
                           
   boost::shared_ptr<boost::thread> ros_thread_;
   
@@ -341,7 +341,7 @@ public:
 
     /// @todo Do something about exit status?
     std::string last_status_message;
-    while (node_handle_.ok() && state_ != EXITING && !ctrl_c_hit_count_)
+    while (node_handle_.ok() && /*state_ != EXITING &&*/ !ctrl_c_hit_count_)
     {
       {
         // Must lock here, otherwise operations like reconfigure will cause
@@ -369,7 +369,7 @@ public:
       }
       ros::WallDuration(0.1).sleep();
     }
-  
+
     driver_.goClosed();
 
     ros::shutdown();
