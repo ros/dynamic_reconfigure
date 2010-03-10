@@ -58,9 +58,17 @@ macro(gencfg_cpp)
     # Add the rule to build the .h the .cfg and the .msg
     # FIXME Horrible hack. Can't get CMAKE to add dependencies for anything
     # but the first output in add_custom_command.
+    execute_process(
+      COMMAND ${dynamic_reconfigure_PACKAGE_PATH}/cmake/gendeps ${_input}
+      OUTPUT_VARIABLE __gencfg_autodeps
+      ERROR_VARIABLE __gencfg_cpp_err_ignore
+      OUTPUT_STRIP_TRAILING_WHITESPACE)
+    string(REPLACE "\n" " " ${_input}_AUTODEPS ${__gencfg_autodeps})
+    separate_arguments(${_input}_AUTODEPS)
+    #message("MSG: " ${${_input}_AUTODEPS})
     add_custom_command(OUTPUT ${_output_cpp} ${_output_dox} ${_output_usage} ${_output_py} ${_output_wikidoc}
                        COMMAND ${gencfg_cpp_exe} ${_input}
-                       DEPENDS ${_input} ${gencfg_cpp_exe} ${ROS_MANIFEST_LIST} ${gencfg_build_files} ${gencfg_extra_deps})
+                       DEPENDS ${_input} ${gencfg_cpp_exe} ${ROS_MANIFEST_LIST} ${gencfg_build_files} ${gencfg_extra_deps} ${${_input}_AUTODEPS})
     list(APPEND _autogen ${_output_cpp} ${_output_msg} ${_output_getsrv} ${_output_setsrv} 
       ${_output_dox} ${_output_usage} ${_output_py})
   endforeach(_cfg)
