@@ -88,9 +88,19 @@ Examples:
   dynparam set wge100_camera camera_url foo
   dynparam set wge100_camera "{'camera_url':'foo', 'brightness':58}" """
 
+    args, optparse_args = [], []
+    for s in myargv[2:]:
+        if s.startswith('-'):
+            if len(s) > 1 and ord(s[1]) >= ord('0') and ord(s[1]) <= ord('9'):
+                args.append(s)
+            else:
+                optparse_args.append(s)
+        else:
+            args.append(s)
+
     parser = optparse.OptionParser(usage=usage, prog=NAME)
     add_timeout_option(parser)
-    options, args = parser.parse_args(myargv[2:])
+    options, _ = parser.parse_args(optparse_args)
     if len(args) > 3:
         parser.error("too many arguments")
     elif len(args) < 2:
