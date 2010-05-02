@@ -109,7 +109,7 @@ public:
 
   static int size(dynamic_reconfigure::Config &msg)
   {
-    return msg.get_bools_size() + msg.get_doubles_size() + msg.get_ints_size() + msg.get_strs_size();
+    return msg.bools.size() + msg.doubles.size() + msg.ints.size() + msg.strs.size();
   }
 
   static void clear(dynamic_reconfigure::Config &msg)
