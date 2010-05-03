@@ -274,7 +274,7 @@ ${doline} ${linenum} "${filename}"
   
   
   template <> // Max and min are ignored for strings.
-  void ${configname}Config::ParamDescription<std::string>::clamp(${configname}Config &config, const ${configname}Config &max, const ${configname}Config &min) const
+  inline void ${configname}Config::ParamDescription<std::string>::clamp(${configname}Config &config, const ${configname}Config &max, const ${configname}Config &min) const
   {
     return;
   }
