@@ -50,12 +50,14 @@ ${doline} ${linenum} "${filename}"
 #include <dynamic_reconfigure/config_tools.h>
 #include <limits>
 #include <ros/node_handle.h>
-#include <boost/thread/mutex.hpp>
 #include <dynamic_reconfigure/ConfigDescription.h>
 #include <dynamic_reconfigure/ParamDescription.h>
+#include <dynamic_reconfigure/config_init_mutex.h>
 
 namespace ${pkgname}
 {
+  class ${configname}ConfigStatics;
+  
   class ${configname}Config
   {
   public:
@@ -136,6 +138,7 @@ ${doline} ${linenum} "${filename}"
 
     bool __fromMessage__(dynamic_reconfigure::Config &msg)
     {
+      const std::vector<AbstractParamDescriptionConstPtr> &__param_descriptions__ = __getParamDescriptions__();
       int count = 0;
       for (std::vector<AbstractParamDescriptionConstPtr>::const_iterator i = __param_descriptions__.begin(); i != __param_descriptions__.end(); i++)
         if ((*i)->fromMessage(msg, *this))
@@ -162,116 +165,62 @@ ${doline} ${linenum} "${filename}"
       return true;
     }
 
-    void __toMessage__(dynamic_reconfigure::Config &msg) const
+    // This version of __toMessage__ is used during initialization of
+    // statics when __getParamDescriptions__ can't be called yet.
+    void __toMessage__(dynamic_reconfigure::Config &msg, const std::vector<AbstractParamDescriptionConstPtr> &__param_descriptions__) const
     {
       dynamic_reconfigure::ConfigTools::clear(msg);
       for (std::vector<AbstractParamDescriptionConstPtr>::const_iterator i = __param_descriptions__.begin(); i != __param_descriptions__.end(); i++)
         (*i)->toMessage(msg, *this);
     }
     
+    void __toMessage__(dynamic_reconfigure::Config &msg) const
+    {
+      const std::vector<AbstractParamDescriptionConstPtr> &__param_descriptions__ = __getParamDescriptions__();
+      __toMessage__(msg, __param_descriptions__);
+    }
+    
     void __toServer__(const ros::NodeHandle &nh) const
     {
+      const std::vector<AbstractParamDescriptionConstPtr> &__param_descriptions__ = __getParamDescriptions__();
       for (std::vector<AbstractParamDescriptionConstPtr>::const_iterator i = __param_descriptions__.begin(); i != __param_descriptions__.end(); i++)
         (*i)->toServer(nh, *this);
     }
 
     void __fromServer__(const ros::NodeHandle &nh)
     {
+      const std::vector<AbstractParamDescriptionConstPtr> &__param_descriptions__ = __getParamDescriptions__();
       for (std::vector<AbstractParamDescriptionConstPtr>::const_iterator i = __param_descriptions__.begin(); i != __param_descriptions__.end(); i++)
         (*i)->fromServer(nh, *this);
     }
 
     void __clamp__()
     {
+      const std::vector<AbstractParamDescriptionConstPtr> &__param_descriptions__ = __getParamDescriptions__();
+      const ${configname}Config &__max__ = __getMax__();
+      const ${configname}Config &__min__ = __getMin__();
       for (std::vector<AbstractParamDescriptionConstPtr>::const_iterator i = __param_descriptions__.begin(); i != __param_descriptions__.end(); i++)
         (*i)->clamp(*this, __max__, __min__);
     }
 
     uint32_t __level__(const ${configname}Config &config) const
     {
+      const std::vector<AbstractParamDescriptionConstPtr> &__param_descriptions__ = __getParamDescriptions__();
       uint32_t level = 0;
       for (std::vector<AbstractParamDescriptionConstPtr>::const_iterator i = __param_descriptions__.begin(); i != __param_descriptions__.end(); i++)
         (*i)->calcLevel(level, config, *this);
       return level;
     }
     
-    static const dynamic_reconfigure::ConfigDescription &__getDescriptionMessage__() 
-    {
-      __init_statics__();
-      return __description_message__;
-    }
-
-    static const ${configname}Config &__getDefault__()
-    {
-      __init_statics__();
-      return __default__;
-    }
+    static const dynamic_reconfigure::ConfigDescription &__getDescriptionMessage__();
+    static const ${configname}Config &__getDefault__();
+    static const ${configname}Config &__getMax__();
+    static const ${configname}Config &__getMin__();
+    static const std::vector<AbstractParamDescriptionConstPtr> &__getParamDescriptions__();
     
-    static const ${configname}Config &__getMax__()
-    {
-      __init_statics__();
-      return __max__;
-    }
-    
-    static const ${configname}Config &__getMin__()
-    {
-      __init_statics__();
-      return __min__;
-    }
-   
-    static const std::vector<AbstractParamDescriptionConstPtr> __getParamDescriptions__()
-    {
-      __init_statics__();
-      return __param_descriptions__;
-    }
-
-    ${configname}Config()
-    {
-      if (this != &__min__ && this != &__max__ && this != &__default__)
-				__init_statics__(); // These three need to be initialized before we can initialize.
-    }
-
   private:
-    static bool __initialized__;
-    static boost::mutex __init_mutex__;
-    
-    static std::vector<AbstractParamDescriptionConstPtr> __param_descriptions__;
-    static ${configname}Config __max__;
-    static ${configname}Config __min__;
-    static ${configname}Config __default__;
-    static dynamic_reconfigure::ConfigDescription __description_message__;
-
-    static void __init_statics__()
-    {
-      if (__initialized__) // Common case
-        return;
-
-      boost::mutex::scoped_lock lock(__init_mutex__);
-
-      if (__initialized__) // In case we lost a race.
-        return;
-
-${paramdescr}
-${doline} ${linenum} "${filename}"
-      
-      for (std::vector<AbstractParamDescriptionConstPtr>::const_iterator i = __param_descriptions__.begin(); i != __param_descriptions__.end(); i++)
-        __description_message__.parameters.push_back(**i);
-      __max__.__toMessage__(__description_message__.max); 
-      __min__.__toMessage__(__description_message__.min); 
-      __default__.__toMessage__(__description_message__.dflt); 
-      
-      __initialized__ = true;
-    }
+    static const ${configname}ConfigStatics *__get_statics__();
   };
-
-  bool ${configname}Config::__initialized__ = false;
-  boost::mutex ${configname}Config::__init_mutex__;
-  std::vector<${configname}Config::AbstractParamDescriptionConstPtr> ${configname}Config::__param_descriptions__;
-  ${configname}Config ${configname}Config::__max__;
-  ${configname}Config ${configname}Config::__min__;
-  ${configname}Config ${configname}Config::__default__;
-  dynamic_reconfigure::ConfigDescription ${configname}Config::__description_message__;
-  
   
   template <> // Max and min are ignored for strings.
   inline void ${configname}Config::ParamDescription<std::string>::clamp(${configname}Config &config, const ${configname}Config &max, const ${configname}Config &min) const
@@ -279,8 +228,80 @@ ${doline} ${linenum} "${filename}"
     return;
   }
 
+  class ${configname}ConfigStatics
+  {
+    friend class ${configname}Config;
+    
+    ${configname}ConfigStatics()
+    {
+${paramdescr}
+${doline} ${linenum} "${filename}"
+    
+      for (std::vector<${configname}Config::AbstractParamDescriptionConstPtr>::const_iterator i = __param_descriptions__.begin(); i != __param_descriptions__.end(); i++)
+        __description_message__.parameters.push_back(**i);
+      __max__.__toMessage__(__description_message__.max, __param_descriptions__); 
+      __min__.__toMessage__(__description_message__.min, __param_descriptions__); 
+      __default__.__toMessage__(__description_message__.dflt, __param_descriptions__); 
+    }
+    std::vector<${configname}Config::AbstractParamDescriptionConstPtr> __param_descriptions__;
+    ${configname}Config __max__;
+    ${configname}Config __min__;
+    ${configname}Config __default__;
+    dynamic_reconfigure::ConfigDescription __description_message__;
+    static const ${configname}ConfigStatics *get_instance()
+    {
+      // Split this off in a separate function because I know that
+      // instance will get initialized the first time get_instance is
+      // called, and I am guaranteeing that get_instance gets called at
+      // most once.
+      static ${configname}ConfigStatics instance;
+      return &instance;
+    }
+  };
+
+  inline const dynamic_reconfigure::ConfigDescription &${configname}Config::__getDescriptionMessage__() 
+  {
+    return __get_statics__()->__description_message__;
+  }
+
+  inline const ${configname}Config &${configname}Config::__getDefault__()
+  {
+    return __get_statics__()->__default__;
+  }
+  
+  inline const ${configname}Config &${configname}Config::__getMax__()
+  {
+    return __get_statics__()->__max__;
+  }
+  
+  inline const ${configname}Config &${configname}Config::__getMin__()
+  {
+    return __get_statics__()->__min__;
+  }
+  
+  inline const std::vector<${configname}Config::AbstractParamDescriptionConstPtr> &${configname}Config::__getParamDescriptions__()
+  {
+    return __get_statics__()->__param_descriptions__;
+  }
+
+  inline const ${configname}ConfigStatics *${configname}Config::__get_statics__()
+  {
+    const static ${configname}ConfigStatics *statics;
+  
+    if (statics) // Common case
+      return statics;
+
+    boost::mutex::scoped_lock lock(dynamic_reconfigure::__init_mutex__);
+
+    if (statics) // In case we lost a race.
+      return statics;
+
+    statics = ${configname}ConfigStatics::get_instance();
+    
+    return statics;
+  }
+
 ${constants}
 }
-    
 
 #endif // __${uname}RECONFIGURATOR_H__

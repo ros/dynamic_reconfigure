@@ -325,7 +325,7 @@ $i.desc=$description $range"""
             self.appendline(paramdescr, "__max__.${name} = $v;", param, "max")
             self.appendline(paramdescr, "__default__.${name} = $v;", param, "default")
             self.appendline(paramdescr, 
-                    "__param_descriptions__.push_back(AbstractParamDescriptionConstPtr(new ParamDescription<${ctype}>(\"${name}\", \"${type}\", ${level}, "\
+                    "__param_descriptions__.push_back(${configname}Config::AbstractParamDescriptionConstPtr(new ${configname}Config::ParamDescription<${ctype}>(\"${name}\", \"${type}\", ${level}, "\
                     "\"${description}\", \"${edit_method}\", &${configname}Config::${name})));", param)
         paramdescr = string.join(paramdescr, '\n')
         members = string.join(members, '\n')
