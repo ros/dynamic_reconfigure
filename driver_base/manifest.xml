@@ -16,5 +16,8 @@
     <cpp cflags="-I${prefix}/include -I${prefix}/msg/cpp"/>
   </export>
   <url>http://www.ros.org/wiki/driver_base</url>
+  <platform os="ubuntu" version="9.04"/>
+  <platform os="ubuntu" version="9.10"/>
+  <platform os="ubuntu" version="10.04"/>
 </package>
 
