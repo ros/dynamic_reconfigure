@@ -37,7 +37,6 @@
 import sys
 import inspect
 import imp
-import dynamic_reconfigure.parameter_generator
 import os.path
 
 def exit_replacement(*args):
@@ -54,17 +53,17 @@ if __name__ == "__main__":
   # that the file expects to see.
   sys.path[0] = os.path.dirname(srcfile)
   f = open(srcfile, 'U')
-  load_module_returned = False
   stderr = sys.stderr
+  stdout = sys.stdout
+  sys.stdout = stderr # Avoid clobbering our output.
   print >> stderr, "Finding dependencies for %s"%srcfile
   try:
     imp.load_module("__main__", f, srcfile, ('.cfg', 'U', 1))
-    load_module_returned = True
-  finally:
-    if not load_module_returned:
-      print >> stderr, "***********************************************************************************"
-      print >> stderr, "load_module did not return. Unable to determine dependencies for file listed above."
-      print >> stderr, "***********************************************************************************"
+  except:
+    print >> stderr, "***********************************************************************************"
+    print >> stderr, "load_module did not return. Unable to determine dependencies for file listed above."
+    print >> stderr, "***********************************************************************************"
+    raise
   
   end_modules = sys.modules
   for m in end_modules:
