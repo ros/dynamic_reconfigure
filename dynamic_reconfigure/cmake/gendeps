@@ -71,6 +71,6 @@ if __name__ == "__main__":
       try:
         file = inspect.getsourcefile(end_modules[m])
         if type(file) == str:
-          print file
+          print >> stdout, file
       except Exception, e:
         pass 
