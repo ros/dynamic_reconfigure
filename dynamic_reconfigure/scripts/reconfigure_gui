@@ -481,7 +481,8 @@ class DynamicReconfigurePanel(wx.lib.scrolledpanel.ScrolledPanel):
     
     class DoubleEditor(IntegerEditor):
         def __init__(self, parent, name, value, min, max):
-            if min is not None and max is not None:
+            infinities = [ 1e1000, -1e1000, None ]
+            if not min in infinities and not max in infinities:
                 self.func  = lambda x: x
                 self.ifunc = lambda x: x
             else:
