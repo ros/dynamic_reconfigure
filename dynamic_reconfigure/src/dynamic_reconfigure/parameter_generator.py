@@ -172,6 +172,9 @@ class ParameterGenerator:
     def generate(self, pkgname, nodename, name):
         try:
             if sys.modules['__main__']._DYNAMIC_RECONFIGURE_GENERATING_DEPENDENCIES:
+                # Done this way because importing this module from gendeps
+                # causes imports of dynamic_reconfigure.msg to fail from at
+                # least some .cfg files. (Not sure why)
                 return
         except:
             pass
