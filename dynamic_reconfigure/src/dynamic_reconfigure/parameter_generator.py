@@ -46,6 +46,7 @@ from string import Template
 import os
 import inspect
 import string 
+import sys
 
 #LINEDEBUG="#line"
 LINEDEBUG="//#line"
@@ -169,6 +170,11 @@ class ParameterGenerator:
         self.mkdirabs(path)
 
     def generate(self, pkgname, nodename, name):
+        try:
+            if sys.modules['__main__']._DYNAMIC_RECONFIGURE_GENERATING_DEPENDENCIES:
+                return
+        except:
+            pass
         try:
             self.pkgname = pkgname
             self.pkgpath = roslib.packages.get_pkg_dir(pkgname)

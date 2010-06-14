@@ -39,15 +39,18 @@ import inspect
 import imp
 import os.path
 
-def exit_replacement(*args):
+_DYNAMIC_RECONFIGURE_GENERATING_DEPENDENCIES = True
+
+def do_nothing(*args):
   pass
 
 if __name__ == "__main__":
   srcfile = sys.argv[1]
 
   start_modules = list(sys.modules)
-  sys.exit = exit_replacement
-  exit = exit_replacement
+  sys.exit = do_nothing
+  exit = do_nothing
+  #dynamic_reconfigure.parameter_generator.ParameterGenerator.generate = do_nothing
 
   # Remove our directory from the system path, and replace it with the one
   # that the file expects to see.
