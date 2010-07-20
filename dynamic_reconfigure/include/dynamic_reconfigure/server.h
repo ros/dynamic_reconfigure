@@ -82,7 +82,7 @@ public:
 
   typedef boost::function<void(ConfigType &, uint32_t level)> CallbackType;
   
-  void setCallback(CallbackType &callback)
+  void setCallback(const CallbackType &callback)
   {
     boost::recursive_mutex::scoped_lock lock(mutex_);
     callback_ = callback;
