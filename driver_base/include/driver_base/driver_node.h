@@ -234,24 +234,41 @@ private:
     else
       status.summary(0, "No operation interrupted.");
   } 
+  
+  void reliableGoStateTest(diagnostic_updater::DiagnosticStatusWrapper &status, drv_state_t target_state)
+  {
+    const int max_tries = 5;
+    ROS_ASSERT(max_tries > 0);
+    int retries;
+    drv_state_t current_state;
+    for (retries = 0; retries < max_tries; retries++)
+    {
+      sleep(1);
+      driver_.goState(target_state);
+
+      current_state = driver_.getState();
+      if (current_state == target_state)
+        break;
+    }
+
+    std::string target_state_name = Driver::getStateName(target_state);
+    std::string current_state_name = Driver::getStateName(current_state);
     
+    // We carefully avoid rechecking the state here, as it may have
+    // changed since we last checked. We aren't here to check that we
+    // stayed in the target state, just want to check that we made it
+    // there...
+    if (retries >= max_tries) 
+      status.summaryf(2, "Failed to go to %s state despite %u retries, now in state %s.", target_state_name.c_str(), retries, current_state_name.c_str());
+    else if (retries)
+      status.summaryf(1, "Successfully went to state %s after %u retries.", target_state_name.c_str(), retries);
+    else
+      status.summaryf(0, "Successfully went to state %s.", target_state_name.c_str());
+  }
+
   void openTest(diagnostic_updater::DiagnosticStatusWrapper& status)
   {
-    driver_.open();
-
-    if (driver_.isOpened())
-      status.summaryf(0, "Successfully opened device");
-    else
-    {
-      sleep(2);
-      driver_.open();
-      if (driver_.isOpened())
-      {
-        status.summaryf(1, "Successfully opened device after one retry");
-      }
-      else
-        status.summary(2, "Failed to open.");
-    }
+    reliableGoStateTest(status, Driver::OPENED);
   }
   
   void idTest(diagnostic_updater::DiagnosticStatusWrapper& status)
@@ -268,59 +285,22 @@ private:
 
   void runTest(diagnostic_updater::DiagnosticStatusWrapper& status)
   {
-    driver_.start();
-    
-    if (!driver_.isRunning()) // Retry to avoid occasional glitches.
-    {
-      sleep(2);
-      driver_.start();
-    }
-
-    if (driver_.isRunning())      
-      status.summaryf(0, "Successfully started streaming.");
-    else
-    {
-      sleep(2);
-      driver_.open();
-      if (driver_.isOpened())
-        status.summaryf(1, "Successfully started streaming after one retry.");
-      else
-        status.summary(2, "Failed to start streaming.");
-    }
+    reliableGoStateTest(status, Driver::RUNNING);
   } 
 
   void stopTest(diagnostic_updater::DiagnosticStatusWrapper& status)
   {
-    driver_.stop();
-    
-    if (driver_.isOpened())      
-      status.summaryf(0, "Successfully stopped streaming.");
-    else
-      status.summary(2, "Failed to stop streaming.");
+    reliableGoStateTest(status, Driver::OPENED);
   } 
   
   void closeTest(diagnostic_updater::DiagnosticStatusWrapper& status)
   {
-    driver_.close();
-    
-    if (driver_.isClosed())      
-      status.summaryf(0, "Successfully closed device.");
-    else
-      status.summary(2, "Failed to close device.");
+    reliableGoStateTest(status, Driver::CLOSED);
   } 
   
   void resumeTest(diagnostic_updater::DiagnosticStatusWrapper& status)
   {
-    driver_.goState(pre_self_test_driver_state_);
-  
-    drv_state_t currentState = driver_.getState();
-    std::string desired_state_name = Driver::getStateName(pre_self_test_driver_state_);
-    std::string current_state_name = Driver::getStateName(currentState);
-   
-    if (currentState == pre_self_test_driver_state_)
-      status.summaryf(0, "Successfully returned to %s state.", desired_state_name.c_str());
-    else
-      status.summaryf(2, "Failed to return to %s state, now in state %s.", desired_state_name.c_str(), current_state_name.c_str());
+    reliableGoStateTest(status, pre_self_test_driver_state_);
   }
   
 public:
