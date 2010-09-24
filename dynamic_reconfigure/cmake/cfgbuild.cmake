@@ -61,7 +61,6 @@ macro(gencfg_cpp)
     execute_process(
       COMMAND ${dynamic_reconfigure_PACKAGE_PATH}/cmake/gendeps ${_input}
       OUTPUT_VARIABLE __gencfg_autodeps
-      ERROR_VARIABLE __gencfg_cpp_err_ignore
       OUTPUT_STRIP_TRAILING_WHITESPACE)
     string(REPLACE "\n" " " ${_input}_AUTODEPS ${__gencfg_autodeps})
     separate_arguments(${_input}_AUTODEPS)
