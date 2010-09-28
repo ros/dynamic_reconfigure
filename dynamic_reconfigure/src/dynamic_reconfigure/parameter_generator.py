@@ -59,14 +59,14 @@ double_t = "double"
 
 class ParameterGenerator:
     minval = {
-            'int' : 'INT_MIN',
+            'int' : -0x80000000, #'INT_MIN',
             'double' : '-std::numeric_limits<double>::infinity()',
             'str' : '',
             'bool' : False,
             }
             
     maxval = {
-            'int' : 'INT_MAX',
+            'int' : 0x7FFFFFFF, #'INT_MAX',
             'double' : 'std::numeric_limits<double>::infinity()',
             'str' : '',
             'bool' : True,
