@@ -94,7 +94,7 @@ class Server(object):
         
         self._copy_to_parameter_server()
         
-        self.update_topic.publish(encode_config(config))
+        self.update_topic.publish(encode_config(self.config))
 
         return self.config
    
