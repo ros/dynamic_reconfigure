@@ -90,9 +90,11 @@ class ParameterGenerator:
         pytype = self.pytype(drtype)
         if pytype != type(value) and (pytype != float or type(value) != int):
             raise TypeError("'%s' has type %s, but %s is %s"%(name, drtype, field, repr(value)))
+        param[field] = pytype(value)
+
+    def fill_type(self, param):
         param['ctype'] = { 'str':'std::string', 'int':'int', 'double':'double', 'bool':'bool' }[param['type']]
         param['cconsttype'] = { 'str':'const char * const', 'int':'const int', 'double':'const double', 'bool':'const bool' }[param['type']]
-        param[field] = pytype(value)
 
     def check_type_fill_default(self, param, field, default):
         value = param[field]
@@ -117,6 +119,7 @@ class ParameterGenerator:
                 'srcfile' : inspect.getsourcefile(inspect.currentframe().f_back.f_code),
                 'description' : descr
                 }
+        self.fill_type(newconst)
         self.check_type(newconst, 'value')
         self.constants.append(newconst)
         return newconst # So that we can assign the value easily.
@@ -142,6 +145,7 @@ class ParameterGenerator:
         if type == str_t and (max != None or min != None):
             raise Exception("Max or min specified for %s, which is of string type"%name)
 
+        self.fill_type(newparam)
         self.check_type_fill_default(newparam, 'default', self.defval[paramtype])
         self.check_type_fill_default(newparam, 'max', self.maxval[paramtype])
         self.check_type_fill_default(newparam, 'min', self.minval[paramtype])
