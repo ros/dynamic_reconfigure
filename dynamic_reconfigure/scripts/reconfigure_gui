@@ -55,6 +55,8 @@ import wx
 import wx.lib.scrolledpanel
 
 import dynamic_reconfigure.client
+import rosservice
+import sys
 
 class MainWindow(wx.Frame):
     def __init__(self, node=None):
@@ -126,6 +128,7 @@ class DynamicReconfigureSelector(wx.Panel):
 
         self.parent       = parent
         self.reconf_panel = None
+        self.has_master   = True
 
         self.combobox = wx.ComboBox(self, wx.ID_ANY, style=wx.CB_READONLY)
         self.update_combobox()
@@ -144,14 +147,24 @@ class DynamicReconfigureSelector(wx.Panel):
         self.update_combobox()
 
     def update_combobox(self):
-        nodes = dynamic_reconfigure.find_reconfigure_services()
-        self.combobox.SetItems(nodes)
+        try:
+          nodes = dynamic_reconfigure.find_reconfigure_services()
+        except rosservice.ROSServiceIOException:
+          if self.has_master:
+            print >> sys.stderr, "reconfigure_gui cannot connect to master."
+          self.has_master = False
+        else:
+          if not self.has_master:
+            print >> sys.stderr, "reconfigure_gui reconnected to master."
+          self.has_master = True
 
-        selected_node = self.get_selected_node()
-        if selected_node not in nodes:
-            self.close_node()               # node has stopped
-        elif self.reconf_panel is None:
-            self.view_node(selected_node)   # node has restarted
+          self.combobox.SetItems(nodes)
+  
+          selected_node = self.get_selected_node()
+          if selected_node not in nodes:
+              self.close_node()               # node has stopped
+          elif self.reconf_panel is None:
+              self.view_node(selected_node)   # node has restarted
 
     def get_selected_node(self):
         return str(self.combobox.GetValue())
