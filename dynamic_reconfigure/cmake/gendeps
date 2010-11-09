@@ -74,6 +74,10 @@ if __name__ == "__main__":
       try:
         file = inspect.getsourcefile(end_modules[m])
         if type(file) == str:
-          print >> stdout, file
+          for i in range(50): # .eggs on mac are strange, move up the hierarchy until we find the .egg, bail after 50 tries.
+            if os.path.exists(file): 
+              print >> stdout, file
+              break
+            file = os.path.dirname(file) 
       except Exception, e:
         pass 
