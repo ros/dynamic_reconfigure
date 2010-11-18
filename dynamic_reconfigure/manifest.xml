@@ -16,6 +16,7 @@
   <rosdep name="wxpython" />
   <export>
       <rosdoc config="rosdoc.yaml" />
+      <rosbuild cmake_directory="${prefix}/cmake" />
       <cpp cflags="`rosboost-cfg --cflags` -I${prefix}/include -I${prefix}/msg/cpp -I${prefix}/srv/cpp"
         lflags="`rosboost-cfg --lflags thread` -Wl,-rpath,${prefix}/lib -L${prefix}/lib -ldynamic_reconfigure_config_init_mutex"/>
   </export>
