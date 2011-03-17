@@ -38,6 +38,7 @@ example server implementation (L{Server}).
 import roslib; roslib.load_manifest('dynamic_reconfigure')
 import rospy
 import rosservice
+import os
 
 class DynamicReconfigureException(Exception):
     """
@@ -60,3 +61,9 @@ def find_reconfigure_services():
 
 def get_parameter_names(descr):
     return descr.defaults.keys()
+
+
+if 'ROS_BUILD' in os.environ:
+    import sys
+    import parameter_generator_rosbuild2 as p
+    sys.modules['dynamic_reconfigure.parameter_generator'] = p
