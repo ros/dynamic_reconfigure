@@ -51,7 +51,7 @@ macro(rosbuild_cfgs)
       COMMENT "Generating dynamic reconfigure stuff from ${_cfg}: ${_output_cpp} ${_output_py}"
       )
 
-    list(APPEND ${PROJECT_NAME}_generated 
+    list(APPEND ${PROJECT_NAME}_generated_cpp 
       ${_output_cpp} ${_output_py}
       )
 
