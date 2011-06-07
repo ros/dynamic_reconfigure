@@ -27,6 +27,7 @@
     <depend package="rospy" />
     <depend package="roscpp" />
     <depend package="rosservice" />
+    <depend package="std_msgs" />
     <export>
       <include_dir>${dynamic_reconfigure_PACKAGE_DIR}/include</include_dir>
       <lib>dynamic_reconfigure_config_init_mutex</lib>
