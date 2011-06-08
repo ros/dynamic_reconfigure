@@ -64,6 +64,13 @@ macro(rosbuild_cfgs)
   add_dependencies(${PROJECT_NAME}_codegen
     ${PROJECT_NAME}_cfggen)
 
+  foreach(_dep ${${PROJECT_NAME}_RECURSIVE_DEPENDS})
+    add_dependencies(${PROJECT_NAME}_cfggen
+      ${_dep}_codegen)
+  endforeach()
+      
+      
+
   #add_custom_target(rospack_gencfg_real ALL)
   #add_dependencies(rospack_gencfg_real rospack_gencfg)
   #include_directories(${PROJECT_SOURCE_DIR}/cfg/cpp)
