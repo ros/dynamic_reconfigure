@@ -65,8 +65,8 @@ macro(rosbuild_cfgs)
     ${PROJECT_NAME}_cfggen)
 
   foreach(_dep ${${PROJECT_NAME}_RECURSIVE_DEPENDS})
-    add_dependencies(${PROJECT_NAME}_cfggen
-      ${_dep}_codegen)
+    message("add_dependencies(${PROJECT_NAME}_cfggen ${_dep}_codegen)")
+    add_dependencies(${PROJECT_NAME}_cfggen ${_dep}_codegen)
   endforeach()
       
       
