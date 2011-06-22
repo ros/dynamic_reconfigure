@@ -52,6 +52,7 @@ ${doline} ${linenum} "${filename}"
 #include <ros/node_handle.h>
 #include <dynamic_reconfigure/ConfigDescription.h>
 #include <dynamic_reconfigure/ParamDescription.h>
+#include <dynamic_reconfigure/Group.h>
 #include <dynamic_reconfigure/config_init_mutex.h>
 
 namespace ${pkgname}
@@ -232,22 +233,25 @@ ${doline} ${linenum} "${filename}"
   {
     friend class ${configname}Config;
     
-    ${configname}ConfigStatics()
+    ${configname}ConfigStatics() : __groups__("Default", 0, 0)
     {
 ${paramdescr}
 ${doline} ${linenum} "${filename}"
     
-      for (std::vector<${configname}Config::AbstractParamDescriptionConstPtr>::const_iterator i = __param_descriptions__.begin(); i != __param_descriptions__.end(); i++)
-        __description_message__.parameters.push_back(**i);
+      for (std::vector<dynamic_reconfigure::Group>::const_iterator i = __group_descriptions__.begin(); i != __group_descriptions__.end(); i++)
+        __description_message__.groups.push_back(*i);
       __max__.__toMessage__(__description_message__.max, __param_descriptions__); 
       __min__.__toMessage__(__description_message__.min, __param_descriptions__); 
       __default__.__toMessage__(__description_message__.dflt, __param_descriptions__); 
     }
     std::vector<${configname}Config::AbstractParamDescriptionConstPtr> __param_descriptions__;
+    std::vector<dynamic_reconfigure::Group> __group_descriptions__;
+    dynamic_reconfigure::GroupDescription __groups__;
     ${configname}Config __max__;
     ${configname}Config __min__;
     ${configname}Config __default__;
     dynamic_reconfigure::ConfigDescription __description_message__;
+
     static const ${configname}ConfigStatics *get_instance()
     {
       // Split this off in a separate function because I know that

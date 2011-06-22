@@ -68,6 +68,7 @@ class Client(object):
         self.name              = name
         self.config            = None
         self.param_description = None
+        self.group_description = None
         
         self._param_types = None
 
@@ -138,6 +139,26 @@ class Client(object):
                     self._cv.wait(secs_left)
 
         return self.param_description
+
+    def get_group_descriptions(self, timeout=None):
+        if timeout is None or timeout == 0.0:
+            with self._cv:
+                while self.group_description is None:
+                    if rospy.is_shutdown():
+                        return None
+                    self._cv.wait()
+        else:
+            start_time = time.time()
+            with self._cv:
+                while self.group_description is None:
+                    if rospy.is_shutdown():
+                        return None
+                    secs_left = timeout - (time.time() - start_time)
+                    if secs_left <= 0.0:
+                        break
+                    self._cv.wait(secs_left)
+
+        return self.group_description
 
     def update_configuration(self, changes):
         """
@@ -241,7 +262,8 @@ class Client(object):
             self._config_callback(self.config)
 
     def _descriptions_msg(self, msg):
-        self.param_description = decode_description(msg)
+        self.group_description = decode_description(msg)
+        self.param_description = extract_params(self.group_description)
 
         # Build map from parameter name to type
         self._param_types = {}

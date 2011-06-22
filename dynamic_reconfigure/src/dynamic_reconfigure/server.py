@@ -75,14 +75,14 @@ class Server(object):
             return self._change_config(new_config, self._calc_level(new_config, self.config))
 
     def _copy_from_parameter_server(self):
-        for param in self.type.config_description:
+        for param in extract_params(self.type.config_description):
             try:
                 self.config[param['name']] = rospy.get_param("~" + param['name'])
             except KeyError:
                 pass
 
     def _copy_to_parameter_server(self):
-        for param in self.type.config_description:
+        for param in extract_params(self.type.config_description):
             rospy.set_param('~' + param['name'], self.config[param['name']])
 
     def _change_config(self, config, level):
@@ -100,14 +100,14 @@ class Server(object):
    
     def _calc_level(self, config1, config2):
         level = 0
-        for param in self.type.config_description:
+        for param in extract_params(self.type.config_description):
             if config1[param['name']] != config2[param['name']]:
                 level |= param['level']
 
         return level
 
     def _clamp(self, config):
-        for param in self.type.config_description: 
+        for param in extract_params(self.type.config_description): 
             maxval = self.type.max[param['name']] 
             minval = self.type.min[param['name']] 
             val = config[param['name']]

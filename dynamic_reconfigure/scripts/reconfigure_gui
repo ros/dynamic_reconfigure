@@ -217,7 +217,7 @@ class DynamicReconfigurePanel(wx.lib.scrolledpanel.ScrolledPanel):
         self.reconf = reconf
 
         config = self.reconf.get_configuration()
-        descr  = self.reconf.get_parameter_descriptions()
+        descr  = self.reconf.get_group_descriptions()
         
         # Create the editors
         self.editors = {}
@@ -228,7 +228,7 @@ class DynamicReconfigurePanel(wx.lib.scrolledpanel.ScrolledPanel):
             'double': DynamicReconfigurePanel.DoubleEditor,
             'str':    DynamicReconfigurePanel.StringEditor
         }
-        flags = {
+        self.flags = {
             'bool':   wx.ALIGN_LEFT,
             'int':    wx.EXPAND,
             'str':    wx.EXPAND,
@@ -241,7 +241,35 @@ class DynamicReconfigurePanel(wx.lib.scrolledpanel.ScrolledPanel):
         sizer.SetFlexibleDirection(wx.BOTH)
         sizer.AddGrowableCol(1, 1)
 
-        for param_descr in descr:
+        self.add_group_controls(sizer, descr, config)
+
+        self.hbox.Add(sizer, 1, wx.ALL | wx.EXPAND, 4)
+
+        self.SetSizerAndFit(self.hbox)
+        self.SetMinSize((self.GetSize()[0] + 30, 10))
+        self.SetupScrolling()
+
+        self.reconf.config_callback = self._config_callback
+
+        self.updater = self.BatchUpdater(self.reconf)
+        self.updater.start()
+
+    def add_group_controls(self, sizer, group, config):
+        if not group['id'] == 0:
+            # Construct a group header
+            sizer.Add((10,20), 0, wx.ALIGN_CENTER_VERTICAL | wx.EXPAND | wx.ALL)
+            sizer.Add((10,20), 1, wx.ALIGN_CENTER_VERTICAL | wx.EXPAND | wx.ALL)
+
+            # Label
+            label_name = group['name'].replace("_", " ")
+            label = wx.StaticText(self, wx.ID_ANY, label_name)
+            sizer.Add(label, 1, wx.ALIGN_CENTER_VERTICAL | wx.EXPAND | wx.ALL)
+
+            # Line
+            divider = wx.StaticLine(self, wx.ID_ANY)
+            sizer.Add(divider, 0, wx.ALIGN_CENTER_VERTICAL | wx.EXPAND | wx.ALL)
+        
+        for param_descr in group['parameters']:
             name = param_descr['name']
             type, val, min, max, description = param_descr['type'], config[name], param_descr['min'], param_descr['max'], param_descr['description']
 
@@ -256,7 +284,7 @@ class DynamicReconfigurePanel(wx.lib.scrolledpanel.ScrolledPanel):
             except:
                 editor = self._editor_types[type](self, name, val, min, max)
             self.editors[name] = editor
-            sizer.Add(editor, 0, flags[type])
+            sizer.Add(editor, 0, self.flags[type])
 
             tooltip_text = description
             min_max_text = editor.get_min_max_text(min, max)
@@ -266,16 +294,8 @@ class DynamicReconfigurePanel(wx.lib.scrolledpanel.ScrolledPanel):
             tooltip.SetDelay(2000)
             label.SetToolTip(tooltip)
 
-        self.hbox.Add(sizer, 1, wx.ALL | wx.EXPAND, 4)
-
-        self.SetSizerAndFit(self.hbox)
-        self.SetMinSize((self.GetSize()[0] + 30, 10))
-        self.SetupScrolling()
-
-        self.reconf.config_callback = self._config_callback
-
-        self.updater = self.BatchUpdater(self.reconf)
-        self.updater.start()
+        for g in group['groups']:
+            self.add_group_controls(sizer, g, config)
 
     def _config_callback(self, config):
         for name, editor in self.editors.iteritems():

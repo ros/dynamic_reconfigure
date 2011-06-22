@@ -35,6 +35,7 @@ import rospy
 
 from dynamic_reconfigure.msg import Config as ConfigMsg
 from dynamic_reconfigure.msg import ConfigDescription as ConfigDescrMsg
+from dynamic_reconfigure.msg import Group as GroupMsg
 from dynamic_reconfigure.msg import IntParameter, BoolParameter, StrParameter, DoubleParameter, ParamDescription
 
 def encode_description(descr):
@@ -42,9 +43,26 @@ def encode_description(descr):
     msg.max = encode_config(descr.max)
     msg.min = encode_config(descr.min)
     msg.dflt = encode_config(descr.defaults)
-    for param in descr.config_description:
-        msg.parameters.append(ParamDescription(param['name'], param['type'], param['level'], param['description'], param['edit_method']))
+    msg.groups = encode_groups(None, descr.config_description)
     return msg
+
+def encode_groups(parent, group):
+    group_list = []
+    
+    msg = GroupMsg()
+
+    msg.name = group['name']
+    msg.id = group['id']
+    msg.parent = group['parent']
+
+    for param in group['parameters']:
+        msg.parameters.append(ParamDescription(param['name'], param['type'], param['level'], param['description'], param['edit_method']))
+
+    group_list.append(msg)
+    for next in group['groups']:
+        group_list.extend(encode_groups(msg, next))
+
+    return group_list
 
 def encode_config(config):
     msg = ConfigMsg()
@@ -56,23 +74,66 @@ def encode_config(config):
         elif type(v) == float: msg.doubles.append(DoubleParameter(k, v))
     return msg
 
+def group_dict(group):
+    return {
+        'id' : group.id,
+        'parent' : group.parent,
+        'name' : group.name,
+        'groups' : [],
+        'parameters' : [],
+    }
+
 def decode_description(msg):
-    descr = []
     mins = decode_config(msg.min)
     maxes = decode_config(msg.max)
     defaults = decode_config(msg.dflt)
-    for param in msg.parameters:
-        name = param.name
-        descr.append({
-            'name': name,
-            'min': mins[name],
-            'max': maxes[name],
-            'default': defaults[name],
-            'type': param.type,
-            'description': param.description,
-            'edit_method': param.edit_method,
+    groups = {}
+    grouplist = msg.groups
+
+    def params_from_msg(msg):
+        params = []
+        for param in msg.parameters:
+            name = param.name
+            params.append({
+               'name': name,
+               'min' : mins[name],
+               'max' : maxes[name],
+               'default' : defaults[name],
+               'type' : param.type,
+               'description' : param.description,
+               'edit_method' : param.edit_method,
             })
-    return descr
+        return params
+
+    # grab the default group
+    for group in grouplist:
+        if group.id == 0:
+            groups = group_dict(group)
+            groups['parameters'] = params_from_msg(group)
+            grouplist.remove(group)
+  
+    def build_tree(group):
+        children = []
+        for g in grouplist:
+            if g.parent == group['id']:
+               gd = group_dict(g)
+               
+               gd['parameters'] = params_from_msg(g)
+               gd['groups'].extend(build_tree(gd))
+               # add the dictionary into the tree
+               children.append(gd)
+        return children
+    groups['groups'].extend(build_tree(groups))
+
+    return groups
 
 def decode_config(msg):
     return dict([(kv.name, kv.value) for kv in msg.bools + msg.ints + msg.strs + msg.doubles])
+
+def extract_params(group):
+    params = []
+    params.extend(group['parameters'])
+    for next in group['groups']:
+        params.extend(extract_params(next))
+    return params
+

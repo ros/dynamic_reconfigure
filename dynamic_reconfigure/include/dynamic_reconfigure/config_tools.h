@@ -4,10 +4,23 @@
 #include <string>
 #include <vector>
 #include <dynamic_reconfigure/Config.h>
+#include <dynamic_reconfigure/Group.h>
 
 namespace dynamic_reconfigure
 {
 
+//wrap the Group message to allow recursion
+class GroupDescription : public dynamic_reconfigure::Group {
+  public:
+    GroupDescription(std::string n, int p, int  i) { 
+      name = n;
+      parent = p;
+      id = i;
+    }
+
+    std::vector<GroupDescription> groups;
+};
+ 
 class ConfigTools
 {
 public:
