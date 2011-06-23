@@ -12,8 +12,9 @@ namespace dynamic_reconfigure
 //wrap the Group message to allow recursion
 class GroupDescription : public dynamic_reconfigure::Group {
   public:
-    GroupDescription(std::string n, int p, int  i) { 
+    GroupDescription(std::string n, std::string t, int p, int  i) { 
       name = n;
+      type = t;
       parent = p;
       id = i;
     }

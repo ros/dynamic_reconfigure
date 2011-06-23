@@ -82,8 +82,9 @@ class ParameterGenerator:
             }
         
     class Group:
-        def __init__(self, gen, name, id, parent):
+        def __init__(self, gen, name, type, id, parent):
             self.name = name.replace(" ", "_")
+            self.type = type
             self.groups = []
             self.parameters =[]
             self.gen = gen
@@ -92,12 +93,14 @@ class ParameterGenerator:
 
             self.srcline = inspect.currentframe().f_back.f_lineno
             self.srcfile = inspect.getsourcefile(inspect.currentframe().f_back.f_code)
-        def add_group(self, name):
+
+        def add_group(self, name, type=""):
             global id
-            group = self.gen.Group(self.gen, name, id, self.id)
+            group = self.gen.Group(self.gen, name, type, id, self.id)
             id = id + 1
             self.groups.append(group)
             return group
+
         def add(self, name, paramtype, level, description, default = None, min = None, max = None, edit_method = ""):
             newparam = {
                     'name' : name,
@@ -132,6 +135,7 @@ class ParameterGenerator:
         def to_dict(self):
           return {
               'name': self.name,
+              'type': self.type,
               'id':self.id, 'parent':self.parent,
               'parameters': self.parameters,
               'groups' : [group.to_dict() for group in self.groups],
@@ -168,7 +172,7 @@ class ParameterGenerator:
     
     def __init__(self):
         global id
-        self.group = self.Group(self, "Default", id, 0)
+        self.group = self.Group(self, "Default", "", id, 0)
         id = id + 1
         self.constants = []
         self.dynconfpath = roslib.packages.get_pkg_dir("dynamic_reconfigure")
@@ -194,10 +198,10 @@ class ParameterGenerator:
 
     # Wrap add and add_group for the default group
     def add(self, name, paramtype, level, description, default = None, min = None, max = None, edit_method = ""):
-        self.group.add(name, paramtype, level, description, default = None, min = None, max = None, edit_method = "")
+        self.group.add(name, paramtype, level, description, default, min, max, edit_method) 
 
-    def add_group(self, name):
-        return self.group.add_group(name)
+    def add_group(self, name, type=""):
+        return self.group.add_group(name, type)
 
     def mkdirabs(self, path, second_attempt = False):
         if os.path.isdir(path):
@@ -385,7 +389,7 @@ $i.desc=$description $range"""
                 name = "__groups__"
             else:
                 name = group.name
-                self.appendline(paramdescr, 'dynamic_reconfigure::GroupDescription ${name}("${name}", ${parent}, ${id});', group.to_dict())
+                self.appendline(paramdescr, 'dynamic_reconfigure::GroupDescription ${name}("${name}", "${type}", ${parent}, ${id});', group.to_dict())
             for param in group.parameters:
                 self.appendline(members, "${ctype} ${name};", param)
                 self.appendline(paramdescr, "__min__.${name} = $v;", param, "min")

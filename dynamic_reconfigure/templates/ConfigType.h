@@ -233,7 +233,7 @@ ${doline} ${linenum} "${filename}"
   {
     friend class ${configname}Config;
     
-    ${configname}ConfigStatics() : __groups__("Default", 0, 0)
+    ${configname}ConfigStatics() : __groups__("Default", "", 0, 0)
     {
 ${paramdescr}
 ${doline} ${linenum} "${filename}"
