@@ -39,6 +39,28 @@ from dynamic_reconfigure.msg import Group as GroupMsg
 from dynamic_reconfigure.msg import GroupState
 from dynamic_reconfigure.msg import IntParameter, BoolParameter, StrParameter, DoubleParameter, ParamDescription
 
+# Wrapper object for the config dictionary
+class Config:
+  def __init__(self, **args):
+        for k, v in args.items():
+            if type(v) is dict:
+                self.__dict__[k] = Config(**v) 
+            elif type(v) is list:
+                for d in v:
+                    if type(d) is dict:
+                        self.__dict__[d['name']] = Config(**d) 
+            else:
+                self.__dict__[k] = v
+
+  # Preserve backwards compatibility by allowing dictionary style lookup
+  def __getitem__(self, key):
+      if not type(key) is str:
+          raise TypeError
+      elif not key in self.__dict__:
+          raise KeyError
+      else:
+          return self.__dict__[key]
+
 def encode_description(descr):
     msg = ConfigDescrMsg()
     msg.max = encode_config(descr.max)
@@ -174,10 +196,11 @@ def get_tree(m, group = None):
         return children
 
 def decode_config(msg):
-    ret = dict([(kv.name, kv.value) for kv in msg.bools + msg.ints + msg.strs + msg.doubles])
+    d = dict([(kv.name, kv.value) for kv in msg.bools + msg.ints + msg.strs + msg.doubles])
     if not msg.groups == []:
-        ret["groups"] = get_tree(msg)
-    return ret
+        d["groups"] = get_tree(msg)
+
+    return Config(**d)
 
 def extract_params(group):
     params = []

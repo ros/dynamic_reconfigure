@@ -222,7 +222,6 @@ ${doline} ${linenum} "${filename}"
         {
           boost::any cfg = *this;
           (*i)->fromMessage(msg, cfg);
-          count++;
         }
       }
 
