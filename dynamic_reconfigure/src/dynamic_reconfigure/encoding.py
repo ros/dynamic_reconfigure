@@ -42,10 +42,11 @@ from dynamic_reconfigure.msg import IntParameter, BoolParameter, StrParameter, D
 # Wrapper object for the config dictionary
 class Config:
   def __init__(self, **args):
+        self.config = args
         for k, v in args.items():
-            if type(v) is dict:
+            if type(v) == dict:
                 self.__dict__[k] = Config(**v) 
-            elif type(v) is list:
+            elif type(v) == list:
                 for d in v:
                     if type(d) is dict:
                         self.__dict__[d['name']] = Config(**d) 
@@ -60,6 +61,17 @@ class Config:
           raise KeyError
       else:
           return self.__dict__[key]
+
+  def __repr__(self):
+      return repr(self.__dict__)
+
+  def update(self, *args):
+      for set in args:
+        self.config.update(set)
+      self = Config(**self.config)
+
+  def items(self):
+      return self.config.items()
 
 def encode_description(descr):
     msg = ConfigDescrMsg()

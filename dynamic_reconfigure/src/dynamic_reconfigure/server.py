@@ -62,7 +62,7 @@ class Server(object):
 
         # setup group defaults
         self.config['groups'] = get_tree(self.description)
-        print self.config['groups']
+        self.config = Config(**self.config)
 
         self.descr_topic = rospy.Publisher('~parameter_descriptions', ConfigDescrMsg, latch=True)
         self.descr_topic.publish(self.description);
@@ -74,8 +74,8 @@ class Server(object):
 
     def update_configuration(self, changes):
         with self.mutex:
-            new_config = dict(self.config)
-            new_config.update(changes)
+            new_config = self.config
+            new_config.update(changes['config'])
             self._clamp(new_config)
             return self._change_config(new_config, self._calc_level(new_config, self.config))
 
