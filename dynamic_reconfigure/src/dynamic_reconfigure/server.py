@@ -54,10 +54,15 @@ class Server(object):
         self.mutex = threading.Lock()
         self.type = type
         self.config = type.defaults
+
         self.description = encode_description(type)
         self._copy_from_parameter_server()
         self.callback = callback
         self._clamp(self.config) 
+
+        # setup group defaults
+        self.config['groups'] = get_tree(self.description)
+        print self.config['groups']
 
         self.descr_topic = rospy.Publisher('~parameter_descriptions', ConfigDescrMsg, latch=True)
         self.descr_topic.publish(self.description);

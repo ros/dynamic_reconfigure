@@ -54,6 +54,7 @@ ${doline} ${linenum} "${filename}"
 #include <dynamic_reconfigure/ParamDescription.h>
 #include <dynamic_reconfigure/Group.h>
 #include <dynamic_reconfigure/config_init_mutex.h>
+#include <boost/any.hpp>
 
 namespace ${pkgname}
 {
@@ -134,16 +135,97 @@ namespace ${pkgname}
       }
     };
 
+    class AbstractGroupDescription : public dynamic_reconfigure::Group
+    {
+      public:
+      AbstractGroupDescription(std::string n, std::string t, int p, int i)
+      {
+        name = n;
+        type = t;
+        parent = p;
+        id = i;
+      }
+
+      virtual void toMessage(dynamic_reconfigure::Config &msg, const boost::any &config) const = 0;
+      virtual bool fromMessage(const dynamic_reconfigure::Config &msg, boost::any &config) const =0;
+    };
+
+    typedef boost::shared_ptr<AbstractGroupDescription> AbstractGroupDescriptionPtr;
+    typedef boost::shared_ptr<const AbstractGroupDescription> AbstractGroupDescriptionConstPtr;
+
+    template<class T, class PT>
+    class GroupDescription : public AbstractGroupDescription
+    {
+    public:
+      GroupDescription(std::string name, std::string type, int parent, int id, T PT::* f) : AbstractGroupDescription(name, type, parent, id), field(f)
+      {
+      }
+
+      GroupDescription(const GroupDescription<T, PT>& g): AbstractGroupDescription(g.name, g.type, g.parent, g.id), field(g.field), groups(g.groups)
+      {
+        parameters = g.parameters;
+
+        std::cout << "Group " << name << " subgroups:" << groups.size() << std::endl;
+      }
+
+      virtual bool fromMessage(const dynamic_reconfigure::Config &msg, boost::any &cfg) const
+      {
+        PT config = boost::any_cast<PT>(cfg);
+        dynamic_reconfigure::ConfigTools::getGroupState(msg, name, config.*field);
+
+        for(std::vector<AbstractGroupDescriptionConstPtr>::const_iterator i = groups.begin(); i != groups.end(); i++) 
+        {
+          boost::any n = config.*field;
+          (*i)->fromMessage(msg, n);
+        }
+
+        return true;
+      }
+
+      virtual void toMessage(dynamic_reconfigure::Config &msg, const boost::any &cfg) const
+      {
+        const PT config = boost::any_cast<PT>(cfg);
+        const T &c = config.*field; 
+        std::cout << c.name << std::endl;
+        dynamic_reconfigure::ConfigTools::appendGroup<T>(msg, name, id, parent, config.*field);
+
+        for(std::vector<AbstractGroupDescriptionConstPtr>::const_iterator i = groups.begin(); i != groups.end(); i++)
+        {
+          std::cout << (*i)->name << std::endl;
+          (*i)->toMessage(msg, config.*field);
+        }
+      }
+
+      T (PT::* field);
+      std::vector<${configname}Config::AbstractGroupDescriptionConstPtr> groups;
+    };
+    
+${groups}
+
+
 ${members}
 ${doline} ${linenum} "${filename}"
 
     bool __fromMessage__(dynamic_reconfigure::Config &msg)
     {
       const std::vector<AbstractParamDescriptionConstPtr> &__param_descriptions__ = __getParamDescriptions__();
+      const std::vector<AbstractGroupDescriptionConstPtr> &__group_descriptions__ = __getGroupDescriptions__();
+
       int count = 0;
       for (std::vector<AbstractParamDescriptionConstPtr>::const_iterator i = __param_descriptions__.begin(); i != __param_descriptions__.end(); i++)
         if ((*i)->fromMessage(msg, *this))
           count++;
+
+      for (std::vector<AbstractGroupDescriptionConstPtr>::const_iterator i = __group_descriptions__.begin(); i != __group_descriptions__.end(); i ++)
+      {
+        if ((*i)->id == 0)
+        {
+          boost::any cfg = *this;
+          (*i)->fromMessage(msg, cfg);
+          count++;
+        }
+      }
+
       if (count != dynamic_reconfigure::ConfigTools::size(msg))
       {
         ROS_ERROR("${configname}Config::__fromMessage__ called with an unexpected parameter.");
@@ -168,17 +250,26 @@ ${doline} ${linenum} "${filename}"
 
     // This version of __toMessage__ is used during initialization of
     // statics when __getParamDescriptions__ can't be called yet.
-    void __toMessage__(dynamic_reconfigure::Config &msg, const std::vector<AbstractParamDescriptionConstPtr> &__param_descriptions__) const
+    void __toMessage__(dynamic_reconfigure::Config &msg, const std::vector<AbstractParamDescriptionConstPtr> &__param_descriptions__, const std::vector<AbstractGroupDescriptionConstPtr> &__group_descriptions__) const
     {
       dynamic_reconfigure::ConfigTools::clear(msg);
       for (std::vector<AbstractParamDescriptionConstPtr>::const_iterator i = __param_descriptions__.begin(); i != __param_descriptions__.end(); i++)
         (*i)->toMessage(msg, *this);
+
+      for (std::vector<AbstractGroupDescriptionConstPtr>::const_iterator i = __group_descriptions__.begin(); i != __group_descriptions__.end(); i++)
+      {
+        if((*i)->id == 0)
+        {
+          (*i)->toMessage(msg, *this);
+        }
+      }
     }
     
     void __toMessage__(dynamic_reconfigure::Config &msg) const
     {
       const std::vector<AbstractParamDescriptionConstPtr> &__param_descriptions__ = __getParamDescriptions__();
-      __toMessage__(msg, __param_descriptions__);
+      const std::vector<AbstractGroupDescriptionConstPtr> &__group_descriptions__ = __getGroupDescriptions__();
+      __toMessage__(msg, __param_descriptions__, __group_descriptions__);
     }
     
     void __toServer__(const ros::NodeHandle &nh) const
@@ -218,6 +309,7 @@ ${doline} ${linenum} "${filename}"
     static const ${configname}Config &__getMax__();
     static const ${configname}Config &__getMin__();
     static const std::vector<AbstractParamDescriptionConstPtr> &__getParamDescriptions__();
+    static const std::vector<AbstractGroupDescriptionConstPtr> &__getGroupDescriptions__();
     
   private:
     static const ${configname}ConfigStatics *__get_statics__();
@@ -233,20 +325,19 @@ ${doline} ${linenum} "${filename}"
   {
     friend class ${configname}Config;
     
-    ${configname}ConfigStatics() : __groups__("Default", "", 0, 0)
+    ${configname}ConfigStatics()
     {
 ${paramdescr}
 ${doline} ${linenum} "${filename}"
     
-      for (std::vector<dynamic_reconfigure::Group>::const_iterator i = __group_descriptions__.begin(); i != __group_descriptions__.end(); i++)
-        __description_message__.groups.push_back(*i);
-      __max__.__toMessage__(__description_message__.max, __param_descriptions__); 
-      __min__.__toMessage__(__description_message__.min, __param_descriptions__); 
-      __default__.__toMessage__(__description_message__.dflt, __param_descriptions__); 
+      for (std::vector<${configname}Config::AbstractGroupDescriptionConstPtr>::const_iterator i = __group_descriptions__.begin(); i != __group_descriptions__.end(); i++)
+        __description_message__.groups.push_back(**i);
+      __max__.__toMessage__(__description_message__.max, __param_descriptions__, __group_descriptions__); 
+      __min__.__toMessage__(__description_message__.min, __param_descriptions__, __group_descriptions__); 
+      __default__.__toMessage__(__description_message__.dflt, __param_descriptions__, __group_descriptions__); 
     }
     std::vector<${configname}Config::AbstractParamDescriptionConstPtr> __param_descriptions__;
-    std::vector<dynamic_reconfigure::Group> __group_descriptions__;
-    dynamic_reconfigure::GroupDescription __groups__;
+    std::vector<${configname}Config::AbstractGroupDescriptionConstPtr> __group_descriptions__;
     ${configname}Config __max__;
     ${configname}Config __min__;
     ${configname}Config __default__;
@@ -286,6 +377,11 @@ ${doline} ${linenum} "${filename}"
   inline const std::vector<${configname}Config::AbstractParamDescriptionConstPtr> &${configname}Config::__getParamDescriptions__()
   {
     return __get_statics__()->__param_descriptions__;
+  }
+
+  inline const std::vector<${configname}Config::AbstractGroupDescriptionConstPtr> &${configname}Config::__getGroupDescriptions__()
+  {
+    return __get_statics__()->__group_descriptions__;
   }
 
   inline const ${configname}ConfigStatics *${configname}Config::__get_statics__()

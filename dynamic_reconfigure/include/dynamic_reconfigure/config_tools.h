@@ -9,19 +9,6 @@
 namespace dynamic_reconfigure
 {
 
-//wrap the Group message to allow recursion
-class GroupDescription : public dynamic_reconfigure::Group {
-  public:
-    GroupDescription(std::string n, std::string t, int p, int  i) { 
-      name = n;
-      type = t;
-      parent = p;
-      id = i;
-    }
-
-    std::vector<GroupDescription> groups;
-};
- 
 class ConfigTools
 {
 public:
@@ -121,9 +108,32 @@ public:
     return getParameter(getVectorForType(set, val), name, val);
   }
 
+  template<class T>
+  static void appendGroup(dynamic_reconfigure::Config &set, const std::string &name, int id, int parent, const T &val) 
+  {
+    dynamic_reconfigure::GroupState msg;
+    msg.name = name;
+    msg.id= id;
+    msg.parent = parent;
+    msg.state = val.state;
+    set.groups.push_back(msg);
+  }
+
+  template<class T>
+  static bool getGroupState(const dynamic_reconfigure::Config &msg, const std::string &name, T &val)
+  {
+    for(std::vector<dynamic_reconfigure::GroupState>::const_iterator i = msg.groups.begin(); i != msg.groups.end(); i++)
+      if(i->name == name)
+      {
+        val.state = i->state;
+        return true;
+      }
+    return false;
+  }
+
   static int size(dynamic_reconfigure::Config &msg)
   {
-    return msg.bools.size() + msg.doubles.size() + msg.ints.size() + msg.strs.size();
+    return msg.bools.size() + msg.doubles.size() + msg.ints.size() + msg.strs.size() + msg.groups.size();
   }
 
   static void clear(dynamic_reconfigure::Config &msg)
