@@ -90,7 +90,6 @@ def encode_groups(parent, group):
 def encode_config(config):
     msg = ConfigMsg()
     for k, v in config.items():
-        print type(v)
         ## @todo add more checks here?
         if   type(v) == int:   msg.ints.append(IntParameter(k, v))
         elif type(v) == bool:  msg.bools.append(BoolParameter(k, v))

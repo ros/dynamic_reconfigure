@@ -259,7 +259,6 @@ class Client(object):
         with self._cv:
             self._cv.notifyAll()
         if self._config_callback is not None:
-            print self.config.groups.state
             self._config_callback(self.config)
 
     def _descriptions_msg(self, msg):

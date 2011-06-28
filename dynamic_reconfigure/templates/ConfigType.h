@@ -164,8 +164,6 @@ namespace ${pkgname}
       GroupDescription(const GroupDescription<T, PT>& g): AbstractGroupDescription(g.name, g.type, g.parent, g.id), field(g.field), groups(g.groups)
       {
         parameters = g.parameters;
-
-        std::cout << "Group " << name << " subgroups:" << groups.size() << std::endl;
       }
 
       virtual bool fromMessage(const dynamic_reconfigure::Config &msg, boost::any &cfg) const
@@ -186,12 +184,10 @@ namespace ${pkgname}
       {
         const PT config = boost::any_cast<PT>(cfg);
         const T &c = config.*field; 
-        std::cout << c.name << std::endl;
         dynamic_reconfigure::ConfigTools::appendGroup<T>(msg, name, id, parent, config.*field);
 
         for(std::vector<AbstractGroupDescriptionConstPtr>::const_iterator i = groups.begin(); i != groups.end(); i++)
         {
-          std::cout << (*i)->name << std::endl;
           (*i)->toMessage(msg, config.*field);
         }
       }
