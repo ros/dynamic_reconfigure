@@ -218,7 +218,7 @@ class DynamicReconfigurePanel(wx.lib.scrolledpanel.ScrolledPanel):
 
         config = self.reconf.get_configuration()
         descr  = self.reconf.get_group_descriptions()
-        
+
         # Create the editors
         self.editors = {}
         
@@ -342,6 +342,11 @@ class DynamicReconfigurePanel(wx.lib.scrolledpanel.ScrolledPanel):
                 self._last_pending = time.time()
 
                 self._cv.notify()
+
+        def update_group(self, config):
+            with self._cv:
+                for i, group in enumerate(config.groups):
+                    self._pending_config.groups[i] = group
 
         def stop(self):
             self._stop_flag = True
@@ -530,6 +535,16 @@ class DynamicReconfigurePanel(wx.lib.scrolledpanel.ScrolledPanel):
         def _inv_slider_value(self, val): return self.ifunc(self.offset + val * self.scale)
         def _text_value(self, val):       return '%.5g' % val
         def _inv_text_value(self, val):   return float(val)
+
+    class GroupPane:
+        def __init__(self, name):
+            self.name = name
+
+        def update_state(self, state):
+            pass
+
+        def _update(self, event):
+          nes_state = self.get_state()
 
 if __name__ == '__main__':
     argv = rospy.myargv()

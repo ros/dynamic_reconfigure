@@ -189,6 +189,30 @@ class Client(object):
 
         return resp
 
+    def update_groups(self, changes):
+        """
+        Changes the servers group configuration
+
+        @param changes: dictionary of key value pairs for the parameters that are changing
+        @type  changes: {str: value}
+        """
+        
+        def update_state(group, description):
+            for g in description['groups']:
+                if g['id'] == group['id']:
+                    g['state'] = group['state']
+                else:
+                    update_state(group, g)
+            return description
+        print update_state(changes, self.get_group_descriptions())
+
+        # Update only the groups
+        config = encode_config({'groups': update_state(changes, self.get_group_descriptions())})
+        msg    = self._set_service(config).config
+        resp   = decode_config(msg)
+
+        return resp
+
     def close(self):
         """
         Close connections to the server

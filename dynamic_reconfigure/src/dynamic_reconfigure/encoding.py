@@ -42,11 +42,11 @@ from dynamic_reconfigure.msg import IntParameter, BoolParameter, StrParameter, D
 # Wrapper object for the config dictionary
 class Config:
   def __init__(self, **args):
-        self.config = args
+        #self.config = args
         for k, v in args.items():
-            if type(v) == dict:
+            if type(v) is dict:
                 self.__dict__[k] = Config(**v) 
-            elif type(v) == list:
+            elif type(v) is list:
                 for d in v:
                     if type(d) is dict:
                         self.__dict__[d['name']] = Config(**d) 
@@ -57,21 +57,44 @@ class Config:
   def __getitem__(self, key):
       if not type(key) is str:
           raise TypeError
+      elif key == "groups":
+          groups = []
+          for k,v in self.items():
+              if isinstance(v, Config):
+                  groups.append(v)
+          return groups
       elif not key in self.__dict__:
           raise KeyError
       else:
           return self.__dict__[key]
+
+  def __setitem__(self, key, value):
+      if not type(key) is str:
+          raise TypeError
+      else:
+          if type(value) is dict or isinstance(value, Config):
+              self.__dict__[key] = Config(**value)
+          elif type(value) is list:
+              for d in value:
+                  if type(d) is dict:
+                      self.__dict__[d['value']] = Config(**d)
+          else:
+              self.__dict__[key] = value
 
   def __repr__(self):
       return repr(self.__dict__)
 
   def update(self, *args):
       for set in args:
-        self.config.update(set)
-      self = Config(**self.config)
+          try:
+              for k,v in set.items():
+                  self[k] = v
+          except Exception as exc:
+              raise exc
 
+  # TODO:Implement proper form of items
   def items(self):
-      return self.config.items()
+      return self.__dict__.items()
 
 def encode_description(descr):
     msg = ConfigDescrMsg()
@@ -107,7 +130,8 @@ def encode_config(config):
         elif type(v) == bool:  msg.bools.append(BoolParameter(k, v))
         elif type(v) == str:   msg.strs.append(StrParameter(k, v))
         elif type(v) == float: msg.doubles.append(DoubleParameter(k, v))
-        elif type(v) == dict:
+        # TODO: Make Configs have a 'groups' field and sqahs this into one
+        elif type(v) == dict or isinstance(v, Config):
             def flatten(g):
                 groups = []
                 for x in g['groups']:
@@ -116,6 +140,17 @@ def encode_config(config):
                 return groups
             msg.groups.append(GroupState(v['name'], v['state'], v['id'], v['parent']))
             msg.groups.extend(flatten(v))
+        #elif isinstance(v, Config):
+        #    def flatten(g):
+        #        groups = []
+        #        for p,g in g.items():
+        #            if isinstance(g, Config):
+        #                groups.extend(flatten(g))
+        #                groups.append(GroupState(g['name'], g['state'], g['id'], g['parent']))
+        #        return groups
+        #    msg.groups.append(GroupState(v.name, v.state, v.id, v.parent))
+        #    msg.groups.extend(flatten(v))
+           
     return msg
 
 def group_dict(group):
@@ -220,3 +255,10 @@ def extract_params(group):
         params.extend(extract_params(next))
     return params
 
+def get_parents(group, descriptions):
+    parents = []
+    for p in descriptions['group']:
+        if p['id'] == group['parent']:
+            parents.extend(get_parents(p, descriptions))
+            parents.append(p)
+    return parents
