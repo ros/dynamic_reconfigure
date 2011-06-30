@@ -58,6 +58,8 @@ import dynamic_reconfigure.client
 import rosservice
 import sys
 
+row = 0
+
 class MainWindow(wx.Frame):
     def __init__(self, node=None):
         if node is not None:
@@ -81,7 +83,7 @@ class MainWindow(wx.Frame):
                 wx.SetCursor(wx.StockCursor(wx.CURSOR_WAIT))
                 wx.Yield()
 
-                reconf = dynamic_reconfigure.client.Client(node, timeout=5.0)
+                self.reconf = dynamic_reconfigure.client.Client(node, timeout=5.0)
             except:
                 print 'Can\'t connect to node %s' % node
                 self.Close()
@@ -90,7 +92,7 @@ class MainWindow(wx.Frame):
                 wx.SetCursor(wx.StockCursor(wx.CURSOR_ARROW))
                 wx.Yield()
                 
-            control = DynamicReconfigurePanel(self, reconf)
+            control = DynamicReconfigurePanel(self, self.reconf)
 
             control.SetMinSize((control.GetSize()[0] + 30, control.GetSize()[1]))
         else:
@@ -210,6 +212,7 @@ class DynamicReconfigureSelector(wx.Panel):
             self.reconf_panel = None
 
 class DynamicReconfigurePanel(wx.lib.scrolledpanel.ScrolledPanel):
+    updater = None
     def __init__(self, parent, reconf):
         wx.lib.scrolledpanel.ScrolledPanel.__init__(self, parent, wx.ID_ANY)
 
@@ -219,8 +222,11 @@ class DynamicReconfigurePanel(wx.lib.scrolledpanel.ScrolledPanel):
         config = self.reconf.get_configuration()
         descr  = self.reconf.get_group_descriptions()
 
+        DynamicReconfigurePanel.updater = DynamicReconfigurePanel.BatchUpdater(self.reconf)
+
         # Create the editors
         self.editors = {}
+        self.groups = {}
         
         self._editor_types = {
             'bool':   DynamicReconfigurePanel.BooleanEditor,
@@ -228,6 +234,12 @@ class DynamicReconfigurePanel(wx.lib.scrolledpanel.ScrolledPanel):
             'double': DynamicReconfigurePanel.DoubleEditor,
             'str':    DynamicReconfigurePanel.StringEditor
         }
+
+        self._group_types = {
+            '': DynamicReconfigurePanel.PaneGroup,
+            'collapse': DynamicReconfigurePanel.CollapsibleGroup
+        }
+
         self.flags = {
             'bool':   wx.ALIGN_LEFT,
             'int':    wx.EXPAND,
@@ -237,9 +249,9 @@ class DynamicReconfigurePanel(wx.lib.scrolledpanel.ScrolledPanel):
         
         self.hbox = wx.BoxSizer(wx.HORIZONTAL)
         
-        sizer = wx.FlexGridSizer(0, 2, vgap=1, hgap=4)
+        sizer = wx.GridBagSizer(vgap=1, hgap=4)
         sizer.SetFlexibleDirection(wx.BOTH)
-        sizer.AddGrowableCol(1, 1)
+        sizer.AddGrowableCol(1, 0)
 
         self.add_group_controls(sizer, descr, config)
 
@@ -251,55 +263,23 @@ class DynamicReconfigurePanel(wx.lib.scrolledpanel.ScrolledPanel):
 
         self.reconf.config_callback = self._config_callback
 
-        self.updater = self.BatchUpdater(self.reconf)
-        self.updater.start()
+        DynamicReconfigurePanel.updater.start()
 
     def add_group_controls(self, sizer, group, config):
-        if not group['id'] == 0:
-            # Construct a group header
-            sizer.Add((10,20), 0, wx.ALIGN_CENTER_VERTICAL | wx.EXPAND | wx.ALL)
-            sizer.Add((10,20), 1, wx.ALIGN_CENTER_VERTICAL | wx.EXPAND | wx.ALL)
-
-            # Label
-            label_name = group['name'].replace("_", " ")
-            label = wx.StaticText(self, wx.ID_ANY, label_name)
-            sizer.Add(label, 1, wx.ALIGN_CENTER_VERTICAL | wx.EXPAND | wx.ALL)
-
-            # Line
-            divider = wx.StaticLine(self, wx.ID_ANY)
-            sizer.Add(divider, 0, wx.ALIGN_CENTER_VERTICAL | wx.EXPAND | wx.ALL)
-        
-        for param_descr in group['parameters']:
-            name = param_descr['name']
-            type, val, min, max, description = param_descr['type'], config[name], param_descr['min'], param_descr['max'], param_descr['description']
-
-            # Label
-            label = wx.StaticText(self, wx.ID_ANY, name + ':')
-            sizer.Add(label, 1, wx.ALIGN_CENTER_VERTICAL | wx.ALIGN_RIGHT)
-
-            # Editor
-            try:
-                enum = eval(param_descr['edit_method'])['enum']
-                editor = self.EnumEditor(self, name, val, enum)
-            except:
-                editor = self._editor_types[type](self, name, val, min, max)
-            self.editors[name] = editor
-            sizer.Add(editor, 0, self.flags[type])
-
-            tooltip_text = description
-            min_max_text = editor.get_min_max_text(min, max)
-            if min_max_text is not None:
-                tooltip_text += ' ' + min_max_text
-            tooltip = wx.ToolTip(tooltip_text)
-            tooltip.SetDelay(2000)
-            label.SetToolTip(tooltip)
-
-        for g in group['groups']:
-            self.add_group_controls(sizer, g, config)
+        sizer.Add(DynamicReconfigurePanel.PaneGroup(self, group, config, top=self), (row, 0), span=(1,2), flag = wx.ALIGN_CENTER_VERTICAL | wx.EXPAND | wx.ALL)
 
     def _config_callback(self, config):
         for name, editor in self.editors.iteritems():
             wx.CallAfter(editor.update_value, config[name])
+        for name, group in self.groups.iteritems():
+            cfg = None
+            for k, v in config.groups.items():
+                if k.lower() <= name.lower():
+                    cfg = v
+            try:
+                wx.CallAfter(group.update_state, cfg['state'])
+            except:
+                print "Could not get config for %s"%name
 
     def close(self):
         self.updater.stop()
@@ -320,19 +300,18 @@ class DynamicReconfigurePanel(wx.lib.scrolledpanel.ScrolledPanel):
             last_commit = None
 
             while not self._stop_flag:
-                if last_commit > self._last_pending:
+                if last_commit >= self._last_pending:
                     with self._cv:
                         self._cv.wait()                 
-                        
+
                 last_commit = time.time()
-                
                 update = self._pending_config.copy()
                 self._pending_config = {}
 
                 try:
                     updated = self._reconf.update_configuration(update)
-                except:
-                    pass
+                except Exception as exc:
+                    raise exc
 
         def update(self, config):
             with self._cv:
@@ -343,10 +322,13 @@ class DynamicReconfigurePanel(wx.lib.scrolledpanel.ScrolledPanel):
 
                 self._cv.notify()
 
-        def update_group(self, config):
+        def update_group(self, group):
             with self._cv:
-                for i, group in enumerate(config.groups):
-                    self._pending_config.groups[i] = group
+                if not 'groups' in self._pending_config.keys():
+                    self._pending_config['groups'] = []
+                self._pending_config['groups'].append(group)
+
+                self._cv.notify()
 
         def stop(self):
             self._stop_flag = True
@@ -366,7 +348,7 @@ class DynamicReconfigurePanel(wx.lib.scrolledpanel.ScrolledPanel):
                 self.update_configuration(new_value)
 
         def update_configuration(self, value):
-            self.GetParent().updater.update({ self.name : value })
+            DynamicReconfigurePanel.updater.update({ self.name : value })
 
         def get_min_max_text(self, min, max):
             return None
@@ -536,15 +518,169 @@ class DynamicReconfigurePanel(wx.lib.scrolledpanel.ScrolledPanel):
         def _text_value(self, val):       return '%.5g' % val
         def _inv_text_value(self, val):   return float(val)
 
-    class GroupPane:
-        def __init__(self, name):
-            self.name = name
+    class GroupView:
+        def __init__(self, group, top=None):
+            self.group = group
+            self.name = group['name']
+            self.id = group['id']
+            self.type = group['type']
+            self.groups = group['groups']
+            self.params = group['parameters']
+            self.old_state = group['state']
+            self.top = top
 
         def update_state(self, state):
             pass
 
         def _update(self, event):
-          nes_state = self.get_state()
+            self.update_configuration(self.get_state())
+
+        def update_configuration(self, state):
+            self.group['state'] = state
+            DynamicReconfigurePanel.updater.update_group(self.group)
+
+        def add_groups(self, sizer, config, row):
+            for g in self.groups:
+                sizer.Add(self.top._group_types[g['type']](self, g, config, top=self.top), (row, 0), span=(1,2), flag = wx.EXPAND | wx.ALL)
+
+    class PaneGroup(GroupView, wx.Panel):
+        def __init__(self, parent, group, config, top=None):
+            DynamicReconfigurePanel.GroupView.__init__(self, group, top) 
+            wx.Panel.__init__(self, parent, wx.ID_ANY)
+            
+            if top is None:
+                self.top = self.GetParent()
+
+            sizer = wx.GridBagSizer()
+            sizer.AddGrowableCol(1)
+            sizer.SetFlexibleDirection(wx.BOTH)
+            row = 0
+            
+            if not self.id == 0:
+                # spacer
+                sizer.Add((10,20),(row, 0), flag = wx.ALIGN_CENTER_VERTICAL | wx.EXPAND | wx.ALL, span = (1, 2)) 
+                row = row+1
+                
+                # Label
+                label_name = group['name'].replace("_", " ")
+                label = wx.StaticText(self, wx.ID_ANY, label_name)
+                sizer.Add(label, (row, 0), flag = wx.ALIGN_CENTER_VERTICAL | wx.EXPAND | wx.ALL)
+
+                # Line
+                divider = wx.StaticLine(self, wx.ID_ANY)
+                sizer.Add(divider, (row, 1), flag = wx.ALIGN_CENTER_VERTICAL | wx.EXPAND | wx.ALL)
+                row = row+1
+            for param_descr in self.params:
+                name = param_descr['name']
+                type, val, min, max, description = param_descr['type'], config[name], param_descr['min'], param_descr['max'], param_descr['description']
+ 
+                # Label
+                label = wx.StaticText(self, wx.ID_ANY, name + ':')
+                sizer.Add(label, (row, 0), flag = wx.ALIGN_CENTER_VERTICAL | wx.ALIGN_RIGHT)
+ 
+                # Editor
+                try:
+                    enum = eval(param_descr['edit_method'])['enum']
+                    editor = self.EnumEditor(self, name, val, enum)
+                except:
+                    editor = self.top._editor_types[type](self, name, val, min, max)
+                self.top.editors[name] = editor
+                sizer.Add(editor, (row, 1), flag = self.top.flags[type])
+                row = row+1
+       
+                tooltip_text = description
+                min_max_text = editor.get_min_max_text(min, max)
+                if min_max_text is not None:
+                    tooltip_text += ' ' + min_max_text
+                tooltip = wx.ToolTip(tooltip_text)
+                tooltip.SetDelay(2000)
+                label.SetToolTip(tooltip)
+
+            self.add_groups(sizer, config, row)
+
+            self.SetSizer(sizer)
+            self.top.groups[self.name] = self
+
+    class CollapsibleGroup(GroupView, wx.Panel):
+        def __init__(self, parent, group, config, top=None):
+            DynamicReconfigurePanel.GroupView.__init__(self, group, top)
+            wx.Panel.__init__(self, parent, wx.ID_ANY)
+            
+            sizer = wx.GridBagSizer()
+            sizer.AddGrowableCol(1)
+            sizer.SetFlexibleDirection(wx.BOTH)
+            row = 0
+
+            self.button = wx.ToggleButton(self, wx.ID_ANY, label = self.name)
+            self.Bind(wx.EVT_TOGGLEBUTTON, self.toggle)
+            sizer.Add(self.button, (row,0), span = (1,2))
+            row = row+1
+
+            self.sp = wx.Panel(self, wx.ID_ANY)
+            ss = wx.GridBagSizer()
+            ss.AddGrowableCol(1)
+            ss.SetFlexibleDirection(wx.BOTH)
+            sr = 0
+
+            for param_descr in self.params:
+                name = param_descr['name']
+                type, val, min, max, description = param_descr['type'], config[name], param_descr['min'], param_descr['max'], param_descr['description']
+ 
+                # Label
+                label = wx.StaticText(self.sp, wx.ID_ANY, name + ':')
+                ss.Add(label, (sr, 0), flag = wx.ALIGN_CENTER_VERTICAL | wx.ALIGN_RIGHT)
+ 
+                # Editor
+                try:
+                    enum = eval(param_descr['edit_method'])['enum']
+                    editor = self.EnumEditor(self.sp, name, val, enum)
+                except:
+                    editor = self.top._editor_types[type](self.sp, name, val, min, max)
+                self.top.editors[name] = editor
+                ss.Add(editor, (sr, 1), flag = self.top.flags[type])
+                sr = sr+1
+       
+                tooltip_text = description
+                min_max_text = editor.get_min_max_text(min, max)
+                if min_max_text is not None:
+                    tooltip_text += ' ' + min_max_text
+                tooltip = wx.ToolTip(tooltip_text)
+                tooltip.SetDelay(2000)
+                label.SetToolTip(tooltip)
+
+            self.add_groups(ss, config, sr)
+            self.sp.SetSizer(ss)
+            sizer.Add(self.sp, (row, 0), span=(1,2), flag= wx.EXPAND | wx.ALL)
+            self.SetSizer(sizer)
+
+            self.top.groups[self.name] = self
+
+        def toggle(self, event, up=True):
+            old_x, old_y = self.GetTopLevelParent().GetSizeTuple()
+            this_x, this_y = self.sp.GetSizeTuple()
+            if self.sp.IsShown() and self.get_state() is False:
+                self.sp.Hide()
+                y = old_y - this_y
+                self.GetTopLevelParent().SetSize((old_x,y))
+            elif not self.sp.IsShown() and self.get_state() is True:
+                y = old_y + this_y
+                self.GetTopLevelParent().SetSize((old_x,y))
+                self.sp.Show()
+            else:
+                self.button.SetValue(self.get_state())
+            if up is True:
+                self._update(event)
+
+        def get_state(self):
+           return self.group['state']
+
+        def update_state(self, state):
+           print "Update_state called"
+           if not state == self.get_state():
+              # up=False prevents the configuration from going into an infinite loop
+              self.group['state'] = state
+              self.toggle(None, up=False)
+            
 
 if __name__ == '__main__':
     argv = rospy.myargv()

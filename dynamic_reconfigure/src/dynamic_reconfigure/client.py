@@ -174,15 +174,19 @@ class Client(object):
         # Cast the parameters to the appropriate types
         if self.param_description is not None:
             for name, value in changes.items()[:]:
-                dest_type = self._param_types.get(name)
-                if dest_type is None:
-                    raise DynamicReconfigureParameterException('don\'t know parameter: %s' % name)
+                if not name is 'groups':
+                    dest_type = self._param_types.get(name)
+                    if dest_type is None:
+                        raise DynamicReconfigureParameterException('don\'t know parameter: %s' % name)
                 
-                try:
-                    changes[name] = dest_type(value)
-                except ValueError, e:
-                    raise DynamicReconfigureParameterException('can\'t set parameter \'%s\' of %s: %s' % (name, str(dest_type), e))
-        
+                    try:
+                        changes[name] = dest_type(value)
+                    except ValueError, e:
+                        raise DynamicReconfigureParameterException('can\'t set parameter \'%s\' of %s: %s' % (name, str(dest_type), e))
+
+        if 'groups' in changes.keys():
+            changes['groups'] = self.update_groups(changes['groups'])
+
         config = encode_config(changes)
         msg    = self._set_service(config).config
         resp   = decode_config(msg)
@@ -197,21 +201,20 @@ class Client(object):
         @type  changes: {str: value}
         """
         
+        groups = []
         def update_state(group, description):
-            for g in description['groups']:
+            for p,g in enumerate(description['groups']):
                 if g['id'] == group['id']:
-                    g['state'] = group['state']
+                    description['groups'][p]['state'] = group['state']
                 else:
                     update_state(group, g)
             return description
-        print update_state(changes, self.get_group_descriptions())
 
-        # Update only the groups
-        config = encode_config({'groups': update_state(changes, self.get_group_descriptions())})
-        msg    = self._set_service(config).config
-        resp   = decode_config(msg)
+        descr = self.get_group_descriptions()
+        for change in changes:
+            descr = update_state(change, descr)
 
-        return resp
+        return descr
 
     def close(self):
         """

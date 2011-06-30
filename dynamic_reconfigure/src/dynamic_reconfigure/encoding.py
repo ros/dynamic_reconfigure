@@ -42,7 +42,6 @@ from dynamic_reconfigure.msg import IntParameter, BoolParameter, StrParameter, D
 # Wrapper object for the config dictionary
 class Config:
   def __init__(self, **args):
-        #self.config = args
         for k, v in args.items():
             if type(v) is dict:
                 self.__dict__[k] = Config(**v) 
@@ -72,12 +71,14 @@ class Config:
       if not type(key) is str:
           raise TypeError
       else:
-          if type(value) is dict or isinstance(value, Config):
+          if type(value) is dict:
               self.__dict__[key] = Config(**value)
+          elif isinstance(value, Config):
+              self.__dict__[key] = value 
           elif type(value) is list:
               for d in value:
                   if type(d) is dict:
-                      self.__dict__[d['value']] = Config(**d)
+                      self.__dict__[d['name']] = Config(**d)
           else:
               self.__dict__[key] = value
 
@@ -112,6 +113,7 @@ def encode_groups(parent, group):
     msg.name = group['name']
     msg.id = group['id']
     msg.parent = group['parent']
+    msg.type = group['type']
 
     for param in group['parameters']:
         msg.parameters.append(ParamDescription(param['name'], param['type'], param['level'], param['description'], param['edit_method']))
@@ -122,7 +124,7 @@ def encode_groups(parent, group):
 
     return group_list
 
-def encode_config(config):
+def encode_config(config, flat=True):
     msg = ConfigMsg()
     for k, v in config.items():
         ## @todo add more checks here?
@@ -130,27 +132,19 @@ def encode_config(config):
         elif type(v) == bool:  msg.bools.append(BoolParameter(k, v))
         elif type(v) == str:   msg.strs.append(StrParameter(k, v))
         elif type(v) == float: msg.doubles.append(DoubleParameter(k, v))
-        # TODO: Make Configs have a 'groups' field and sqahs this into one
-        elif type(v) == dict or isinstance(v, Config):
-            def flatten(g):
-                groups = []
-                for x in g['groups']:
-                    groups.extend(flatten(x))
-                    groups.append(GroupState(x['name'], x['state'], x['id'], x['parent']))
-                return groups
-            msg.groups.append(GroupState(v['name'], v['state'], v['id'], v['parent']))
-            msg.groups.extend(flatten(v))
-        #elif isinstance(v, Config):
-        #    def flatten(g):
-        #        groups = []
-        #        for p,g in g.items():
-        #            if isinstance(g, Config):
-        #                groups.extend(flatten(g))
-        #                groups.append(GroupState(g['name'], g['state'], g['id'], g['parent']))
-        #        return groups
-        #    msg.groups.append(GroupState(v.name, v.state, v.id, v.parent))
-        #    msg.groups.extend(flatten(v))
-           
+        elif type(v) == dict or type(v) == list or isinstance(v, Config):
+            if flat is True:
+                def flatten(g):
+                    groups = []
+                    for x in g['groups']:
+                        groups.extend(flatten(x))
+                        groups.append(GroupState(x['name'], x['state'], x['id'], x['parent']))
+                    return groups
+                msg.groups.append(GroupState(v['name'], v['state'], v['id'], v['parent']))
+                msg.groups.extend(flatten(v))
+            else:
+                msg.groups = [GroupState(x['name'], x['state'], x['id'], x['parent']) for x in v]
+
     return msg
 
 def group_dict(group):
@@ -158,10 +152,15 @@ def group_dict(group):
         state = group.state
     else:
         state = True
+    if hasattr(group, 'type'):
+        type = group.type
+    else:
+        type =''
     return {
         'id' : group.id,
         'parent' : group.parent,
         'name' : group.name,
+        'type' : type,
         'state': state,
         'groups' : [],
         'parameters' : [],
@@ -225,11 +224,6 @@ def get_tree(m, group = None):
           pass
         elif g.parent == group.id:
             gd = group_dict(g)
-            if hasattr(g, 'state'):
-                gd['state'] = g.state
-            # state defaults to true
-            else:
-                gd['state'] = True
 
             gd['groups'] = get_tree(m, g)
             children.append(gd)
