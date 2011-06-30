@@ -201,19 +201,27 @@ class Client(object):
         @type  changes: {str: value}
         """
         
-        groups = []
-        def update_state(group, description):
-            for p,g in enumerate(description['groups']):
-                if g['id'] == group['id']:
-                    description['groups'][p]['state'] = group['state']
-                else:
-                    update_state(group, g)
-            return description
-
         descr = self.get_group_descriptions()
-        for change in changes:
-            descr = update_state(change, descr)
-
+        print descr
+        try:
+            print "Trying: ", changes.items()
+            for k,v in changes.items():
+                for p,g in enumerate(descr['groups']):
+                    print "Group name: ",  g['name']
+                    if k == g['name']:
+                        g['state'] = v
+        except:
+            groups = []
+            def update_state(group, description):
+                for p,g in enumerate(description['groups']):
+                    if g['id'] == group['id']:
+                        description['groups'][p]['state'] = group['state']
+                    else:
+                        update_state(group, g)
+                return description
+ 
+            for change in changes:
+                descr = update_state(change, descr)
         return descr
 
     def close(self):
