@@ -142,6 +142,7 @@ public:
     msg.ints.clear();
     msg.strs.clear();
     msg.doubles.clear();
+    msg.groups.clear();
   }
 };
 

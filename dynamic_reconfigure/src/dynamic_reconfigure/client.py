@@ -181,6 +181,9 @@ class Client(object):
                 
                     try:
                         changes[name] = dest_type(value)
+                        # Fix not converting bools properly
+                        if dest_type is bool and type(value) is str:
+                            changes[name] = value.lower() in ("yes", "true", "t", "1")
                     except ValueError, e:
                         raise DynamicReconfigureParameterException('can\'t set parameter \'%s\' of %s: %s' % (name, str(dest_type), e))
 
@@ -202,12 +205,9 @@ class Client(object):
         """
         
         descr = self.get_group_descriptions()
-        print descr
         try:
-            print "Trying: ", changes.items()
             for k,v in changes.items():
                 for p,g in enumerate(descr['groups']):
-                    print "Group name: ",  g['name']
                     if k == g['name']:
                         g['state'] = v
         except:

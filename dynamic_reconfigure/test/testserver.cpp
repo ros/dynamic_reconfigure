@@ -44,12 +44,10 @@ void callback(dynamic_reconfigure::TestConfig &config, uint32_t level)
   config.str_ += "A";
   config.bool_ = !config.bool_;
   config.level = level;
+  
 
-  ROS_INFO("State of group one is %d", config.groups.group_one.state);
-  if(config.groups.group_one.state == false)
-    config.groups.group_one.state = true;
-  else
-    config.groups.group_one.state =false;
+  ROS_INFO("TEST");
+  ROS_INFO("Group 2 requested to be set to %d", config.groups.group_one.group2.state);
 
   ROS_INFO("Reconfigured to     : %i %f %s %i %i", config.int_, config.double_, config.str_.c_str(), (int) config.bool_, config.level);
 }

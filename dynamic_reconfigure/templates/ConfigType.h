@@ -168,13 +168,16 @@ namespace ${pkgname}
 
       virtual bool fromMessage(const dynamic_reconfigure::Config &msg, boost::any &cfg) const
       {
-        PT config = boost::any_cast<PT>(cfg);
-        dynamic_reconfigure::ConfigTools::getGroupState(msg, name, config.*field);
+
+        PT* config = boost::any_cast<PT*>(cfg);
+        if(!dynamic_reconfigure::ConfigTools::getGroupState(msg, name, (*config).*field))
+          return false;
 
         for(std::vector<AbstractGroupDescriptionConstPtr>::const_iterator i = groups.begin(); i != groups.end(); i++) 
         {
-          boost::any n = config.*field;
-          (*i)->fromMessage(msg, n);
+          boost::any n = &((*config).*field);
+          if(!(*i)->fromMessage(msg, n))
+            return false;
         }
 
         return true;
@@ -183,7 +186,6 @@ namespace ${pkgname}
       virtual void toMessage(dynamic_reconfigure::Config &msg, const boost::any &cfg) const
       {
         const PT config = boost::any_cast<PT>(cfg);
-        const T &c = config.*field; 
         dynamic_reconfigure::ConfigTools::appendGroup<T>(msg, name, id, parent, config.*field);
 
         for(std::vector<AbstractGroupDescriptionConstPtr>::const_iterator i = groups.begin(); i != groups.end(); i++)
@@ -216,8 +218,8 @@ ${doline} ${linenum} "${filename}"
       {
         if ((*i)->id == 0)
         {
-          boost::any cfg = *this;
-          (*i)->fromMessage(msg, cfg);
+         boost::any n = boost::any(this);
+         (*i)->fromMessage(msg, n);
         }
       }
 
