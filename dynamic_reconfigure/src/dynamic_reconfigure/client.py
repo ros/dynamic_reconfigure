@@ -180,10 +180,25 @@ class Client(object):
                         raise DynamicReconfigureParameterException('don\'t know parameter: %s' % name)
                 
                     try:
-                        changes[name] = dest_type(value)
+                        found = False
+                        descr = [x for x in self.param_description if x['name'].lower() == name.lower()][0]
+
                         # Fix not converting bools properly
                         if dest_type is bool and type(value) is str:
                             changes[name] = value.lower() in ("yes", "true", "t", "1")
+                            found = True
+                        # Handle enums
+                        elif type(value) is str and not descr['edit_method'] == '':
+                            enum_descr = eval(descr['edit_method'])
+                            found = False
+                            for const in enum_descr['enum']:
+                                if value.lower() == const['name'].lower():
+                                    val_type = self._param_type_from_string(const['type'])
+                                    changes[name] = val_type(const['value'])
+                                    found = True
+                        if not found:
+                            changes[name] = dest_type(value)
+
                     except ValueError, e:
                         raise DynamicReconfigureParameterException('can\'t set parameter \'%s\' of %s: %s' % (name, str(dest_type), e))
 
