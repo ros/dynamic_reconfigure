@@ -295,7 +295,7 @@ class DynamicReconfigurePanel(wx.lib.scrolledpanel.ScrolledPanel):
             try:
                 wx.CallAfter(group.update_state, cfg['state'])
             except:
-                if not name.lower == 'default':
+                if not name.lower() == 'default':
                     print "Could not get config for %s"%name
 
     def close(self):
@@ -682,16 +682,15 @@ class DynamicReconfigurePanel(wx.lib.scrolledpanel.ScrolledPanel):
             old_x, old_y = self.GetTopLevelParent().GetSizeTuple()
             this_x, this_y = self.sp.GetSizeTuple()
             if self.sp.IsShown() and self.get_state() is False:
-                print self.sp.GetChildren()
                 for w in self.sp.GetChildren():
                     w.Hide()
                 self.sp.Hide()
                 self.GetTopLevelParent().Layout()
-                #y = old_y - this_y
-                #self.GetTopLevelParent().SetSize((old_x,y))
+                y = old_y - this_y
+                self.GetTopLevelParent().SetSize((old_x,y))
             elif not self.sp.IsShown() and self.get_state() is True:
-                #y = old_y + this_y
-                #self.GetTopLevelParent().SetSize((old_x,y))
+                y = old_y + this_y
+                self.GetTopLevelParent().SetSize((old_x,y))
                 self.sp.Show()
                 for w in self.sp.GetChildren():
                     w.Show()
