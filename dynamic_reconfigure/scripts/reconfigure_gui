@@ -237,7 +237,8 @@ class DynamicReconfigurePanel(wx.lib.scrolledpanel.ScrolledPanel):
 
         self._group_types = {
             '': DynamicReconfigurePanel.PaneGroup,
-            'collapse': DynamicReconfigurePanel.CollapsibleGroup
+            'collapse': DynamicReconfigurePanel.CollapsibleGroup,
+            'hide': DynamicReconfigurePanel.HideableGroup
         }
 
         self.flags = {
@@ -706,11 +707,92 @@ class DynamicReconfigurePanel(wx.lib.scrolledpanel.ScrolledPanel):
               # up=False prevents the configuration from going into an infinite loop
               self.group['state'] = state
               self.toggle(None, up=False)
-
+        
+        # Override add_groups to use a subpanel
         def add_groups(self, sizer, config, row):
            for g in self.groups:
                sizer.Add(self.top._group_types[g['type']](self.sp, g, config, top=self.top), (row, 0), span=(1,2), flag = wx.EXPAND | wx.ALL)
                row = row+1           
+
+    class HideableGroup(GroupView, wx.Panel):
+        def __init__(self, parent, group, config, top=None):
+            DynamicReconfigurePanel.GroupView.__init__(self, group, top) 
+            wx.Panel.__init__(self, parent, wx.ID_ANY)
+            
+            if top is None:
+                self.top = self.GetParent()
+
+            sizer = wx.GridBagSizer()
+            sizer.AddGrowableCol(1)
+            sizer.SetFlexibleDirection(wx.BOTH)
+            row = 0
+            
+            if not self.id == 0:
+                # spacer
+                sizer.Add((10,20),(row, 0), flag = wx.ALIGN_CENTER_VERTICAL | wx.EXPAND | wx.ALL, span = (1, 2)) 
+                row = row+1
+                
+                # Label
+                label_name = group['name'].replace("_", " ")
+                label = wx.StaticText(self, wx.ID_ANY, label_name)
+                sizer.Add(label, (row, 0), flag = wx.ALIGN_CENTER_VERTICAL | wx.EXPAND | wx.ALL)
+
+                # Line
+                divider = wx.StaticLine(self, wx.ID_ANY)
+                sizer.Add(divider, (row, 1), flag = wx.ALIGN_CENTER_VERTICAL | wx.EXPAND | wx.ALL)
+                row = row+1
+            for param_descr in self.params:
+                name = param_descr['name']
+                type, val, min, max, description = param_descr['type'], config[name], param_descr['min'], param_descr['max'], param_descr['description']
+ 
+                # Label
+                label = wx.StaticText(self, wx.ID_ANY, name + ':')
+                sizer.Add(label, (row, 0), flag = wx.ALIGN_CENTER_VERTICAL | wx.ALIGN_RIGHT)
+ 
+                # Editor
+                try:
+                    enum = eval(param_descr['edit_method'])['enum']
+                    editor = self.top.EnumEditor(self, name, val, enum)
+                except:
+                    editor = self.top._editor_types[type](self, name, val, min, max)
+                self.top.editors[name] = editor
+                sizer.Add(editor, (row, 1), flag = self.top.flags[type])
+                row = row+1
+       
+                tooltip_text = description
+                min_max_text = editor.get_min_max_text(min, max)
+                if min_max_text is not None:
+                    tooltip_text += ' ' + min_max_text
+                tooltip = wx.ToolTip(tooltip_text)
+                tooltip.SetDelay(2000)
+                label.SetToolTip(tooltip)
+
+            self.add_groups(sizer, config, row)
+
+            self.SetSizer(sizer)
+            self.top.groups[self.name] = self
+
+        def toggle(self):
+            old_x, old_y = self.GetTopLevelParent().GetSizeTuple()
+            this_x, this_y = self.GetSizeTuple()
+            if self.IsShown() and self.get_state() is False:
+                self.Hide()
+                self.GetTopLevelParent().Layout()
+                y = old_y - this_y
+                self.GetTopLevelParent().SetSize((old_x,y))
+            elif not self.IsShown() and self.get_state() is True:
+                y = old_y + this_y
+                self.GetTopLevelParent().SetSize((old_x,y))
+                self.Show()
+                self.GetTopLevelParent().Layout()
+
+        def update_state(self, state):
+            if not state == self.get_state():
+                self.group['state'] = state
+                self.toggle()
+
+        def get_state(self):
+            return self.group['state']
 
 if __name__ == '__main__':
     argv = rospy.myargv()
