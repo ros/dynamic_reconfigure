@@ -32,6 +32,7 @@
 
 import roslib; roslib.load_manifest('dynamic_reconfigure')
 import rospy
+import inspect
 
 from dynamic_reconfigure.msg import Config as ConfigMsg
 from dynamic_reconfigure.msg import ConfigDescription as ConfigDescrMsg
@@ -81,6 +82,14 @@ class Config:
                       self.__dict__[d['name']] = Config(**d)
           else:
               self.__dict__[key] = value
+              self.__setparam__(key, value)
+
+  def __setparam__(self, name, value):
+      for k, v in self.items():
+          if name == k:
+              self.__dict__[name] = value
+          elif isinstance(v, Config):
+              v.__setparam__(name, value)
 
   def __repr__(self):
       return repr(self.__dict__)
@@ -235,11 +244,21 @@ def get_tree(m, group = None):
     else:
         return children
 
-def decode_config(msg):
+def decode_config(msg, description = None):
     d = dict([(kv.name, kv.value) for kv in msg.bools + msg.ints + msg.strs + msg.doubles])
     if not msg.groups == []:
         d["groups"] = get_tree(msg)
+        
+        def add_params(group, descr):
+            for param in descr['parameters']:
+                group[param['name']] = d[param['name']]
+            for g in group['groups']:
+                for dr in descr['groups']:
+                    if dr['name'] == g['name']:
+                        add_params(g, dr)
 
+        add_params(d['groups'], description)
+    
     return Config(**d)
 
 def extract_params(group):

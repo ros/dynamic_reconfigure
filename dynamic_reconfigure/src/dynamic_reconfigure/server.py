@@ -62,7 +62,7 @@ class Server(object):
 
         # setup group defaults
         self.config['groups'] = get_tree(self.description)
-        self.config = Config(**self.config)
+        self.config = decode_config(encode_config(self.config), type.config_description)
 
         self.descr_topic = rospy.Publisher('~parameter_descriptions', ConfigDescrMsg, latch=True)
         self.descr_topic.publish(self.description);
@@ -122,4 +122,4 @@ class Server(object):
                 config[param['name']] = minval 
 
     def _set_callback(self, req):
-        return encode_config(self.update_configuration(decode_config(req.config)))
+        return encode_config(self.update_configuration(decode_config(req.config, self.type.config_description)))

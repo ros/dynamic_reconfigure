@@ -207,7 +207,9 @@ class Client(object):
 
         config = encode_config(changes)
         msg    = self._set_service(config).config
-        resp   = decode_config(msg)
+        if self.group_description is None:
+            self.get_group_descriptions()
+        resp   = decode_config(msg, self.group_description)
 
         return resp
 
@@ -304,7 +306,9 @@ class Client(object):
         return rospy.Subscriber(topic_name, type, callback=callback)
 
     def _updates_msg(self, msg):
-        self.config = decode_config(msg)
+        if self.group_description is None:
+            self.get_group_descriptions()
+        self.config = decode_config(msg, self.group_description)
         
         with self._cv:
             self._cv.notifyAll()
