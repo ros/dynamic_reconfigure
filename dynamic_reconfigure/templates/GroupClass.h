@@ -11,13 +11,11 @@ class ${upper}
     {
       for (std::vector<AbstractParamDescriptionConstPtr>::const_iterator i = params.begin(); i != params.end(); i++)
       {
-        ROS_INFO("Lopping Params");
         boost::any val;
         (*i)->getValue(config, val);
 
 ${setters}
       }
-      ROS_INFO("Done looping");
     }
 
     ${params}
