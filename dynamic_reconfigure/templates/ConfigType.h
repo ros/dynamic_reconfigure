@@ -82,6 +82,7 @@ namespace ${pkgname}
       virtual void toServer(const ros::NodeHandle &nh, const ${configname}Config &config) const = 0;
       virtual bool fromMessage(const dynamic_reconfigure::Config &msg, ${configname}Config &config) const = 0;
       virtual void toMessage(dynamic_reconfigure::Config &msg, const ${configname}Config &config) const = 0;
+      virtual void getValue(const ${configname}Config &config, boost::any &val) const = 0;
     };
 
     typedef boost::shared_ptr<AbstractParamDescription> AbstractParamDescriptionPtr;
@@ -133,6 +134,11 @@ namespace ${pkgname}
       {
         dynamic_reconfigure::ConfigTools::appendParameter(msg, name, config.*field);
       }
+
+      virtual void getValue(const ${configname}Config &config, boost::any &val) const
+      {
+        val = config.*field;
+      }
     };
 
     class AbstractGroupDescription : public dynamic_reconfigure::Group
@@ -146,8 +152,19 @@ namespace ${pkgname}
         id = i;
       }
 
+      std::vector<AbstractParamDescriptionConstPtr> abstract_parameters;
+
       virtual void toMessage(dynamic_reconfigure::Config &msg, const boost::any &config) const = 0;
       virtual bool fromMessage(const dynamic_reconfigure::Config &msg, boost::any &config) const =0;
+      virtual void updateParams(boost::any &cfg, ${configname}Config &top) const= 0;
+
+      void convertParams()
+      {
+        for(std::vector<AbstractParamDescriptionConstPtr>::const_iterator i = abstract_parameters.begin(); i != abstract_parameters.end(); i++)
+        {
+          parameters.push_back(dynamic_reconfigure::ParamDescription(**i));
+        }
+      }
     };
 
     typedef boost::shared_ptr<AbstractGroupDescription> AbstractGroupDescriptionPtr;
@@ -164,15 +181,15 @@ namespace ${pkgname}
       GroupDescription(const GroupDescription<T, PT>& g): AbstractGroupDescription(g.name, g.type, g.parent, g.id), field(g.field), groups(g.groups)
       {
         parameters = g.parameters;
+        abstract_parameters = g.abstract_parameters;
       }
 
       virtual bool fromMessage(const dynamic_reconfigure::Config &msg, boost::any &cfg) const
       {
-
         PT* config = boost::any_cast<PT*>(cfg);
         if(!dynamic_reconfigure::ConfigTools::getGroupState(msg, name, (*config).*field))
           return false;
-
+        
         for(std::vector<AbstractGroupDescriptionConstPtr>::const_iterator i = groups.begin(); i != groups.end(); i++) 
         {
           boost::any n = &((*config).*field);
@@ -181,6 +198,20 @@ namespace ${pkgname}
         }
 
         return true;
+      }
+      
+      virtual void updateParams(boost::any &cfg, ${configname}Config &top) const
+      {
+        PT* config = boost::any_cast<PT*>(cfg);
+
+        T* f = &((*config).*field);
+        f->setParams(top, abstract_parameters);
+
+        for(std::vector<AbstractGroupDescriptionConstPtr>::const_iterator i = groups.begin(); i != groups.end(); i++) 
+        {
+          boost::any n = &((*config).*field);
+          (*i)->updateParams(n, top);
+        }
       }
 
       virtual void toMessage(dynamic_reconfigure::Config &msg, const boost::any &cfg) const
@@ -219,6 +250,7 @@ ${doline} ${linenum} "${filename}"
         if ((*i)->id == 0)
         {
          boost::any n = boost::any(this);
+         (*i)->updateParams(n, *this);
          (*i)->fromMessage(msg, n);
         }
       }

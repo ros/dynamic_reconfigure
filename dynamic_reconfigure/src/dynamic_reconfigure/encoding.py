@@ -246,7 +246,7 @@ def get_tree(m, group = None):
 
 def decode_config(msg, description = None):
     d = dict([(kv.name, kv.value) for kv in msg.bools + msg.ints + msg.strs + msg.doubles])
-    if not msg.groups == []:
+    if not msg.groups == [] and description is not None:
         d["groups"] = get_tree(msg)
         
         def add_params(group, descr):

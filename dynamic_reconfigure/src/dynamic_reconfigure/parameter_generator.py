@@ -413,10 +413,17 @@ $i.desc=$description $range"""
         subgroups = []
         for g in group.groups:
             self.appendgroup(subgroups, g)
+        setters = []
+        params = []
+        for p in group.parameters:
+            setters.append(Template("        if(\"${name}\"==(*i)->name){${name} = boost::any_cast<${ctype}>(val);}").substitute(p));
+            params.append(Template("${ctype} ${name};").substitute(p));
 
         subgroups = string.join(subgroups, "\n") 
+        setters = string.join(setters, "\n")
+        params = string.join(params, "\n")
         grouptemplate = open(os.path.join(self.dynconfpath, "templates", "GroupClass.h")).read()
-        list.append(Template(grouptemplate).safe_substitute(group.to_dict(), subgroups = subgroups))
+        list.append(Template(grouptemplate).safe_substitute(group.to_dict(), subgroups = subgroups, setters = setters, params = params, configname = self.name))
 
     def generatecpp(self):
         # Read the configuration manipulator template and insert line numbers and file name into template.
@@ -454,15 +461,16 @@ $i.desc=$description $range"""
                 self.appendline(paramdescr, "__min__.${name} = $v;", param, "min")
                 self.appendline(paramdescr, "__max__.${name} = $v;", param, "max")
                 self.appendline(paramdescr, "__default__.${name} = $v;", param, "default")
-                self.appendline(paramdescr, group.to_dict()['name']+".parameters.push_back(${configname}Config::ParamDescription<${ctype}>(\"${name}\", \"${type}\", ${level}, "\
-                        "\"${description}\", \"${edit_method}\", &${configname}Config::${name}));", param)
+                self.appendline(paramdescr, group.to_dict()['name']+".abstract_parameters.push_back(${configname}Config::AbstractParamDescriptionConstPtr(new ${configname}Config::ParamDescription<${ctype}>(\"${name}\", \"${type}\", ${level}, "\
+                        "\"${description}\", \"${edit_method}\", &${configname}Config::${name})));", param)
                 self.appendline(paramdescr, 
                         "__param_descriptions__.push_back(${configname}Config::AbstractParamDescriptionConstPtr(new ${configname}Config::ParamDescription<${ctype}>(\"${name}\", \"${type}\", ${level}, "\
                         "\"${description}\", \"${edit_method}\", &${configname}Config::${name})));", param)
                 
             for g in group.groups:
                 write_params(g)    
-
+            
+            self.appendline(paramdescr, "${name}.convertParams();", group.to_dict())
             if group.id == 0:
                 self.appendline(paramdescr, "__group_descriptions__.push_back(${configname}Config::AbstractGroupDescriptionConstPtr(new ${configname}Config::GroupDescription<${configname}Config::${class}, ${configname}Config>(${name})));", group.to_dict())
             else:
