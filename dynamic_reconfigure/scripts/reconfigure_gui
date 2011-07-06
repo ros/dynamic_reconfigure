@@ -630,10 +630,29 @@ class DynamicReconfigurePanel(wx.lib.scrolledpanel.ScrolledPanel):
             sizer.SetFlexibleDirection(wx.BOTH)
             row = 0
 
-            self.button = wx.ToggleButton(self, wx.ID_ANY, label = self.name)
-            self.button.SetValue(1)
-            self.Bind(wx.EVT_TOGGLEBUTTON, self.toggle)
-            sizer.Add(self.button, (row,0), span = (1,2))
+            #self.button = wx.ToggleButton(self, wx.ID_ANY, label = self.name)
+            #self.button.SetValue(1)
+            #self.Bind(wx.EVT_TOGGLEBUTTON, self.toggle)
+            #sizer.Add(self.button, (row,0), span = (1,2))
+            #row = row+1
+
+            # spacer
+            sizer.Add((10,20),(row, 0), flag = wx.ALIGN_CENTER_VERTICAL | wx.EXPAND | wx.ALL, span = (1, 2)) 
+            row = row+1
+            
+            # Label
+            label_name = group['name'].replace("_", " ")
+            label = wx.StaticText(self, wx.ID_ANY, label_name)
+            sizer.Add(label, (row, 0), flag = wx.ALIGN_CENTER_VERTICAL | wx.EXPAND | wx.ALL)
+
+            # Line
+            divider = wx.StaticLine(self, wx.ID_ANY)
+            sizer.Add(divider, (row, 1), flag = wx.ALIGN_CENTER_VERTICAL | wx.EXPAND | wx.ALL)
+
+            self.check = wx.CheckBox(self, wx.ID_ANY)
+            self.check.SetValue(1)
+            self.Bind(wx.EVT_CHECKBOX, self.toggle)
+            sizer.Add(self.check, (row, 2))
             row = row+1
 
             self.sp = wx.Panel(self, wx.ID_ANY)
@@ -677,7 +696,7 @@ class DynamicReconfigurePanel(wx.lib.scrolledpanel.ScrolledPanel):
 
         def toggle(self, event, up=True):
             if up == True:
-                self.group['state'] = self.button.GetValue()
+                self.group['state'] = self.check.GetValue()
                 self._update(event)
 
             old_x, old_y = self.GetTopLevelParent().GetSizeTuple()
