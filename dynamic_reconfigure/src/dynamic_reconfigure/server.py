@@ -53,7 +53,7 @@ class Server(object):
     def __init__(self, type, callback):
         self.mutex = threading.Lock()
         self.type = type
-        self.config = type.defaults
+        self.config = type.defaults.copy()
 
         self.description = encode_description(type)
         self._copy_from_parameter_server()
