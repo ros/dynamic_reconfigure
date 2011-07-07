@@ -53,11 +53,16 @@ class Server(object):
     def __init__(self, type, callback):
         self.mutex = threading.Lock()
         self.type = type
-        self.config = type.defaults
+        self.config = type.defaults.copy()
+
         self.description = encode_description(type)
         self._copy_from_parameter_server()
         self.callback = callback
         self._clamp(self.config) 
+
+        # setup group defaults
+        self.config['groups'] = get_tree(self.description)
+        self.config = decode_config(encode_config(self.config), type.config_description)
 
         self.descr_topic = rospy.Publisher('~parameter_descriptions', ConfigDescrMsg, latch=True)
         self.descr_topic.publish(self.description);
@@ -69,20 +74,20 @@ class Server(object):
 
     def update_configuration(self, changes):
         with self.mutex:
-            new_config = dict(self.config)
+            new_config = self.config
             new_config.update(changes)
             self._clamp(new_config)
             return self._change_config(new_config, self._calc_level(new_config, self.config))
 
     def _copy_from_parameter_server(self):
-        for param in self.type.config_description:
+        for param in extract_params(self.type.config_description):
             try:
                 self.config[param['name']] = rospy.get_param("~" + param['name'])
             except KeyError:
                 pass
 
     def _copy_to_parameter_server(self):
-        for param in self.type.config_description:
+        for param in extract_params(self.type.config_description):
             rospy.set_param('~' + param['name'], self.config[param['name']])
 
     def _change_config(self, config, level):
@@ -100,14 +105,14 @@ class Server(object):
    
     def _calc_level(self, config1, config2):
         level = 0
-        for param in self.type.config_description:
+        for param in extract_params(self.type.config_description):
             if config1[param['name']] != config2[param['name']]:
                 level |= param['level']
 
         return level
 
     def _clamp(self, config):
-        for param in self.type.config_description: 
+        for param in extract_params(self.type.config_description): 
             maxval = self.type.max[param['name']] 
             minval = self.type.min[param['name']] 
             val = config[param['name']]
@@ -117,4 +122,4 @@ class Server(object):
                 config[param['name']] = minval 
 
     def _set_callback(self, req):
-        return encode_config(self.update_configuration(decode_config(req.config)))
+        return encode_config(self.update_configuration(decode_config(req.config, self.type.config_description)))
