@@ -1,11 +1,11 @@
 <package>
-  <description brief="Dynamically reconfigure driver parameters">
+  <description brief="Dynamically reconfigure parameters">
     This package provides a class to facilitate dynamic node
     reconfiguration. This package is still under development, and should be
     considered unstable except for features that are explicitely marked as
     stable in the documentation.
   </description>
-  <author>Blaise Gassend, Tim Field</author>
+  <author>Blaise Gassend, Tim Field, Ze'ev Klapow</author>
   <license>BSD</license>
   <review status="Doc Reviewed" note="Jan 18 2010, rosparam and Python
     client API only."/>

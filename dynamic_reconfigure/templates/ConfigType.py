@@ -40,6 +40,8 @@
 ##  POSSIBILITY OF SUCH DAMAGE.
 ##**********************************************************/
 
+from dynamic_reconfigure.encoding import extract_params
+
 config_description = ${pycfgdata}
 
 min = {}
@@ -49,7 +51,14 @@ level = {}
 type = {}
 all_level = 0
 
-for param in config_description:
+#def extract_params(config):
+#    params = []
+#    params.extend(config['parameters'])    
+#    for group in config['groups']:
+#        params.extend(extract_params(group))
+#    return params
+
+for param in extract_params(config_description):
     min[param['name']] = param['min']
     max[param['name']] = param['max']
     defaults[param['name']] = param['default']

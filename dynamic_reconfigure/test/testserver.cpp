@@ -37,13 +37,18 @@
 
 void callback(dynamic_reconfigure::TestConfig &config, uint32_t level)
 {
-  ROS_INFO("Reconfigure request : %i %f %s %i %i", config.int_, config.double_, config.str_.c_str(), (int) config.bool_, config.level);
+  ROS_INFO("Reconfigure request : %i %f %s %i %i Group1:%i Group2: %f %s", config.int_, config.double_, config.str_.c_str(), (int) config.bool_, config.level, config.group1_int, config.group2_double, config.group2_string.c_str());
   
   config.int_ |= 1;
   config.double_ = -config.double_;
   config.str_ += "A";
   config.bool_ = !config.bool_;
   config.level = level;
+  
+
+  ROS_INFO("TEST");
+  ROS_INFO("Group 2 requested to be set to %d", config.groups.group_one.group2.state);
+  ROS_INFO("group2_doube requested to be set to %f", config.groups.group_one.group2.group2_double);
 
   ROS_INFO("Reconfigured to     : %i %f %s %i %i", config.int_, config.double_, config.str_.c_str(), (int) config.bool_, config.level);
 }

@@ -68,6 +68,7 @@ class Client(object):
         self.name              = name
         self.config            = None
         self.param_description = None
+        self.group_description = None
         
         self._param_types = None
 
@@ -139,6 +140,26 @@ class Client(object):
 
         return self.param_description
 
+    def get_group_descriptions(self, timeout=None):
+        if timeout is None or timeout == 0.0:
+            with self._cv:
+                while self.group_description is None:
+                    if rospy.is_shutdown():
+                        return None
+                    self._cv.wait()
+        else:
+            start_time = time.time()
+            with self._cv:
+                while self.group_description is None:
+                    if rospy.is_shutdown():
+                        return None
+                    secs_left = timeout - (time.time() - start_time)
+                    if secs_left <= 0.0:
+                        break
+                    self._cv.wait(secs_left)
+
+        return self.group_description
+
     def update_configuration(self, changes):
         """
         Change the server's configuration
@@ -153,20 +174,72 @@ class Client(object):
         # Cast the parameters to the appropriate types
         if self.param_description is not None:
             for name, value in changes.items()[:]:
-                dest_type = self._param_types.get(name)
-                if dest_type is None:
-                    raise DynamicReconfigureParameterException('don\'t know parameter: %s' % name)
+                if not name is 'groups':
+                    dest_type = self._param_types.get(name)
+                    if dest_type is None:
+                        raise DynamicReconfigureParameterException('don\'t know parameter: %s' % name)
                 
-                try:
-                    changes[name] = dest_type(value)
-                except ValueError, e:
-                    raise DynamicReconfigureParameterException('can\'t set parameter \'%s\' of %s: %s' % (name, str(dest_type), e))
-        
+                    try:
+                        found = False
+                        descr = [x for x in self.param_description if x['name'].lower() == name.lower()][0]
+
+                        # Fix not converting bools properly
+                        if dest_type is bool and type(value) is str:
+                            changes[name] = value.lower() in ("yes", "true", "t", "1")
+                            found = True
+                        # Handle enums
+                        elif type(value) is str and not descr['edit_method'] == '':
+                            enum_descr = eval(descr['edit_method'])
+                            found = False
+                            for const in enum_descr['enum']:
+                                if value.lower() == const['name'].lower():
+                                    val_type = self._param_type_from_string(const['type'])
+                                    changes[name] = val_type(const['value'])
+                                    found = True
+                        if not found:
+                            changes[name] = dest_type(value)
+
+                    except ValueError, e:
+                        raise DynamicReconfigureParameterException('can\'t set parameter \'%s\' of %s: %s' % (name, str(dest_type), e))
+
+        if 'groups' in changes.keys():
+            changes['groups'] = self.update_groups(changes['groups'])
+
         config = encode_config(changes)
         msg    = self._set_service(config).config
-        resp   = decode_config(msg)
+        if self.group_description is None:
+            self.get_group_descriptions()
+        resp   = decode_config(msg, self.group_description)
 
         return resp
+
+    def update_groups(self, changes):
+        """
+        Changes the servers group configuration
+
+        @param changes: dictionary of key value pairs for the parameters that are changing
+        @type  changes: {str: value}
+        """
+        
+        descr = self.get_group_descriptions()
+        try:
+            for k,v in changes.items():
+                for p,g in enumerate(descr['groups']):
+                    if k == g['name']:
+                        g['state'] = v
+        except:
+            groups = []
+            def update_state(group, description):
+                for p,g in enumerate(description['groups']):
+                    if g['id'] == group['id']:
+                        description['groups'][p]['state'] = group['state']
+                    else:
+                        update_state(group, g)
+                return description
+ 
+            for change in changes:
+                descr = update_state(change, descr)
+        return descr
 
     def close(self):
         """
@@ -233,7 +306,9 @@ class Client(object):
         return rospy.Subscriber(topic_name, type, callback=callback)
 
     def _updates_msg(self, msg):
-        self.config = decode_config(msg)
+        if self.group_description is None:
+            self.get_group_descriptions()
+        self.config = decode_config(msg, self.group_description)
         
         with self._cv:
             self._cv.notifyAll()
@@ -241,7 +316,8 @@ class Client(object):
             self._config_callback(self.config)
 
     def _descriptions_msg(self, msg):
-        self.param_description = decode_description(msg)
+        self.group_description = decode_description(msg)
+        self.param_description = extract_params(self.group_description)
 
         # Build map from parameter name to type
         self._param_types = {}
