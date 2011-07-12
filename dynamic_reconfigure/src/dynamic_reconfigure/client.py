@@ -78,8 +78,8 @@ class Client(object):
         self._description_callback = description_callback
 
         self._set_service      = self._get_service_proxy('set_parameters', timeout)       
-        self._updates_sub      = self._get_subscriber('parameter_updates',      ConfigMsg,      self._updates_msg)
         self._descriptions_sub = self._get_subscriber('parameter_descriptions', ConfigDescrMsg, self._descriptions_msg)
+        self._updates_sub      = self._get_subscriber('parameter_updates',      ConfigMsg,      self._updates_msg)
 
     def get_configuration(self, timeout=None):
         """
@@ -245,8 +245,8 @@ class Client(object):
         """
         Close connections to the server
         """
-        self._updates_sub.unregister()
         self._descriptions_sub.unregister()
+        self._updates_sub.unregister()
 
     ## config_callback
 
