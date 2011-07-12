@@ -328,6 +328,8 @@ class DynamicReconfigurePanel(wx.lib.scrolledpanel.ScrolledPanel):
 
                 try:
                     updated = self._reconf.update_configuration(update)
+                except rospy.ServiceException as ex:
+                    pass
                 except Exception as exc:
                     raise exc
 
