@@ -87,6 +87,7 @@ public:
     boost::recursive_mutex::scoped_lock lock(mutex_);
     callback_ = callback;
     callCallback(config_, ~0); // At startup we need to load the configuration with all level bits set. (Everything has changed.)
+    updateConfigInternal(config_);
   }
 
   void clearCallback()
