@@ -22,3 +22,5 @@ gencfg()
 rosbuild_add_library(dynamic_reconfigure_config_init_mutex src/dynamic_reconfigure_config_init_mutex.cpp)
 
 add_subdirectory(test)
+
+rosbuild_make_distribution(1.3.0)
