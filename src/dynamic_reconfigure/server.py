@@ -62,7 +62,7 @@ class Server(object):
 
         # setup group defaults
         self.config['groups'] = get_tree(self.description)
-        self.config = decode_config(encode_config(self.config), type.config_description)
+        self.config = initial_config(encode_config(self.config), type.config_description)
 
         self.descr_topic = rospy.Publisher('~parameter_descriptions', ConfigDescrMsg, latch=True)
         self.descr_topic.publish(self.description);

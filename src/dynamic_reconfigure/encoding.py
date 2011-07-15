@@ -157,9 +157,10 @@ def encode_config(config, flat=True):
     return msg
 
 def group_dict(group):
-    if hasattr(group, 'state'):
+    try:
         state = group.state
-    else:
+    except AttributeError:
+        print "Group does not have state defaulting to True"
         state = True
     if hasattr(group, 'type'):
         type = group.type
@@ -243,6 +244,56 @@ def get_tree(m, group = None):
         return ret
     else:
         return children
+
+def initial_config(msg, description = None):
+    d = dict([(kv.name, kv.value) for kv in msg.bools + msg.ints + msg.strs + msg.doubles])
+    def gt(m, descr, group = None):
+        if group is None:
+            for x in m.groups:
+                if x.id == 0:
+                    group = x
+
+        children = []
+        for g in m.groups:
+            if g.id == 0:
+                pass
+            elif g.parent == group.id:
+                gd = group_dict(g)
+
+                def find_state(gr, dr):
+                    for g in dr['groups']:
+                        if g['id'] == gr['id']:
+                            gr['state'] = g['state']
+                            return
+                        else:
+                            find_state(gr, g)
+                            return
+
+                find_state(gd, descr)
+                gd['groups'] = gt(m, descr, g)
+                children.append(gd)
+
+        if group.id == 0:
+            ret = group_dict(group)
+            ret['groups'] = children
+            return ret
+        else:
+            return children
+
+    if not msg.groups == [] and description is not None:
+        d["groups"] = gt(msg, description)
+
+        def add_params(group, descr):
+            for param in descr['parameters']:
+                group[param['name']] = d[param['name']]
+            for g in group['groups']:
+                for dr in descr['groups']:
+                    if dr['name'] == g['name']:
+                        add_params(g, dr)
+
+        add_params(d['groups'], description)
+
+    return Config(**d)
 
 def decode_config(msg, description = None):
     d = dict([(kv.name, kv.value) for kv in msg.bools + msg.ints + msg.strs + msg.doubles])

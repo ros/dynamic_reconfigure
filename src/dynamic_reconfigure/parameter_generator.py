@@ -83,7 +83,7 @@ class ParameterGenerator:
         
     class Group:
         instances = {}
-        def __init__(self, gen, name, type, id, parent):
+        def __init__(self, gen, name, type, state, id, parent):
             self.name = name.replace(" ", "_")
             self.type = type
             self.groups = []
@@ -91,7 +91,7 @@ class ParameterGenerator:
             self.gen = gen
             self.id = id
             self.parent = parent
-            self.state = True
+            self.state = state
 
             self.srcline = inspect.currentframe().f_back.f_lineno
             self.srcfile = inspect.getsourcefile(inspect.currentframe().f_back.f_code)
@@ -100,10 +100,10 @@ class ParameterGenerator:
 
         def get_group(self, id):
             return self.instances[id]
-        
-        def add_group(self, name, type=""):
+
+        def add_group(self, name, type="", state=True):
             global id
-            group = self.gen.Group(self.gen, name, type, id, self.id)
+            group = self.gen.Group(self.gen, name, type, state, id, self.id)
             id = id + 1
             self.groups.append(group)
             return group
@@ -132,7 +132,7 @@ class ParameterGenerator:
 
         # Compile a list of all the parameters in this group
         def get_parameters(self):
-            params = [] 
+            params = []
             params.extend(self.parameters)
             for group in self.groups:
                 params.extend(group.get_parameters())
@@ -174,9 +174,15 @@ class ParameterGenerator:
               name = "groups"
           else:
               name = self.name
+          if self.state:
+              state = 'true'
+          else:
+              state = 'false'
           return {
               'name': self.name,
               'type': self.type,
+              'state': self.state,
+              'cstate': state,
               'id':self.id, 'parent':self.parent,
               'parameters': self.parameters,
               'groups' : [group.to_dict() for group in self.groups],
@@ -219,7 +225,7 @@ class ParameterGenerator:
     
     def __init__(self):
         global id
-        self.group = self.Group(self, "Default", "", 0, 0)
+        self.group = self.Group(self, "Default", "", True, 0, 0)
         id = 1
         self.constants = []
         self.dynconfpath = roslib.packages.get_pkg_dir("dynamic_reconfigure")
@@ -247,8 +253,8 @@ class ParameterGenerator:
     def add(self, name, paramtype, level, description, default = None, min = None, max = None, edit_method = ""):
         self.group.add(name, paramtype, level, description, default, min, max, edit_method) 
 
-    def add_group(self, name, type=""):
-        return self.group.add_group(name, type)
+    def add_group(self, name, type="", state=True):
+        return self.group.add_group(name, type, state)
 
     def mkdirabs(self, path, second_attempt = False):
         if os.path.isdir(path):
@@ -453,9 +459,9 @@ $i.desc=$description $range"""
 
         def write_params(group):
             if group.id == 0:
-                paramdescr.append(Template("${configname}Config::GroupDescription<${configname}Config::${class}, ${configname}Config> ${name}(\"${name}\", \"${type}\", ${parent}, ${id}, &${configname}Config::${lower});").safe_substitute(group.to_dict(), configname = self.name))
+                paramdescr.append(Template("${configname}Config::GroupDescription<${configname}Config::${class}, ${configname}Config> ${name}(\"${name}\", \"${type}\", ${parent}, ${id}, ${cstate}, &${configname}Config::${lower});").safe_substitute(group.to_dict(), configname = self.name))
             else:
-                paramdescr.append(Template("${configname}Config::GroupDescription<${configname}Config::${class}, ${configname}Config::${parentclass}> ${name}(\"${name}\", \"${type}\", ${parent}, ${id}, &${configname}Config::${field});").safe_substitute(group.to_dict(), configname = self.name))
+                paramdescr.append(Template("${configname}Config::GroupDescription<${configname}Config::${class}, ${configname}Config::${parentclass}> ${name}(\"${name}\", \"${type}\", ${parent}, ${id}, ${cstate}, &${configname}Config::${field});").safe_substitute(group.to_dict(), configname = self.name))
             for param in group.parameters:
                 self.appendline(members, "${ctype} ${name};", param)
                 self.appendline(paramdescr, "__min__.${name} = $v;", param, "min")
