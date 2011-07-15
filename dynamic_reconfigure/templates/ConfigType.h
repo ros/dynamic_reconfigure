@@ -144,19 +144,23 @@ namespace ${pkgname}
     class AbstractGroupDescription : public dynamic_reconfigure::Group
     {
       public:
-      AbstractGroupDescription(std::string n, std::string t, int p, int i)
+      AbstractGroupDescription(std::string n, std::string t, int p, int i, bool s)
       {
         name = n;
         type = t;
         parent = p;
+        state = s;
         id = i;
       }
 
       std::vector<AbstractParamDescriptionConstPtr> abstract_parameters;
+      bool state;
 
       virtual void toMessage(dynamic_reconfigure::Config &msg, const boost::any &config) const = 0;
       virtual bool fromMessage(const dynamic_reconfigure::Config &msg, boost::any &config) const =0;
       virtual void updateParams(boost::any &cfg, ${configname}Config &top) const= 0;
+      virtual void setInitialState(boost::any &cfg) const = 0;
+
 
       void convertParams()
       {
@@ -174,11 +178,11 @@ namespace ${pkgname}
     class GroupDescription : public AbstractGroupDescription
     {
     public:
-      GroupDescription(std::string name, std::string type, int parent, int id, T PT::* f) : AbstractGroupDescription(name, type, parent, id), field(f)
+      GroupDescription(std::string name, std::string type, int parent, int id, bool s, T PT::* f) : AbstractGroupDescription(name, type, parent, id, s), field(f)
       {
       }
 
-      GroupDescription(const GroupDescription<T, PT>& g): AbstractGroupDescription(g.name, g.type, g.parent, g.id), field(g.field), groups(g.groups)
+      GroupDescription(const GroupDescription<T, PT>& g): AbstractGroupDescription(g.name, g.type, g.parent, g.id, g.state), field(g.field), groups(g.groups)
       {
         parameters = g.parameters;
         abstract_parameters = g.abstract_parameters;
@@ -198,6 +202,20 @@ namespace ${pkgname}
         }
 
         return true;
+      }
+
+      virtual void setInitialState(boost::any &cfg) const
+      {
+        PT* config = boost::any_cast<PT*>(cfg);
+        T* group = &((*config).*field);
+        group->state = state;
+
+        for(std::vector<AbstractGroupDescriptionConstPtr>::const_iterator i = groups.begin(); i != groups.end(); i++)
+        {
+          boost::any n = boost::any((*config).*field);
+          (*i)->setInitialState(n);
+        }
+
       }
       
       virtual void updateParams(boost::any &cfg, ${configname}Config &top) const
@@ -360,7 +378,11 @@ ${paramdescr}
 ${doline} ${linenum} "${filename}"
     
       for (std::vector<${configname}Config::AbstractGroupDescriptionConstPtr>::const_iterator i = __group_descriptions__.begin(); i != __group_descriptions__.end(); i++)
+      {
+        boost::any n = boost::any(this);
+        (*i)->setInitialState(n);
         __description_message__.groups.push_back(**i);
+      }
       __max__.__toMessage__(__description_message__.max, __param_descriptions__, __group_descriptions__); 
       __min__.__toMessage__(__description_message__.min, __param_descriptions__, __group_descriptions__); 
       __default__.__toMessage__(__description_message__.dflt, __param_descriptions__, __group_descriptions__); 
