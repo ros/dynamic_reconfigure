@@ -42,6 +42,7 @@ import rospy
 import rosservice                  
 import threading
 import time
+import copy
 from dynamic_reconfigure import DynamicReconfigureCallbackException
 from dynamic_reconfigure.srv import Reconfigure as ReconfigureSrv
 from dynamic_reconfigure.msg import Config as ConfigMsg
@@ -74,7 +75,7 @@ class Server(object):
 
     def update_configuration(self, changes):
         with self.mutex:
-            new_config = self.config
+            new_config = copy.deepcopy(self.config)
             new_config.update(changes)
             self._clamp(new_config)
             return self._change_config(new_config, self._calc_level(new_config, self.config))

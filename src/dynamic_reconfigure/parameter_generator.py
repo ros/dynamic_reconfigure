@@ -254,7 +254,7 @@ class ParameterGenerator:
         self.group.add(name, paramtype, level, description, default, min, max, edit_method) 
 
     def add_group(self, name, type="", state=True):
-        return self.group.add_group(name, type, state)
+        return self.group.add_group(name, type=type, state=state)
 
     def mkdirabs(self, path, second_attempt = False):
         if os.path.isdir(path):

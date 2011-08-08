@@ -212,7 +212,7 @@ namespace ${pkgname}
 
         for(std::vector<AbstractGroupDescriptionConstPtr>::const_iterator i = groups.begin(); i != groups.end(); i++)
         {
-          boost::any n = boost::any((*config).*field);
+          boost::any n = boost::any(&((*config).*field));
           (*i)->setInitialState(n);
         }
 
@@ -267,9 +267,9 @@ ${doline} ${linenum} "${filename}"
       {
         if ((*i)->id == 0)
         {
-         boost::any n = boost::any(this);
-         (*i)->updateParams(n, *this);
-         (*i)->fromMessage(msg, n);
+          boost::any n = boost::any(this);
+          (*i)->updateParams(n, *this);
+          (*i)->fromMessage(msg, n);
         }
       }
 
@@ -328,9 +328,20 @@ ${doline} ${linenum} "${filename}"
 
     void __fromServer__(const ros::NodeHandle &nh)
     {
+      static bool setup=false;
+
       const std::vector<AbstractParamDescriptionConstPtr> &__param_descriptions__ = __getParamDescriptions__();
       for (std::vector<AbstractParamDescriptionConstPtr>::const_iterator i = __param_descriptions__.begin(); i != __param_descriptions__.end(); i++)
         (*i)->fromServer(nh, *this);
+
+      const std::vector<AbstractGroupDescriptionConstPtr> &__group_descriptions__ = __getGroupDescriptions__();
+      for (std::vector<AbstractGroupDescriptionConstPtr>::const_iterator i = __group_descriptions__.begin(); i != __group_descriptions__.end(); i++){
+        if (!setup && (*i)->id == 0) {
+          setup = true;
+          boost::any n = boost::any(this);
+          (*i)->setInitialState(n);
+        }
+      }
     }
 
     void __clamp__()
@@ -379,8 +390,6 @@ ${doline} ${linenum} "${filename}"
     
       for (std::vector<${configname}Config::AbstractGroupDescriptionConstPtr>::const_iterator i = __group_descriptions__.begin(); i != __group_descriptions__.end(); i++)
       {
-        boost::any n = boost::any(this);
-        (*i)->setInitialState(n);
         __description_message__.groups.push_back(**i);
       }
       __max__.__toMessage__(__description_message__.max, __param_descriptions__, __group_descriptions__); 

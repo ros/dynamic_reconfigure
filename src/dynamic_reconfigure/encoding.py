@@ -160,7 +160,6 @@ def group_dict(group):
     try:
         state = group.state
     except AttributeError:
-        print "Group does not have state defaulting to True"
         state = True
     if hasattr(group, 'type'):
         type = group.type
