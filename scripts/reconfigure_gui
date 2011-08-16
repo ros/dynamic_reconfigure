@@ -652,7 +652,7 @@ class DynamicReconfigurePanel(wx.lib.scrolledpanel.ScrolledPanel):
             sizer.Add(divider, (row, 1), flag = wx.ALIGN_CENTER_VERTICAL | wx.EXPAND | wx.ALL)
 
             self.check = wx.CheckBox(self, wx.ID_ANY)
-            self.check.SetValue(1)
+            self.check.SetValue(self.group['state'])
             self.Bind(wx.EVT_CHECKBOX, self.toggle)
             sizer.Add(self.check, (row, 2))
             row = row+1
@@ -718,7 +718,7 @@ class DynamicReconfigurePanel(wx.lib.scrolledpanel.ScrolledPanel):
                     w.Show()
                 self.GetTopLevelParent().Layout()
             else:
-                self.button.SetValue(self.get_state())
+                self.check.SetValue(self.get_state())
 
         def get_state(self):
            return self.group['state']
@@ -727,6 +727,8 @@ class DynamicReconfigurePanel(wx.lib.scrolledpanel.ScrolledPanel):
            if not state == self.get_state():
               # up=False prevents the configuration from going into an infinite loop
               self.group['state'] = state
+              # make sure that the states match
+              self.check.SetValue(state)
               self.toggle(None, up=False)
         
         # Override add_groups to use a subpanel
