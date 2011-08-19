@@ -587,19 +587,20 @@ class DynamicReconfigurePanel(wx.lib.scrolledpanel.ScrolledPanel):
             row = 0
             
             if not self.id == 0:
-                # spacer
-                sizer.Add((10,20),(row, 0), flag = wx.ALIGN_CENTER_VERTICAL | wx.EXPAND | wx.ALL, span = (1, 2)) 
-                row = row+1
+                if not group['type'] == 'tab':
+                    # spacer
+                    sizer.Add((10,20),(row, 0), flag = wx.ALIGN_CENTER_VERTICAL | wx.EXPAND | wx.ALL, span = (1, 2)) 
+                    row = row+1
                 
-                # Label
-                label_name = group['name'].replace("_", " ")
-                label = wx.StaticText(self, wx.ID_ANY, label_name)
-                sizer.Add(label, (row, 0), flag = wx.ALIGN_CENTER_VERTICAL | wx.EXPAND | wx.ALL)
+                    # Label
+                    label_name = group['name'].replace("_", " ")
+                    label = wx.StaticText(self, wx.ID_ANY, label_name)
+                    sizer.Add(label, (row, 0), flag = wx.ALIGN_CENTER_VERTICAL | wx.EXPAND | wx.ALL)
 
-                # Line
-                divider = wx.StaticLine(self, wx.ID_ANY)
-                sizer.Add(divider, (row, 1), flag = wx.ALIGN_CENTER_VERTICAL | wx.EXPAND | wx.ALL)
-                row = row+1
+                    # Line
+                    divider = wx.StaticLine(self, wx.ID_ANY)
+                    sizer.Add(divider, (row, 1), flag = wx.ALIGN_CENTER_VERTICAL | wx.EXPAND | wx.ALL)
+                    row = row+1
             for param_descr in self.params:
                 name = param_descr['name']
                 type, val, min, max, description = param_descr['type'], config[name], param_descr['min'], param_descr['max'], param_descr['description']
