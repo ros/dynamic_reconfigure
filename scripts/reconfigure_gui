@@ -237,6 +237,7 @@ class DynamicReconfigurePanel(wx.lib.scrolledpanel.ScrolledPanel):
 
         self._group_types = {
             '': DynamicReconfigurePanel.PaneGroup,
+            'tab': DynamicReconfigurePanel.PaneGroup,
             'collapse': DynamicReconfigurePanel.CollapsibleGroup,
             'hide': DynamicReconfigurePanel.HideableGroup
         }
@@ -548,6 +549,7 @@ class DynamicReconfigurePanel(wx.lib.scrolledpanel.ScrolledPanel):
             self.params = group['parameters']
             self.old_state = group['state']
             self.top = top
+            self.tab_view = None
 
         def update_state(self, state):
             pass
@@ -561,8 +563,15 @@ class DynamicReconfigurePanel(wx.lib.scrolledpanel.ScrolledPanel):
 
         def add_groups(self, sizer, config, row):
             for g in self.groups:
-                sizer.Add(self.top._group_types[g['type']](self, g, config, top=self.top), (row, 0), span=(1,2), flag = wx.EXPAND | wx.ALL)
-                row = row+1
+                if g['type'] == "tab":
+                    if self.tab_view is None:
+                        self.tab_view = wx.Notebook(self, wx.ID_ANY)
+                    self.tab_view.AddPage(self.top._group_types[g['type']](self.tab_view, g, config, top=self.top), g['name'])
+                else:
+                    sizer.Add(self.top._group_types[g['type']](self, g, config, top=self.top), (row, 0), span=(1,2), flag = wx.EXPAND | wx.ALL)
+                    row = row+1
+            if self.tab_view is not None:
+                sizer.Add(self.tab_view, (row, 0), span=(1,2), flag=wx.EXPAND | wx.ALL)
 
     class PaneGroup(GroupView, wx.Panel):
         def __init__(self, parent, group, config, top=None):
