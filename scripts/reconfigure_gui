@@ -39,12 +39,13 @@ from __future__ import with_statement
 import roslib; roslib.load_manifest('dynamic_reconfigure')
 import rospy
 
-WXVER = '2.8'
+WXVER = ['2.8', '2.9']
 import wxversion
 if wxversion.checkInstalled(WXVER):
     wxversion.select(WXVER)
 else:
-    print >> sys.stderr, 'This application requires wxPython version %s' % (WXVER)
+    import sys
+    sys.stderr.write('This application requires wxPython version %s' % (WXVER))
     sys.exit(1)
 
 import math
