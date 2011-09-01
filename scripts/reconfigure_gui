@@ -34,9 +34,10 @@
 #
 # Revision $Id$
 
-from __future__ import with_statement
+from __future__ import print_function
 
 import roslib; roslib.load_manifest('dynamic_reconfigure')
+import sys
 import rospy
 
 WXVER = ['2.8', '2.9']
@@ -44,7 +45,6 @@ import wxversion
 if wxversion.checkInstalled(WXVER):
     wxversion.select(WXVER)
 else:
-    import sys
     sys.stderr.write('This application requires wxPython version %s' % (WXVER))
     sys.exit(1)
 
@@ -86,7 +86,7 @@ class MainWindow(wx.Frame):
 
                 self.reconf = dynamic_reconfigure.client.Client(node, timeout=5.0)
             except:
-                print 'Can\'t connect to node %s' % node
+                print("Can't connect to node %s"%node, file=sys.stderr)
                 self.Close()
                 return
             finally:
@@ -154,11 +154,11 @@ class DynamicReconfigureSelector(wx.Panel):
           nodes = dynamic_reconfigure.find_reconfigure_services()
         except rosservice.ROSServiceIOException:
           if self.has_master:
-            print >> sys.stderr, "reconfigure_gui cannot connect to master."
+            print("reconfigure_gui cannot connect to master.", file=sys.stderr)
           self.has_master = False
         else:
           if not self.has_master:
-            print >> sys.stderr, "reconfigure_gui reconnected to master."
+            print("reconfigure_gui reconnected to master.", file=sys.stderr)
           self.has_master = True
 
           self.combobox.SetItems(nodes)
@@ -299,7 +299,7 @@ class DynamicReconfigurePanel(wx.lib.scrolledpanel.ScrolledPanel):
                 wx.CallAfter(group.update_state, cfg['state'])
             except:
                 if not name.lower() == 'default':
-                    print "Could not get config for %s"%name
+                    print("Could not get config for %s"%name, file=sys.stderr)
 
     def close(self):
         self.updater.stop()
@@ -831,7 +831,7 @@ class DynamicReconfigurePanel(wx.lib.scrolledpanel.ScrolledPanel):
 if __name__ == '__main__':
     argv = rospy.myargv()
     if len(argv) > 2:
-        print 'Usage: reconfigure_gui <node_name>'
+        print('Usage: reconfigure_gui <node_name>')
         exit(1)
 
     app = wx.PySimpleApp(clearSigInt=False)
@@ -842,10 +842,10 @@ if __name__ == '__main__':
         frame = MainWindow()
     frame.Show()
 
-    print 'reconfigure_gui started'
+    print('reconfigure_gui started')
 
     try:
         app.MainLoop()
-    except KeyboardInterrupt, e:
+    except KeyboardInterrupt as e:
         pass
-    print 'exiting'
+    print('exiting')
