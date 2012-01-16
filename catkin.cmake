@@ -27,7 +27,7 @@ generate_messages()
 add_library(dynamic_reconfigure_config_init_mutex SHARED
   src/dynamic_reconfigure_config_init_mutex.cpp)
 
-catkin_export_python(src)
+catkin_export_python()
 
 install(FILES manifest.xml
   DESTINATION share/dynamic_reconfigure)
@@ -40,4 +40,4 @@ install(TARGETS dynamic_reconfigure_config_init_mutex
   LIBRARY DESTINATION lib)
       
 install(PROGRAMS scripts/dynparam scripts/reconfigure_gui
-  DESTINATION share/dynamic_reconfigure/)
+  DESTINATION share/dynamic_reconfigure/scripts/)
