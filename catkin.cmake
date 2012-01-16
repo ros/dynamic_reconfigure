@@ -1,5 +1,8 @@
 cmake_minimum_required(VERSION 2.8)
 project(dynamic_reconfigure)
+catkin_project(dynamic_reconfigure
+  LIBRARIES dynamic_reconfigure_config_init_mutex
+  INCLUDE_DIRS include)
 
 find_package(catkin REQUIRED)
 find_package(ROS COMPONENTS
@@ -13,8 +16,7 @@ add_message_files(
   DIRECTORY msg
   FILES 
   BoolParameter.msg      Config.msg           Group.msg       IntParameter.msg      SensorLevels.msg
-  ConfigDescription.msg  DoubleParameter.msg  GroupState.msg  ParamDescription.msg  StrParameter.msg
-)
+  ConfigDescription.msg  DoubleParameter.msg  GroupState.msg  ParamDescription.msg  StrParameter.msg)
 
 add_service_files(
   DIRECTORY srv
@@ -22,13 +24,20 @@ add_service_files(
 
 generate_messages()
 
-add_library(dynamic_reconfigure_config_init_mutex src/dynamic_reconfigure_config_init_mutex.cpp)
+add_library(dynamic_reconfigure_config_init_mutex SHARED
+  src/dynamic_reconfigure_config_init_mutex.cpp)
 
-install_cmake_infrastructure(dynamic_reconfigure
-  VERSION 0.0.1
-  INCLUDE_DIRS include
-  )
+catkin_export_python(src)
 
+install(FILES manifest.xml
+  DESTINATION share/dynamic_reconfigure)
 
-catkin_package(dynamic_reconfigure)
-enable_python(dynamic_reconfigure)
+install(DIRECTORY include/
+  DESTINATION include
+  FILES_MATCHING PATTERN "*.h")
+      
+install(TARGETS dynamic_reconfigure_config_init_mutex
+  LIBRARY DESTINATION lib)
+      
+install(PROGRAMS scripts/dynparam scripts/reconfigure_gui
+  DESTINATION share/dynamic_reconfigure/)
