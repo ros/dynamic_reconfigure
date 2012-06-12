@@ -47,4 +47,9 @@
       srv/Reconfigure.srv
     </srvs>
   </rosbuild2>
+
+  <export>
+    <rqt_gui plugin="${prefix}/plugin.xml" />
+  </export>
+
 </package>

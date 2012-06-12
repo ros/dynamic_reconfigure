@@ -1,0 +1,12 @@
+<library path="scripts">
+  <class name="Reconfigure" type="reconfigure_gui.reconfigure.ReconfigurePlugin" base_class_type="rqt_gui_py::Plugin">
+    <description>
+    GUI to allow the dynamic reconfiguration of nodes.
+    </description>
+    <qtgui>
+      <label>Reconfigure</label>
+      <icon type="theme">document-properties</icon>
+      <statustip>GUI to allow the dynamic reconfiguration of nodes.</statustip>
+    </qtgui>
+  </class>
+</library>
