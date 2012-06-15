@@ -109,7 +109,6 @@ class ClientWidget(QWidget):
         self.grid = QtGui.QGridLayout()
     
         descr = self.reconf.get_group_descriptions()
-        print descr
 
         self.updater = Updater(self.reconf) 
 
