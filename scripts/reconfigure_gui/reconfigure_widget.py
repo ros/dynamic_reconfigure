@@ -51,8 +51,7 @@ class ReconfigureWidget(QWidget):
             self.client = None
 
     def shutdown_plugin(self):
-        #TODO: Proper shutdown
-        pass
+        self.close()
 
 class ReconfigureSelector(QWidget):
     def __init__(self, parent):
@@ -116,6 +115,8 @@ class ClientWidget(QWidget):
 
         self.widgets = []
         self.add_widgets(descr)
+
+        self.grid.setColumnStretch(2, 1)
         self.setLayout(self.grid)
 
         self.updater.start()
@@ -133,3 +134,4 @@ class ClientWidget(QWidget):
         self.reconf.close()
         self.updater.stop()
         self.deleteLater()
+
