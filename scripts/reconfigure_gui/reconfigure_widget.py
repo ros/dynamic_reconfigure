@@ -6,6 +6,10 @@ from QtCore import QTimer
 
 import dynamic_reconfigure.client
 import rosservice
+import rospy
+
+from .editors import *
+from .updater import Updater
 
 class ReconfigureWidget(QWidget):
     def __init__(self):
@@ -13,17 +17,38 @@ class ReconfigureWidget(QWidget):
 
         self.selector = ReconfigureSelector(self)
 
+        self.client = None
+
         hbox = QtGui.QHBoxLayout()
         hbox.addWidget(self.selector)
-        
-        vbox = QtGui.QVBoxLayout()
-        vbox.addLayout(hbox)
-        vbox.addStretch(1)
 
-        self.setLayout(vbox)
+        self.vbox = QtGui.QVBoxLayout()
+        self.vbox.addLayout(hbox)
+        self.vbox.addStretch(1)
+
+        self.setLayout(self.vbox)
 
     def show(self, node):
-        print(node) 
+        self.close()
+
+        reconf = None
+        
+        try:
+            reconf = dynamic_reconfigure.client.Client(node, timeout=5.0)
+        except rospy.exceptions.ROSException:
+            print("Could not connect to %s"%node) 
+            return
+        finally:
+            self.close()
+
+        self.client = ClientWidget(self, reconf)
+        self.vbox.insertWidget(1, self.client)
+
+    def close(self):
+        if self.client is not None:
+            # Clear out the old widget
+            self.client.close()
+            self.client = None
 
     def shutdown_plugin(self):
         #TODO: Proper shutdown
@@ -45,7 +70,6 @@ class ReconfigureSelector(QWidget):
         
         self.setLayout(self.hbox)
 
-
         self.timer = QTimer()
         self.timer.timeout.connect(self.update_combo)
         self.timer.start(100)
@@ -59,6 +83,9 @@ class ReconfigureSelector(QWidget):
             if not self.last_nodes:
                 for n in nodes:
                     self.combo.addItem(n)
+            elif len(nodes) == 0:
+                self.combo.clear()
+                self.parent.close()
             else:
                 for i, n in enumerate(self.last_nodes):
                     if not n in nodes:
@@ -72,3 +99,37 @@ class ReconfigureSelector(QWidget):
 
     def selected(self, node):
         self.parent.show(node)
+
+class ClientWidget(QWidget):
+    def __init__(self, parent, reconf):
+        super(ClientWidget, self).__init__()
+
+        self.parent = parent
+        self.reconf = reconf
+
+        self.grid = QtGui.QGridLayout()
+    
+        descr = self.reconf.get_group_descriptions()
+        print descr
+
+        self.updater = Updater(self.reconf) 
+
+        self.widgets = []
+        self.add_widgets(descr)
+        self.setLayout(self.grid)
+
+        self.updater.start()
+
+    def add_widgets(self, descr):
+        for param in descr['parameters']:
+            if param['type'] in editor_types:
+                ed = eval(editor_types[param['type']])(self.updater, param)
+                self.widgets.append(ed)
+
+        for i, ed in enumerate(self.widgets):
+            ed.display(self.grid, i)
+
+    def close(self):
+        self.reconf.close()
+        self.updater.stop()
+        self.deleteLater()
