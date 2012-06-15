@@ -116,7 +116,6 @@ class ClientWidget(QWidget):
         self.widgets = []
         self.add_widgets(descr)
 
-        self.grid.setColumnStretch(2, 1)
         self.setLayout(self.grid)
 
         self.updater.start()
