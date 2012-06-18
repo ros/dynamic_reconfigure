@@ -42,6 +42,8 @@
 
 from dynamic_reconfigure.encoding import extract_params
 
+inf = float('inf')
+
 config_description = ${pycfgdata}
 
 min = {}
