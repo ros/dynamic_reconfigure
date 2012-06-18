@@ -3,12 +3,12 @@ import QtGui
 from QtGui import QWidget, QLabel, QCheckBox, QLineEdit, QSlider, QHBoxLayout
 
 import sys
-
 import math
 
 editor_types = {
     'bool': 'BooleanEditor',
     'str': 'StringEditor',
+    'int': 'IntegerEditor',
     'double': 'DoubleEditor',
 }
 
@@ -80,26 +80,81 @@ class StringEditor(Editor):
 
         grid.addWidget(self, row, 1)
 
+
+class IntegerEditor(Editor):
+    def __init__(self, updater, config):
+        super(IntegerEditor, self).__init__(updater, config)
+         
+        hbox = QHBoxLayout()
+
+        self.min = int(config['min'])
+        self.max = int(config['max'])
+
+        self.min_label = QLabel(str(self.min))
+        self.max_label = QLabel(str(self.max))
+
+        self.slider = QSlider(Qt.Horizontal)
+        self.slider.setRange(self.min, self.max)
+        self.slider.sliderReleased.connect(self.slider_released)
+        self.slider.sliderMoved.connect(self.update_text)
+
+        self.tb = QLineEdit()   
+        self.tb.editingFinished.connect(self.editing_finished)
+
+        hbox.addWidget(self.min_label, 0)
+        hbox.addWidget(self.slider, 1)
+        hbox.addWidget(self.max_label, 0)
+        hbox.addWidget(self.tb, 0)
+
+        self.setLayout(hbox)
+
+        # TODO: This should not always get set to the default it should be the current value
+        self.tb.setText(str(config['default']))
+        self.slider.setSliderPosition(int(config['default']))
+
+    def slider_released(self):
+        self.update_text(self.slider.value())
+        self._update(self.slider.value())
+
+    def update_text(self, val):
+        self.tb.setText(str(val))
+
+    def editing_finished(self):
+        self.slider.setSliderPosition(int(self.tb.text()))
+        self._update(int(self.tb.text()))
+
+    def display(self, grid, row):
+        grid.addWidget(QLabel(self.name), row, 0, Qt.AlignRight)
+        grid.addWidget(self, row, 1)
+
 class DoubleEditor(Editor):
     def __init__(self, updater, config):
         super(DoubleEditor, self).__init__(updater,config)
 
         # Handle unbounded doubles nicely
-        try:
+        if config['min'] != -float('inf'):
             self.min = float(config['min'])
+            self.min_label = QLabel(str(slef.min))
+
             self.func = lambda x: x
             self.ifunc = self.func
-        except:
+        else:
             self.min = -1e10000 
+            self.min_label = QLabel('-inf')
+
             self.func = lambda x: math.atan(x)
             self.ifunc = lambda x: math.tan(x)
 
-        try:
+        if config['max'] != float('inf'):
             self.max = float(config['max'])
+            self.max_label = QLabel(str(self.max))
+
             self.func = lambda x: x
             self.ifunc = self.func
-        except:
+        else:
             self.max = 1e10000
+            self.max_label = QLabel('inf')
+
             self.func = lambda x: math.atan(x)
             self.ifunc = lambda x: math.tan(x)
 
@@ -110,20 +165,21 @@ class DoubleEditor(Editor):
 
         self.slider = QSlider(Qt.Horizontal)
         self.slider.setRange(self.slider_value(self.min), self.slider_value(self.max))
-        self.slider.sliderReleased.connect(self.slider_release)
+        self.slider.sliderReleased.connect(self.slider_released)
         self.slider.sliderMoved.connect(self.update_text)
 
         self.tb = QLineEdit()
         self.tb.editingFinished.connect(self.editing_finished)
 
+        hbox.addWidget(self.min_label, 0)
         hbox.addWidget(self.slider, 1)
+        hbox.addWidget(self.max_label, 0)
         hbox.addWidget(self.tb, 0)
+
         self.setLayout(hbox)
 
-        print(config)
-
-        self.slider.setSliderPosition(self.slider_value(config['default']))
         self.tb.setText(str(config['default']))
+        self.slider.setSliderPosition(self.slider_value(config['default']))
 
     def get_value(self):
         return self.ifunc(self.slider.value() * self.scale)
@@ -131,7 +187,7 @@ class DoubleEditor(Editor):
     def slider_value(self, value):
         return int(round((self.func(value))/self.scale))
 
-    def slider_release(self):
+    def slider_released(self):
         self.update_text(self.get_value())
         self._update(self.get_value())
 
@@ -144,5 +200,4 @@ class DoubleEditor(Editor):
 
     def display(self, grid, row):
         grid.addWidget(QLabel(self.name), row, 0, Qt.AlignRight)
-
         grid.addWidget(self, row, 1)
