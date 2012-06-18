@@ -121,9 +121,12 @@ class ClientWidget(QWidget):
 
     def add_widgets(self, descr):
         for param in descr['parameters']:
-            if param['type'] in editor_types:
+            if param['edit_method']:
+                ed = EnumEditor(self.updater, param)
+            elif param['type'] in editor_types:
                 ed = eval(editor_types[param['type']])(self.updater, param)
-                self.widgets.append(ed)
+
+            self.widgets.append(ed)
 
         for i, ed in enumerate(self.widgets):
             ed.display(self.grid, i)

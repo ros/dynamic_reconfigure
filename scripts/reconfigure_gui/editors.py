@@ -1,6 +1,6 @@
 from QtCore import Qt
 import QtGui
-from QtGui import QWidget, QLabel, QCheckBox, QLineEdit, QSlider, QHBoxLayout
+from QtGui import QWidget, QLabel, QCheckBox, QLineEdit, QSlider, QComboBox, QHBoxLayout
 
 import sys
 import math
@@ -134,7 +134,7 @@ class DoubleEditor(Editor):
         # Handle unbounded doubles nicely
         if config['min'] != -float('inf'):
             self.min = float(config['min'])
-            self.min_label = QLabel(str(slef.min))
+            self.min_label = QLabel(str(self.min))
 
             self.func = lambda x: x
             self.ifunc = self.func
@@ -197,6 +197,37 @@ class DoubleEditor(Editor):
     def editing_finished(self):
         self.slider.setSliderPosition(self.slider_value(float(self.tb.text())))
         self._update(float(self.tb.text()))
+
+    def display(self, grid, row):
+        grid.addWidget(QLabel(self.name), row, 0, Qt.AlignRight)
+        grid.addWidget(self, row, 1)
+
+class EnumEditor(Editor):
+    def __init__(self, updater, config):
+        super(EnumEditor, self).__init__(updater, config)
+
+        try:
+            enum = eval(config['edit_method'])['enum']
+        except:
+            print("Malformed enum")
+            return
+
+        self.names = [item['name'] for item in enum]
+        self.values = [item['value'] for item in enum]
+
+        items = ["%s (%s)"%(self.names[i], self.values[i]) for i in range(0, len(self.names))]
+
+        self.combo = QComboBox()
+        self.combo.addItems(items)
+        self.combo.currentIndexChanged['int'].connect(self.selected)
+
+        hbox = QHBoxLayout()
+        hbox.addWidget(self.combo)
+
+        self.setLayout(hbox)
+
+    def selected(self, index):
+        self._update(self.values[index])
 
     def display(self, grid, row):
         grid.addWidget(QLabel(self.name), row, 0, Qt.AlignRight)
