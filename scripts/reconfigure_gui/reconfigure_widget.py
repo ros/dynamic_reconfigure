@@ -125,6 +125,10 @@ class ClientWidget(Group):
     def close(self):
         self.reconf.close()
         self.updater.stop()
+
+        for w in self.widgets:
+            w.close()
+
         self.deleteLater()
 
 

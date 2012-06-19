@@ -1,13 +1,13 @@
 from QtCore import Qt
 import QtGui
-from QtGui import QWidget, QLabel, QGridLayout, QGroupBox
+from QtGui import QWidget, QLabel, QTabWidget, QGridLayout, QGroupBox
 
 from .editors import *
 
 group_types = {
     '': 'BoxGroup',
     'collapse': 'CollapseGroup',
-    #'tab': 'TabGroup',
+    'tab': 'TabGroup',
     'hide': 'HideGroup',
 }
 
@@ -86,6 +86,10 @@ class Group(QWidget):
                 cfg = find_cfg(config, widget.name)
                 widget.update_group(cfg)
 
+    def close(self):
+        for w in self.widgets:
+            w.close()
+
 class BoxGroup(Group):
     def __init__(self, updater, config):
         super(BoxGroup, self).__init__(updater, config)
@@ -105,4 +109,26 @@ class HideGroup(BoxGroup):
     def update_group(self, config):
         super(HideGroup, self).update_group(config)
         self.box.setVisible(self.state)
+
+class TabGroup(Group):
+    tab_bar = None
+    tab_in_grid = False
+
+    def __init__(self, updater, config):
+        super(TabGroup, self).__init__(updater, config)
+
+        if TabGroup.tab_bar is None:
+            TabGroup.tab_bar = QTabWidget()
+
+        TabGroup.tab_bar.addTab(self, self.name)
+
+    def display(self, grid, row):
+        if not TabGroup.tab_in_grid:
+            grid.addWidget(TabGroup.tab_bar, row, 0, 1, -1)
+            TabGroup.tab_in_grid = True
+
+    def close(self):
+        super(TabGroup, self).close()
+        TabGroup.tab_bar = None
+        TabGroup.tab_in_grid = False
 

@@ -35,6 +35,9 @@ class Editor(QWidget):
     def display(self, grid, row):
         pass
 
+    def close(self):
+        pass
+
 class BooleanEditor(Editor):
     def __init__(self, updater, config): 
         super(BooleanEditor, self).__init__(updater, config)
