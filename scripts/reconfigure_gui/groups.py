@@ -47,6 +47,8 @@ class Group(QWidget):
         self.widgets = []
         self.add_widgets(config)
 
+        # Labels should not stretch
+        self.grid.setColumnStretch(1,1)
         self.setLayout(self.grid)
 
     def add_widgets(self, descr):
