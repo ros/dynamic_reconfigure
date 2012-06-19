@@ -8,7 +8,7 @@ group_types = {
     '': 'BoxGroup',
     'collapse': 'CollapseGroup',
     #'tab': 'TabGroup',
-    #'hide': 'HideGroup',
+    'hide': 'HideGroup',
 }
 
 def find_cfg(config, name):
@@ -100,3 +100,9 @@ class CollapseGroup(BoxGroup):
     def __init__(self, updater, config):
         super(CollapseGroup, self).__init__(updater, config)
         self.box.setCheckable(True)
+
+class HideGroup(BoxGroup):
+    def update_group(self, config):
+        super(HideGroup, self).update_group(config)
+        self.box.setVisible(self.state)
+
