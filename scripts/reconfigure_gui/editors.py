@@ -99,6 +99,7 @@ class IntegerEditor(Editor):
         self.slider.sliderMoved.connect(self.update_text)
 
         self.tb = QLineEdit()   
+        self.tb.setValidator(QtGui.QIntValidator(self.min, self.max))
         self.tb.editingFinished.connect(self.editing_finished)
 
         hbox.addWidget(self.min_label, 0)
@@ -173,6 +174,7 @@ class DoubleEditor(Editor):
         self.slider.sliderMoved.connect(self.update_text)
 
         self.tb = QLineEdit()
+        self.tb.setValidator(QtGui.QDoubleValidator(self.min, self.max, 4))
         self.tb.editingFinished.connect(self.editing_finished)
 
         hbox.addWidget(self.min_label, 0)
