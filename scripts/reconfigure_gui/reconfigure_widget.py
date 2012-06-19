@@ -9,6 +9,7 @@ import rosservice
 import rospy
 
 from .editors import *
+from .groups import *
 from .updater import Updater
 
 class ReconfigureWidget(QWidget):
@@ -41,7 +42,7 @@ class ReconfigureWidget(QWidget):
         finally:
             self.close()
 
-        self.client = ClientWidget(self, reconf)
+        self.client = ClientWidget(reconf)
         self.vbox.insertWidget(1, self.client)
 
     def close(self):
@@ -99,40 +100,30 @@ class ReconfigureSelector(QWidget):
     def selected(self, node):
         self.parent.show(node)
 
-class ClientWidget(QWidget):
-    def __init__(self, parent, reconf):
-        super(ClientWidget, self).__init__()
+class ClientWidget(Group):
+    def __init__(self, reconf):
+        super(ClientWidget, self).__init__(Updater(reconf), reconf.get_group_descriptions())
 
-        self.parent = parent
         self.reconf = reconf
 
-        self.grid = QtGui.QGridLayout()
-    
-        descr = self.reconf.get_group_descriptions()
-
-        self.updater = Updater(self.reconf) 
-
-        self.widgets = []
-        self.add_widgets(descr)
-
-        self.setLayout(self.grid)
-
         self.updater.start()
+        self.reconf.config_callback = self.config_callback
 
-    def add_widgets(self, descr):
-        for param in descr['parameters']:
-            if param['edit_method']:
-                ed = EnumEditor(self.updater, param)
-            elif param['type'] in editor_types:
-                ed = eval(editor_types[param['type']])(self.updater, param)
+    def config_callback(self, config):
+        # TODO: should use config.keys but this method doesnt exist
+        names = [name for name, v in config.items()]
 
-            self.widgets.append(ed)
-
-        for i, ed in enumerate(self.widgets):
-            ed.display(self.grid, i)
-
+        for widget in self.widgets:
+            if isinstance(widget, Editor):
+                if widget.name in names:
+                    widget.update_value(config[widget.name])
+            elif isinstance(widget, Group):
+                cfg = find_cfg(config, widget.name)
+                widget.update_group(cfg)
+                
     def close(self):
         self.reconf.close()
         self.updater.stop()
         self.deleteLater()
+
 

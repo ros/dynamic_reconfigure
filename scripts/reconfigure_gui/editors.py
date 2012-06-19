@@ -70,7 +70,7 @@ class StringEditor(Editor):
         self.tb.editingFinished.connect(self.edit_finished)
 
     def update_value(self, value):
-        self.tb.setString(value)
+        self.tb.setText(value)
 
     def edit_finished(self):
         self._update(self.tb.text())
@@ -122,6 +122,10 @@ class IntegerEditor(Editor):
     def editing_finished(self):
         self.slider.setSliderPosition(int(self.tb.text()))
         self._update(int(self.tb.text()))
+
+    def update_value(self, val):
+        self.slider.setSliderPosition(int(val))
+        self.tb.setText(str(val))
 
     def display(self, grid, row):
         grid.addWidget(QLabel(self.name), row, 0, Qt.AlignRight)
@@ -192,11 +196,15 @@ class DoubleEditor(Editor):
         self._update(self.get_value())
 
     def update_text(self, value):
-        self.tb.setText('%s'% self.get_value())
+        self.tb.setText(str(self.get_value()))
 
     def editing_finished(self):
         self.slider.setSliderPosition(self.slider_value(float(self.tb.text())))
         self._update(float(self.tb.text()))
+
+    def update_value(self, val):
+        self.slider.setSliderPosition(self.slider_value(float(val)))
+        self.tb.setText(str(val))
 
     def display(self, grid, row):
         grid.addWidget(QLabel(self.name), row, 0, Qt.AlignRight)
@@ -228,6 +236,9 @@ class EnumEditor(Editor):
 
     def selected(self, index):
         self._update(self.values[index])
+
+    def update_value(self, val):
+        self.combo.setCurrentIndex(self.values.index(val))
 
     def display(self, grid, row):
         grid.addWidget(QLabel(self.name), row, 0, Qt.AlignRight)

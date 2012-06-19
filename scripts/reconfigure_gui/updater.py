@@ -29,7 +29,6 @@ class Updater(threading.Thread):
 
             try:
                 updated = self._reconf.update_configuration(update)
-                print updated
             except rospy.ServiceException as ex:
                 print('Could not update configuration')
             except Exception as exc:
