@@ -110,16 +110,17 @@ class ClientWidget(Group):
         self.reconf.config_callback = self.config_callback
 
     def config_callback(self, config):
-        # TODO: should use config.keys but this method doesnt exist
-        names = [name for name, v in config.items()]
+        if config is not None:
+            # TODO: should use config.keys but this method doesnt exist
+            names = [name for name, v in config.items()]
 
-        for widget in self.widgets:
-            if isinstance(widget, Editor):
-                if widget.name in names:
-                    widget.update_value(config[widget.name])
-            elif isinstance(widget, Group):
-                cfg = find_cfg(config, widget.name)
-                widget.update_group(cfg)
+            for widget in self.widgets:
+                if isinstance(widget, Editor):
+                    if widget.name in names:
+                        widget.update_value(config[widget.name])
+                elif isinstance(widget, Group):
+                    cfg = find_cfg(config, widget.name)
+                    widget.update_group(cfg)
                 
     def close(self):
         self.reconf.close()

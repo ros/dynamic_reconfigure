@@ -1,12 +1,12 @@
 from QtCore import Qt
 import QtGui
-from QtGui import QWidget, QLabel, QGridLayout
+from QtGui import QWidget, QLabel, QGridLayout, QGroupBox
 
 from .editors import *
 
 group_types = {
-    '': 'Group',
-    #'collapse': 'CollapseGroup',
+    '': 'BoxGroup',
+    'collapse': 'CollapseGroup',
     #'tab': 'TabGroup',
     #'hide': 'HideGroup',
 }
@@ -84,3 +84,17 @@ class Group(QWidget):
                 cfg = find_cfg(config, widget.name)
                 widget.update_group(cfg)
 
+class BoxGroup(Group):
+    def __init__(self, updater, config):
+        super(BoxGroup, self).__init__(updater, config)
+
+        self.box = QGroupBox(self.name)
+        self.box.setLayout(self.grid)
+
+    def display(self, grid, row):
+        grid.addWidget(self.box, row, 0, 1, -1)
+
+class CollapseGroup(BoxGroup):
+    def __init__(self, updater, config):
+        super(CollapseGroup, self).__init__(updater, config)
+        self.box.setCheckable(True)
