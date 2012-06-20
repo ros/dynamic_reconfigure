@@ -45,6 +45,9 @@ class ReconfigureWidget(QWidget):
         self.client = ClientWidget(reconf)
 
         self.scroll = QScrollArea()
+        # Buffer min width so no horizontal scroll bar appears
+        self.scroll.setMinimumWidth(self.client.minimumWidth()+20)
+
         self.scroll.setWidget(self.client)
         self.scroll.setWidgetResizable(True)
 
@@ -114,6 +117,8 @@ class ReconfigureSelector(QWidget):
 class ClientWidget(Group):
     def __init__(self, reconf):
         super(ClientWidget, self).__init__(Updater(reconf), reconf.get_group_descriptions())
+
+        self.setMinimumWidth(550)
 
         self.reconf = reconf
 
