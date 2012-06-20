@@ -16,4 +16,4 @@ class ReconfigurePlugin(Plugin):
         context.add_widget(self._widget)
 
     def shutdown_plugin(self):
-        self._widget.shutdown_plugin()
+        self._widget.close()

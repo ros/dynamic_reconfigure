@@ -64,9 +64,6 @@ class ReconfigureWidget(QWidget):
         if not self.stretch:
             self.stretch = self.vbox.addStretch(1)
 
-    def shutdown_plugin(self):
-        self.close()
-
 class ReconfigureSelector(QWidget):
     def __init__(self, parent):
         super(ReconfigureSelector, self).__init__()
