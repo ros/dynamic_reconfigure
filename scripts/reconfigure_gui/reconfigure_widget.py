@@ -1,7 +1,7 @@
 import sys
 
 import QtGui
-from QtGui import QWidget, QPushButton, QComboBox
+from QtGui import QWidget, QPushButton, QComboBox, QScrollArea
 from QtCore import QTimer
 
 import dynamic_reconfigure.client
@@ -25,7 +25,7 @@ class ReconfigureWidget(QWidget):
 
         self.vbox = QtGui.QVBoxLayout()
         self.vbox.addLayout(hbox)
-        self.vbox.addStretch(1)
+        self.stretch = self.vbox.addStretch(1)
 
         self.setLayout(self.vbox)
 
@@ -43,13 +43,26 @@ class ReconfigureWidget(QWidget):
             self.close()
 
         self.client = ClientWidget(reconf)
-        self.vbox.insertWidget(1, self.client)
+
+        self.scroll = QScrollArea()
+        self.scroll.setWidget(self.client)
+        self.scroll.setWidgetResizable(True)
+
+        self.vbox.insertWidget(1, self.scroll, 1)
+        self.vbox.removeItem(self.vbox.itemAt(2))
+        self.stretch = None
 
     def close(self):
         if self.client is not None:
             # Clear out the old widget
             self.client.close()
             self.client = None
+
+            self.scroll.deleteLater()
+
+    def clear(self):
+        if not self.stretch:
+            self.stretch = self.vbox.addStretch(1)
 
     def shutdown_plugin(self):
         self.close()
@@ -86,6 +99,7 @@ class ReconfigureSelector(QWidget):
             elif len(nodes) == 0:
                 self.combo.clear()
                 self.parent.close()
+                self.parent.clear()
             else:
                 for i, n in enumerate(self.last_nodes):
                     if not n in nodes:
@@ -130,5 +144,4 @@ class ClientWidget(Group):
             w.close()
 
         self.deleteLater()
-
 
