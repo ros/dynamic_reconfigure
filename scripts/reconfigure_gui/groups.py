@@ -40,6 +40,10 @@ class Group(QWidget):
         self.state = config['state']
         self.name = config['name']
 
+        # Every group can have one tab bar
+        self.tab_bar = None
+        self.tab_bar_shown = False
+
         self.grid = QtGui.QGridLayout()
 
         self.updater = updater 
@@ -61,9 +65,12 @@ class Group(QWidget):
             self.widgets.append(widget)
         
         for group in descr['groups']:
-            if group['type'] in group_types.keys():
+            if group['type'] == 'tab':
+                widget = TabGroup(self, self.updater, group)
+            elif group['type'] in group_types.keys():
                 widget = eval(group_types[group['type']])(self.updater, group)
-                self.widgets.append(widget)
+
+            self.widgets.append(widget)
 
         for i, ed in enumerate(self.widgets):
             ed.display(self.grid, i)
@@ -111,24 +118,22 @@ class HideGroup(BoxGroup):
         self.box.setVisible(self.state)
 
 class TabGroup(Group):
-    tab_bar = None
-    tab_in_grid = False
-
-    def __init__(self, updater, config):
+    def __init__(self, parent, updater, config):
         super(TabGroup, self).__init__(updater, config)
+        self.parent = parent
 
-        if TabGroup.tab_bar is None:
-            TabGroup.tab_bar = QTabWidget()
+        if self.parent.tab_bar is None:
+            self.parent.tab_bar = QTabWidget()
 
-        TabGroup.tab_bar.addTab(self, self.name)
+        parent.tab_bar.addTab(self, self.name)
 
     def display(self, grid, row):
-        if not TabGroup.tab_in_grid:
-            grid.addWidget(TabGroup.tab_bar, row, 0, 1, -1)
-            TabGroup.tab_in_grid = True
+        if not self.parent.tab_bar_shown:
+            grid.addWidget(self.parent.tab_bar, row, 0, 1, -1)
+            self.parent.tab_bar_shown = True
 
     def close(self):
         super(TabGroup, self).close()
-        TabGroup.tab_bar = None
-        TabGroup.tab_in_grid = False
+        self.parent.tab_bar = None
+        self.parent.tab_bar_shown = False
 
