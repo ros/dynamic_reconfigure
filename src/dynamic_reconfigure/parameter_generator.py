@@ -563,3 +563,6 @@ $i.desc=$description $range"""
 
         f = open(os.path.join(self.pkgpath, "src", self.pkgname, "cfg", "__init__.py"), 'a')
         f.close()
+
+        f = open(os.path.join(self.pkgpath, "src", self.pkgname, "__init__.py"), 'a')
+        f.close()
