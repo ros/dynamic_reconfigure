@@ -5,7 +5,7 @@
     considered unstable except for features that are explicitely marked as
     stable in the documentation.
   </description>
-  <author>Blaise Gassend, Tim Field, Ze'ev Klapow</author>
+  <author>Maintained by Brett Grandbois</author>
   <license>BSD</license>
   <review status="Doc Reviewed" note="Jan 18 2010, rosparam and Python
     client API only."/>
