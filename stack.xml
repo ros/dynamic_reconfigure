@@ -1,6 +1,6 @@
 <stack>
   <description brief="dynamicreconfig">dynamicreconfig</description>
-  <author>Maintained by Eitan Marder-Eppstein</author>
+  <author>Maintained by Brett Grandbois</author>
   <license>BSD</license>  
   <review status="unreviewed" notes=""/>
   <url>http://ros.org/wiki/dynamicreconfig</url>
