@@ -47,6 +47,7 @@ import os
 import inspect
 import string 
 import sys
+import re
 
 #LINEDEBUG="#line"
 LINEDEBUG="//#line"
@@ -123,6 +124,9 @@ class ParameterGenerator:
             }
             if type == str_t and (max != None or min != None):
                 raise Exception("Max or min specified for %s, which is of string type"%name)
+            pattern = r'^[a-zA-Z][a-zA-Z0-9_]*$'
+            if not re.match(pattern, name):
+                raise Exception("The name of field \'%s\' is definitely not a valid C++ variable name! Change it accordingly."%name)
 
             self.gen.fill_type(newparam)
             self.gen.check_type_fill_default(newparam, 'default', self.gen.defval[paramtype])
