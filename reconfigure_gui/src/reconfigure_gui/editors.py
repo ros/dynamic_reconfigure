@@ -50,7 +50,7 @@ class BooleanEditor(Editor):
 
         self.update_value(config['default'])
 
-        self.cb.stateChanged.connect(self._update)
+        self.cb.clicked.connect(self._update)
 
     def update_value(self, value):
         self.cb.setChecked(value)
