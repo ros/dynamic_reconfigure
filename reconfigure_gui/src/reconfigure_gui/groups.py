@@ -64,7 +64,7 @@ class Group(QWidget):
 
             self.widgets.append(widget)
         
-        for group in descr['groups']:
+        for name, group in descr['groups'].items():
             if group['type'] == 'tab':
                 widget = TabGroup(self, self.updater, group)
             elif group['type'] in group_types.keys():
