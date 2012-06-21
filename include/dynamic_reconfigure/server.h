@@ -122,19 +122,19 @@ public:
     config = default_;
   }
 
-  void setConfigMax(ConfigType &config)
+  void setConfigMax(const ConfigType &config)
   {
     max_ = config;
     PublishDescription();
   }
 
-  void setConfigMin(ConfigType &config)
+  void setConfigMin(const ConfigType &config)
   {
     min_ = config;
     PublishDescription();
   }
 
-  void setConfigDefault(ConfigType &config)
+  void setConfigDefault(const ConfigType &config)
   {
     default_ = config;
     PublishDescription();

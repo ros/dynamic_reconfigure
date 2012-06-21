@@ -60,7 +60,6 @@ int main(int argc, char **argv)
   ros::init(argc, argv, "dynamic_reconfigure_test_server");
 
   dynamic_reconfigure::Server<dynamic_reconfigure::TestConfig> srvs;
-  //This is done due to the server constructor.  The constructor must run after ros::init() is called
   dynamic_reconfigure::Server<dynamic_reconfigure::TestConfig>::CallbackType f = boost::bind(&callback, boost::ref(srvs),_1, _2);
   srvs.setCallback(f);
   ROS_INFO("Constants are: %i %f %s %i", dynamic_reconfigure::Test_int_const, dynamic_reconfigure::Test_double_const, dynamic_reconfigure::Test_str_const, (int) dynamic_reconfigure::Test_bool_const);
