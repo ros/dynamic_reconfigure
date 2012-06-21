@@ -301,14 +301,15 @@ def decode_config(msg, description = None):
         
         def add_params(group, descr):
             for param in descr['parameters']:
-                group[param['name']] = d[param['name']]
+                if param['name'] in d.keys():
+                    group[param['name']] = d[param['name']]
             for g in group['groups']:
                 for dr in descr['groups']:
                     if dr['name'] == g['name']:
                         add_params(g, dr)
 
         add_params(d['groups'], description)
-    
+
     return Config(**d)
 
 def extract_params(group):

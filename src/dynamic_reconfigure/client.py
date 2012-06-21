@@ -222,23 +222,19 @@ class Client(object):
         """
         
         descr = self.get_group_descriptions()
-        try:
-            for k,v in changes.items():
-                for p,g in enumerate(descr['groups']):
-                    if k == g['name']:
-                        g['state'] = v
-        except:
-            groups = []
-            def update_state(group, description):
-                for p,g in enumerate(description['groups']):
-                    if g['id'] == group['id']:
-                        description['groups'][p]['state'] = group['state']
-                    else:
-                        update_state(group, g)
-                return description
+
+        groups = []
+        def update_state(group, description):
+            for p,g in enumerate(description['groups']):
+                if g['name'] == group:
+                    description['groups'][p]['state'] = changes[group]
+                else:
+                    update_state(group, g)
+            return description
  
-            for change in changes:
-                descr = update_state(change, descr)
+        for change in changes:
+            descr = update_state(change, descr)
+
         return descr
 
     def close(self):
