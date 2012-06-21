@@ -13,7 +13,8 @@
   <depend package="rospy" />
   <depend package="roscpp" />
   <depend package="rosservice" />
-  <rosdep name="wxpython" />
+  <depend package="rqt_gui" />
+  <depend package="rqt_gui_py" />
   <export>
       <rosdoc config="rosdoc.yaml" />
       <rosbuild cmake_directory="${prefix}/cmake" />
@@ -28,6 +29,8 @@
     <depend package="roscpp" />
     <depend package="rosservice" />
     <depend package="std_msgs" />
+    <depend package="rqt_gui" />
+    <depend package="rqt_gui_py" />
     <export>
       <include_dir>${dynamic_reconfigure_PACKAGE_DIR}/include</include_dir>
       <lib>dynamic_reconfigure_config_init_mutex</lib>
