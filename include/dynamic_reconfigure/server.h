@@ -106,6 +106,41 @@ public:
     updateConfigInternal(config);
   }
 
+
+  void getConfigMax(ConfigType &config)
+  {
+    config = max_;
+  }
+
+  void getConfigMin(ConfigType &config)
+  {
+    config = min_;
+  }
+
+  void getConfigDefault(ConfigType &config)
+  {
+    config = default_;
+  }
+
+  void setConfigMax(ConfigType &config)
+  {
+    max_ = config;
+    PublishDescription();
+  }
+
+  void setConfigMin(ConfigType &config)
+  {
+    min_ = config;
+    PublishDescription();
+  }
+
+  void setConfigDefault(ConfigType &config)
+  {
+    default_ = config;
+    PublishDescription();
+  }
+
+
 private:
   ros::NodeHandle node_handle_;
   ros::ServiceServer set_service_;
@@ -113,12 +148,36 @@ private:
   ros::Publisher descr_pub_;
   CallbackType callback_;
   ConfigType config_;
+  ConfigType min_;
+  ConfigType max_;
+  ConfigType default_;
   boost::recursive_mutex &mutex_;
   boost::recursive_mutex own_mutex_; // Used only if an external one isn't specified.
   bool own_mutex_warn_;
 
+
+
+  void PublishDescription()
+  {
+    boost::recursive_mutex::scoped_lock lock(mutex_);
+    //Copy over min_ max_ default_
+    dynamic_reconfigure::ConfigDescription description_message = ConfigType::__getDescriptionMessage__();
+
+    max_.__toMessage__(description_message.max, ConfigType::__getParamDescriptions__(),ConfigType::__getGroupDescriptions__());
+    min_.__toMessage__(description_message.min,ConfigType::__getParamDescriptions__(),ConfigType::__getGroupDescriptions__());
+    default_.__toMessage__(description_message.dflt,ConfigType::__getParamDescriptions__(),ConfigType::__getGroupDescriptions__());
+
+    //Publish description
+    descr_pub_.publish(description_message);
+  }
+
   void init()
   {
+    //Grab copys of the data from the config files.  These are declared in the generated config file.
+    min_ = ConfigType::__getMin__();
+    max_ = ConfigType::__getMax__();
+    default_ = ConfigType::__getDefault__();
+
     boost::recursive_mutex::scoped_lock lock(mutex_);
     set_service_ = node_handle_.advertiseService("set_parameters",
         &Server<ConfigType>::setConfigCallback, this);
