@@ -73,6 +73,7 @@ class ReconfigureSelector(QWidget):
 
         self.parent = parent
         self.last_nodes = None
+        self.current_node = ''
 
         self.combo = QComboBox(self)
         self.update_combo()
@@ -112,7 +113,9 @@ class ReconfigureSelector(QWidget):
             self.last_nodes = nodes
 
     def selected(self, node):
-        self.parent.show(node)
+        if not node == self.current_node:
+            self.parent.show(node)
+            self.current_node = node
 
 class ClientWidget(Group):
     def __init__(self, reconf):

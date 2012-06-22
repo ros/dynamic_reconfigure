@@ -22,7 +22,10 @@ class Updater(threading.Thread):
             if last_commit >= self._last_pending:
                     with self._cv:
                         self._cv.wait()
-            
+
+            if self._stop_flag:  
+                return
+
             last_commit = time.time()
             update = self._pending_config.copy()
             self._pending_config = {}
