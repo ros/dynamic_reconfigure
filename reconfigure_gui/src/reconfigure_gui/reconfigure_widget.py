@@ -1,7 +1,7 @@
 import sys
 
 import QtGui
-from QtGui import QWidget, QPushButton, QComboBox, QScrollArea
+from QtGui import QWidget, QPushButton, QComboBox, QScrollArea, QTreeWidget, QTreeWidgetItem
 from QtCore import QTimer
 
 import dynamic_reconfigure.client
@@ -15,19 +15,14 @@ from .updater import Updater
 class ReconfigureWidget(QWidget):
     def __init__(self):
         super(ReconfigureWidget, self).__init__()
-
-        self.selector = ReconfigureSelector(self)
-
         self.client = None
+        self.stretch = None
 
-        hbox = QtGui.QHBoxLayout()
-        hbox.addWidget(self.selector)
+        self.hbox = QtGui.QHBoxLayout()
+        self.selector = ReconfigureSelector(self)
+        self.hbox.addWidget(self.selector.tree)
 
-        self.vbox = QtGui.QVBoxLayout()
-        self.vbox.addLayout(hbox)
-        self.stretch = self.vbox.addStretch(1)
-
-        self.setLayout(self.vbox)
+        self.setLayout(self.hbox)
 
     def show(self, node):
         self.close()
@@ -51,8 +46,8 @@ class ReconfigureWidget(QWidget):
         self.scroll.setWidget(self.client)
         self.scroll.setWidgetResizable(True)
 
-        self.vbox.insertWidget(1, self.scroll, 1)
-        self.vbox.removeItem(self.vbox.itemAt(2))
+        self.hbox.insertWidget(1, self.scroll, 1)
+        self.hbox.removeItem(self.hbox.itemAt(2))
         self.stretch = None
 
     def close(self):
@@ -65,7 +60,7 @@ class ReconfigureWidget(QWidget):
 
     def clear(self):
         if not self.stretch:
-            self.stretch = self.vbox.addStretch(1)
+            self.stretch = self.hbox.addStretch(1)
 
 class ReconfigureSelector(QWidget):
     def __init__(self, parent):
@@ -75,47 +70,44 @@ class ReconfigureSelector(QWidget):
         self.last_nodes = None
         self.current_node = ''
 
-        self.combo = QComboBox(self)
-        self.update_combo()
-        self.combo.activated[str].connect(self.selected)
+        self.tree = QTreeWidget()
+        self.update_tree()
 
-        self.hbox = QtGui.QHBoxLayout()
-        self.hbox.addWidget(self.combo)
-        
-        self.setLayout(self.hbox)
+        self.tree.itemClicked.connect(self.selected)
+        self.tree.setSelectionMode(QtGui.QAbstractItemView.SingleSelection)
+
+        header = QTreeWidgetItem()
+        header.setText(0, 'Nodes')
+        self.tree.setHeaderItem(header)
 
         self.timer = QTimer()
-        self.timer.timeout.connect(self.update_combo)
+        self.timer.timeout.connect(self.update_tree)
         self.timer.start(100)
 
-    def update_combo(self):
+    def update_tree(self):
         try:
             nodes = dynamic_reconfigure.find_reconfigure_services()
         except rosservice.ROSServiceIOException:
             print("Reconfigure GUI cannot connect to master.")
         else:
-            if not self.last_nodes:
+            if not nodes == self.last_nodes:
+                self.tree.clear()
                 for n in nodes:
-                    self.combo.addItem(n)
+                    item = QTreeWidgetItem()
+                    item.setText(0, n)
+                    self.tree.addTopLevelItem(item)
             elif len(nodes) == 0:
-                self.combo.clear()
+                self.tree.clear()
                 self.parent.close()
                 self.parent.clear()
-            else:
-                for i, n in enumerate(self.last_nodes):
-                    if not n in nodes:
-                        self.combo.removeItem(i)
-
-                for n in nodes:
-                    if not n in self.last_nodes:
-                        self.combo.addItem(n)
 
             self.last_nodes = nodes
 
-    def selected(self, node):
-        if not node == self.current_node:
-            self.parent.show(node)
-            self.current_node = node
+    def selected(self, node, col):
+        print("Selected %s"%node.text(0))
+        if not node.text(0) == self.current_node:
+            self.parent.show(node.text(0))
+            self.current_node = node.text(0)
 
 class ClientWidget(Group):
     def __init__(self, reconf):
