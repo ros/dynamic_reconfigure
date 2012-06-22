@@ -1,6 +1,6 @@
 from QtCore import Qt
 import QtGui
-from QtGui import QWidget, QLabel, QTabWidget, QGridLayout, QGroupBox
+from QtGui import QWidget, QLabel, QPushButton, QTabWidget, QGridLayout, QGroupBox
 
 from .editors import *
 
@@ -9,6 +9,7 @@ group_types = {
     'collapse': 'CollapseGroup',
     'tab': 'TabGroup',
     'hide': 'HideGroup',
+    'apply': 'ApplyGroup',
 }
 
 def find_cfg(config, name):
@@ -137,3 +138,26 @@ class TabGroup(Group):
         self.parent.tab_bar = None
         self.parent.tab_bar_shown = False
 
+class ApplyGroup(BoxGroup):
+    class ApplyUpdater:
+        def __init__(self, updater):
+            self.updater = updater
+            self._pending_config = {}
+
+        def update(self, config):
+            for name, value in config.items():
+                self._pending_config[name] = value
+
+        def apply_update(self):
+            self.updater.update(self._pending_config)
+            self._pending_config = {}
+
+    def __init__(self, updater, config):
+        self.updater = ApplyGroup.ApplyUpdater(updater)
+        super(ApplyGroup, self).__init__(self.updater, config)
+
+        self.button = QPushButton("Apply %s" % self.name)
+        self.button.clicked.connect(self.updater.apply_update)
+
+        rows = self.grid.rowCount()
+        self.grid.addWidget(self.button, rows+1, 1, Qt.AlignRight)
