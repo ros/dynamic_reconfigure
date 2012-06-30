@@ -30,7 +30,7 @@ class ReconfigureWidget(QWidget):
         reconf = None
         
         try:
-            reconf = dynamic_reconfigure.client.Client(node, timeout=5.0)
+            reconf = dynamic_reconfigure.client.Client(str(node), timeout=5.0)
         except rospy.exceptions.ROSException:
             print("Could not connect to %s"%node) 
             return
