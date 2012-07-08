@@ -286,6 +286,17 @@ class ParameterGenerator:
         self.mkdirabs(path)
 
     def generate(self, pkgname, nodename, name):
+        self.pkgname = pkgname
+        self.pkgpath = roslib.packages.get_pkg_dir(pkgname)
+        self.name = name
+        self.nodename = nodename
+        self.msgname = name+"Config"
+
+        # Don't regenerate headers if the config hasn't been modfied
+        cpp_header = os.path.realpath(os.path.join(self.pkgpath, "cpp", pkgname, self.msgname + ".h"))      
+        if os.path.exists(cpp_header) and os.path.getmtime(os.path.realpath(__file__)) < os.path.getmtime(cpp_header):
+              exit(0)
+
         try:
             if sys.modules['__main__']._DYNAMIC_RECONFIGURE_GENERATING_DEPENDENCIES:
                 # Done this way because importing this module from gendeps
@@ -295,11 +306,6 @@ class ParameterGenerator:
         except:
             pass
         try:
-            self.pkgname = pkgname
-            self.pkgpath = roslib.packages.get_pkg_dir(pkgname)
-            self.name = name
-            self.nodename = nodename
-            self.msgname = name+"Config"
             #print '**************************************************************'
             #print '**************************************************************'
             print Template("Generating reconfiguration files for $name in $pkgname").\
