@@ -76,9 +76,7 @@ class ReconfigureSelector(QWidget):
         self.tree.itemClicked.connect(self.selected)
         self.tree.setSelectionMode(QtGui.QAbstractItemView.SingleSelection)
 
-        header = QTreeWidgetItem()
-        header.setText(0, 'Nodes')
-        self.tree.setHeaderItem(header)
+        self.tree.setHeaderLabel("Available Nodes")
 
         self.timer = QTimer()
         self.timer.timeout.connect(self.update_tree)
