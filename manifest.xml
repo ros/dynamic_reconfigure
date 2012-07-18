@@ -13,6 +13,7 @@
   <depend package="rospy" />
   <depend package="roscpp" />
   <depend package="rosservice" />
+  <rosdep name="wxpython" />
   <export>
       <rosdoc config="rosdoc.yaml" />
       <rosbuild cmake_directory="${prefix}/cmake" />
