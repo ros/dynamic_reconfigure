@@ -133,8 +133,6 @@ class ParameterGenerator:
             self.gen.check_type_fill_default(newparam, 'max', self.gen.maxval[paramtype])
             self.gen.check_type_fill_default(newparam, 'min', self.gen.minval[paramtype])
 
-            print("Param: %s default: %s"%(newparam['name'], newparam['default']))
-
             self.parameters.append(newparam)
 
         # Compile a list of all the parameters in this group
