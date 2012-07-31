@@ -28,4 +28,4 @@ rosbuild_add_library(dynamic_reconfigure_config_init_mutex src/dynamic_reconfigu
 
 add_subdirectory(test)
 
-rosbuild_make_distribution(1.4.1)
+rosbuild_make_distribution(1.4.2)
