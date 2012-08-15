@@ -1,31 +1,43 @@
-if(CATKIN)
-  include(catkin.cmake)
-  return()
-endif()
+cmake_minimum_required(VERSION 2.8)
+project(dynamic_reconfigure)
+catkin_project(dynamic_reconfigure
+  LIBRARIES dynamic_reconfigure_config_init_mutex
+  INCLUDE_DIRS include)
 
-if(ROSBUILD)
-  include(rosbuild.cmake)
-  return()
-endif()
-cmake_minimum_required(VERSION 2.4.6)
-include($ENV{ROS_ROOT}/core/rosbuild/rosbuild.cmake)
-rosbuild_init()
+find_package(catkin REQUIRED)
+find_package(ROS COMPONENTS
+  rostime cpp_common roscpp_serialization roscpp_traits # serialization
+  roscpp rosconsole                                     # roscpp
+  std_msgs)
 
+include_directories(include)
 
-set(CMAKE_BUILD_TYPE debug)
+add_message_files(
+  DIRECTORY msg
+  FILES 
+  BoolParameter.msg      Config.msg           Group.msg       IntParameter.msg      SensorLevels.msg
+  ConfigDescription.msg  DoubleParameter.msg  GroupState.msg  ParamDescription.msg  StrParameter.msg)
 
-set(EXECUTABLE_OUTPUT_PATH ${PROJECT_SOURCE_DIR}/bin)
-set(LIBRARY_OUTPUT_PATH ${PROJECT_SOURCE_DIR}/lib)
+add_service_files(
+  DIRECTORY srv
+  FILES Reconfigure.srv)
 
-rosbuild_genmsg()
-rosbuild_gensrv()
+generate_messages()
 
-rosbuild_find_ros_package(dynamic_reconfigure)
-include(${dynamic_reconfigure_PACKAGE_PATH}/cmake/cfgbuild.cmake)
-gencfg()
+add_library(dynamic_reconfigure_config_init_mutex SHARED
+  src/dynamic_reconfigure_config_init_mutex.cpp)
 
-rosbuild_add_library(dynamic_reconfigure_config_init_mutex src/dynamic_reconfigure_config_init_mutex.cpp)
+catkin_export_python()
 
-add_subdirectory(test)
+install(FILES manifest.xml
+  DESTINATION share/dynamic_reconfigure)
 
-rosbuild_make_distribution(1.4.2)
+install(DIRECTORY include/
+  DESTINATION include
+  FILES_MATCHING PATTERN "*.h")
+      
+install(TARGETS dynamic_reconfigure_config_init_mutex
+  LIBRARY DESTINATION lib)
+      
+install(PROGRAMS scripts/dynparam
+  DESTINATION share/dynamic_reconfigure/scripts/)
