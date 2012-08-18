@@ -1,14 +1,20 @@
 cmake_minimum_required(VERSION 2.8)
 project(dynamic_reconfigure)
+
+find_package(catkin REQUIRED)
+catkin_stack()
 catkin_project(dynamic_reconfigure
   LIBRARIES dynamic_reconfigure_config_init_mutex
   INCLUDE_DIRS include)
 
-find_package(catkin REQUIRED)
+
 find_package(ROS COMPONENTS
   rostime cpp_common roscpp_serialization roscpp_traits # serialization
   roscpp rosconsole                                     # roscpp
-  std_msgs)
+  std_msgs
+  genmsg)
+
+catkin_python_setup()
 
 include_directories(include)
 
@@ -26,8 +32,6 @@ generate_messages()
 
 add_library(dynamic_reconfigure_config_init_mutex SHARED
   src/dynamic_reconfigure_config_init_mutex.cpp)
-
-catkin_export_python()
 
 install(FILES manifest.xml
   DESTINATION share/dynamic_reconfigure)

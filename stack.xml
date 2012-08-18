@@ -1,13 +1,20 @@
 <stack>
+  <name>dynamic_reconfigure</name>
+  <version>1.4.2</version>
   <description brief="A system to allow node parameters to be changed without restarting the node.">
   This unary stack contains the dynamic_reconfigure package which provides a means to change
   node parameters at any time without having to restart the node.
   </description>
   <author>Maintained by Ze'ev Klapow</author>
   <license>BSD</license>  
+  <copyright>Willow Garage</copyright>
   <review status="unreviewed" notes=""/>
   <url>http://ros.org/wiki/dynamic_reconfigure</url>
-  <depend stack="ros" />
-  <depend stack="ros_comm" /> <!-- rosservice, rospy, roscpp -->
+
+  <build_depends>catkin</build_depends>
+  <build_depends>genmsg</build_depends>
+
+  <depends>ros_comm</depends>
+  <depends>std_msgs</depends>
 
 </stack>
