@@ -16,10 +16,10 @@
   <build_depends>catkin</build_depends>
   <build_depends>genmsg</build_depends>
   <build_depends>ros_comm</build_depends>
-  <build_depends>roscpp</build_depends>
+  <build_depends>roscpp_core</build_depends>
   <build_depends>std_msgs</build_depends>
 
   <depends>ros_comm</depends>
-  <depends>roscpp</depends>
+  <depends>roscpp_core</depends>
   <depends>std_msgs</depends>
 </stack>
