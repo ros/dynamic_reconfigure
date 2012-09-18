@@ -1,11 +1,12 @@
 <stack>
   <name>dynamic_reconfigure</name>
-  <version>1.5.0</version>
+  <version>1.5.1</version>
   <description brief="A system to allow node parameters to be changed without restarting the node.">
   This unary stack contains the dynamic_reconfigure package which provides a means to change
   node parameters at any time without having to restart the node.
   </description>
   <author>Maintained by Ze'ev Klapow</author>
+  <maintainer email="zklapow@willowgarage.com">Maintained by Ze'ev Klapow</maintainer>
   <license>BSD</license>  
   <copyright>Willow Garage</copyright>
   <review status="unreviewed" notes=""/>
@@ -16,5 +17,4 @@
 
   <depends>ros_comm</depends>
   <depends>std_msgs</depends>
-
 </stack>
