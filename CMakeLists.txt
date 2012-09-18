@@ -8,7 +8,7 @@ catkin_project(dynamic_reconfigure
   INCLUDE_DIRS include)
 
 
-find_package(ROS COMPONENTS
+find_package(catkin COMPONENTS
   rostime cpp_common roscpp_serialization roscpp_traits # serialization
   roscpp rosconsole                                     # roscpp
   std_msgs
