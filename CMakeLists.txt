@@ -36,9 +36,6 @@ add_library(dynamic_reconfigure_config_init_mutex SHARED
   src/dynamic_reconfigure_config_init_mutex.cpp)
 target_link_libraries(dynamic_reconfigure_config_init_mutex ${BOOST_LIBRARIES})
 
-install(FILES manifest.xml
-  DESTINATION ${CATKIN_PROJECT_SHARE_DESTINATION})
-
 install(DIRECTORY include/dynamic_reconfigure/
   DESTINATION ${CATKIN_PROJECT_INCLUDE_DESTINATION}
   FILES_MATCHING PATTERN "*.h")
@@ -46,5 +43,11 @@ install(DIRECTORY include/dynamic_reconfigure/
 install(TARGETS dynamic_reconfigure_config_init_mutex
   LIBRARY DESTINATION ${CATKIN_PROJECT_LIB_DESTINATION})
       
-install(PROGRAMS scripts/dynparam
-  DESTINATION ${CATKIN_PROJECT_SHARE_DESTINATION}/scripts/)
+install(DIRECTORY cmake
+  DESTINATION ${CATKIN_PROJECT_SHARE_DESTINATION}/)
+install(DIRECTORY msg
+  DESTINATION ${CATKIN_PROJECT_SHARE_DESTINATION}/)
+install(DIRECTORY scripts
+  DESTINATION ${CATKIN_PROJECT_SHARE_DESTINATION}/)
+install(DIRECTORY templates
+  DESTINATION ${CATKIN_PROJECT_SHARE_DESTINATION}/)
