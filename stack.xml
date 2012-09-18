@@ -15,12 +15,11 @@
   <build_depends>boost</build_depends>
   <build_depends>catkin</build_depends>
   <build_depends>genmsg</build_depends>
+  <build_depends>ros_comm</build_depends>
   <build_depends>roscpp</build_depends>
-  <build_depends>rosconsole</build_depends>
   <build_depends>std_msgs</build_depends>
 
   <depends>ros_comm</depends>
-  <depends>rosconsole</depends>
   <depends>roscpp</depends>
   <depends>std_msgs</depends>
 </stack>
