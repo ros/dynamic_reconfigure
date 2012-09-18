@@ -30,18 +30,21 @@ add_service_files(
 
 generate_messages()
 
+find_package(Boost REQUIRED)
+include_directories(SYSTEM ${BOOST_INCLUDE_DIRS})
 add_library(dynamic_reconfigure_config_init_mutex SHARED
   src/dynamic_reconfigure_config_init_mutex.cpp)
+target_link_libraries(dynamic_reconfigure_config_init_mutex ${BOOST_LIBRARIES})
 
 install(FILES manifest.xml
-  DESTINATION share/dynamic_reconfigure)
+  DESTINATION ${CATKIN_PROJECT_SHARE_DESTINATION})
 
-install(DIRECTORY include/
-  DESTINATION include
+install(DIRECTORY include/dynamic_reconfigure/
+  DESTINATION ${CATKIN_PROJECT_INCLUDE_DESTINATION}
   FILES_MATCHING PATTERN "*.h")
       
 install(TARGETS dynamic_reconfigure_config_init_mutex
-  LIBRARY DESTINATION lib)
+  LIBRARY DESTINATION ${CATKIN_PROJECT_LIB_DESTINATION})
       
 install(PROGRAMS scripts/dynparam
-  DESTINATION share/dynamic_reconfigure/scripts/)
+  DESTINATION ${CATKIN_PROJECT_SHARE_DESTINATION}/scripts/)
