@@ -14,23 +14,10 @@ except Exception, e:
 
 sys.path.insert(0, 'src')
 
-PKG = 'dynamic_reconfigure'
-gen = ['msg', 'srv']
-packages = [PKG]
-package_dir = {PKG: 'src/%s'%PKG}
-if 'CATKIN_BINARY_DIR' in os.environ:
-     build_d = os.environ['CATKIN_BINARY_DIR']
-     for t in gen:
-         p = os.path.join(build_d, 'gen', 'py', PKG, t)
-         if os.path.isdir(p):
-             # e.g. std_msgs.msg = build/gen/py/std_msgs/msg
-             package_dir["%s.%s"%(PKG, t)] = p
-             packages.append("%s.%s"%(PKG, t))
-
 setup(name='dynamic_reconfigure',
       version= version,
-      packages= packages, 
-      package_dir = package_dir, 
+      packages= ['dynamic_reconfigure'],
+      package_dir = {'':'src'},
       install_requires= ['ros_comm'],
       author = "", 
       author_email = "",
