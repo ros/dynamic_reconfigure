@@ -43,10 +43,13 @@ macro(gencfg_cpp)
 
       # The .cfg file is its own generator.
       set(gencfg_cpp_exe "")
+
+      get_filename_component(SELF_DIR "${CMAKE_CURRENT_LIST_FILE}" PATH)
       set(gencfg_build_files 
-        ${dynamic_reconfigure_PACKAGE_PATH}/templates/ConfigType.py
-        ${dynamic_reconfigure_PACKAGE_PATH}/templates/ConfigType.h
-        ${dynamic_reconfigure_PACKAGE_PATH}/src/dynamic_reconfigure/parameter_generator.py)
+        ${SELF_DIR}/../templates/ConfigType.py
+        ${SELF_DIR}/../templates/ConfigType.h
+      #  ${dynamic_reconfigure_PACKAGE_PATH}/src/dynamic_reconfigure/parameter_generator.py
+      )
 
       string(REPLACE ".cfg" "" _cfg_bare ${_cfg})
 
@@ -60,9 +63,13 @@ macro(gencfg_cpp)
       # FIXME Horrible hack. Can't get CMAKE to add dependencies for anything
       # but the first output in add_custom_command.
       execute_process(
-        COMMAND ${dynamic_reconfigure_PACKAGE_PATH}/cmake/gendeps ${_input}
+        COMMAND ${SELF_DIR}/gendeps ${_input}
+        ERROR_VARIABLE __gencfg_err
         OUTPUT_VARIABLE __gencfg_autodeps
         OUTPUT_STRIP_TRAILING_WHITESPACE)
+      if (__gencfg_err)
+        message(ERROR "${__gencfg_err}")
+      endif(__gencfg_err)
       string(REPLACE "\n" " " ${_input}_AUTODEPS ${__gencfg_autodeps})
       separate_arguments(${_input}_AUTODEPS)
       #message("MSG: " ${${_input}_AUTODEPS})
