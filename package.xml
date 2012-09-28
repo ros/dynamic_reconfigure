@@ -1,4 +1,4 @@
-<stack>
+<package>
   <name>dynamic_reconfigure</name>
   <version>1.5.8</version>
   <description brief="A system to allow node parameters to be changed without restarting the node.">
@@ -12,14 +12,14 @@
   <review status="unreviewed" notes=""/>
   <url>http://ros.org/wiki/dynamic_reconfigure</url>
 
-  <build_depends>boost</build_depends>
-  <build_depends>catkin</build_depends>
-  <build_depends>genmsg</build_depends>
-  <build_depends>ros_comm</build_depends>
-  <build_depends>roscpp_core</build_depends>
-  <build_depends>std_msgs</build_depends>
+  <build_depend>boost</build_depend>
+  <build_depend>catkin</build_depend>
+  <build_depend>genmsg</build_depend>
+  <build_depend>langs-dev</build_depend>
+  <build_depend>roscpp</build_depend>
+  <build_depend>std_msgs</build_depend>
 
-  <depends>ros_comm</depends>
-  <depends>roscpp_core</depends>
-  <depends>std_msgs</depends>
-</stack>
+  <run_depend>ros_comm</run_depend>
+  <run_depend>roscpp_core</run_depend>
+  <run_depend>std_msgs</run_depend>
+</package>

@@ -2,21 +2,22 @@ cmake_minimum_required(VERSION 2.8)
 project(dynamic_reconfigure)
 
 find_package(catkin REQUIRED)
-catkin_stack()
-catkin_project(dynamic_reconfigure
-  LIBRARIES dynamic_reconfigure_config_init_mutex
-  INCLUDE_DIRS include)
 
-
-find_package(catkin COMPONENTS
-  rostime cpp_common roscpp_serialization roscpp_traits # serialization
-  roscpp rosconsole                                     # roscpp
-  std_msgs
-  genmsg)
+catkin_package(LIBRARIES dynamic_reconfigure_config_init_mutex
+               INCLUDE_DIRS include
+)
 
 catkin_python_setup()
 
+find_package(catkin COMPONENTS genmsg
+                               roscpp 
+                               std_msgs
+)
+find_package(Boost REQUIRED)
+
+
 include_directories(include)
+include_directories(SYSTEM ${BOOST_INCLUDE_DIRS})
 
 add_message_files(
   DIRECTORY msg
@@ -30,28 +31,26 @@ add_service_files(
 
 generate_messages()
 
-find_package(Boost REQUIRED)
-include_directories(SYSTEM ${BOOST_INCLUDE_DIRS})
 add_library(dynamic_reconfigure_config_init_mutex SHARED
   src/dynamic_reconfigure_config_init_mutex.cpp)
 target_link_libraries(dynamic_reconfigure_config_init_mutex ${BOOST_LIBRARIES})
 
 install(DIRECTORY include/dynamic_reconfigure/
-  DESTINATION ${CATKIN_PROJECT_INCLUDE_DESTINATION}
+  DESTINATION ${CATKIN_PACKAGE_INCLUDE_DESTINATION}
   FILES_MATCHING PATTERN "*.h")
       
 install(TARGETS dynamic_reconfigure_config_init_mutex
-  LIBRARY DESTINATION ${CATKIN_PROJECT_LIB_DESTINATION})
+  LIBRARY DESTINATION ${CATKIN_PACKAGE_LIB_DESTINATION})
       
 install(DIRECTORY cmake
-  DESTINATION ${CATKIN_PROJECT_SHARE_DESTINATION}/
+  DESTINATION ${CATKIN_PACKAGE_SHARE_DESTINATION}/
   USE_SOURCE_PERMISSIONS
 )
 install(DIRECTORY msg
-  DESTINATION ${CATKIN_PROJECT_SHARE_DESTINATION}/)
+  DESTINATION ${CATKIN_PACKAGE_SHARE_DESTINATION}/)
 install(DIRECTORY scripts
-  DESTINATION ${CATKIN_PROJECT_SHARE_DESTINATION}/)
+  DESTINATION ${CATKIN_PACKAGE_SHARE_DESTINATION}/)
 install(DIRECTORY srv
-  DESTINATION ${CATKIN_PROJECT_SHARE_DESTINATION}/)
+  DESTINATION ${CATKIN_PACKAGE_SHARE_DESTINATION}/)
 install(DIRECTORY templates
-  DESTINATION ${CATKIN_PROJECT_SHARE_DESTINATION}/)
+  DESTINATION ${CATKIN_PACKAGE_SHARE_DESTINATION}/)

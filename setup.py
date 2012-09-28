@@ -6,10 +6,10 @@ import sys
 from xml.etree.ElementTree import ElementTree
 
 try:
-    root = ElementTree(None, 'stack.xml')
+    root = ElementTree(None, 'package.xml')
     version = root.findtext('version')
 except Exception, e:
-    print >> sys.stderr, 'Could not extract version from your stack.xml:\n%s' % e
+    print >>sys.stderr, 'Could not extract version from your stack.xml:\n%s' % e
     sys.exit(-1)
 
 sys.path.insert(0, 'src')
