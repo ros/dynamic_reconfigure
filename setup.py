@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 
 import os
-from setuptools import setup
+from distutils.core import setup
 import sys
 from xml.etree.ElementTree import ElementTree
 
