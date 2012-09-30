@@ -4,6 +4,7 @@ project(dynamic_reconfigure)
 find_package(catkin REQUIRED)
 catkin_package(LIBRARIES dynamic_reconfigure_config_init_mutex
                INCLUDE_DIRS include
+               CFG_EXTRAS extras.cmake
 )
 
 catkin_python_setup()
