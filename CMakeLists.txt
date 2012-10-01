@@ -41,6 +41,14 @@ install(DIRECTORY include/dynamic_reconfigure/
       
 install(TARGETS dynamic_reconfigure_config_init_mutex
   LIBRARY DESTINATION ${CATKIN_PACKAGE_LIB_DESTINATION})
+
+# deal with the CMake folder
+file(COPY cmake/rosbuild2.cmake
+     DESTINATION ${CATKIN_BUILD_PREFIX}/${CATKIN_PACKAGE_SHARE_DESTINATION}/cmake/
+)
+file(COPY templates
+     DESTINATION ${CATKIN_BUILD_PREFIX}/${CATKIN_PACKAGE_SHARE_DESTINATION}/
+)
       
 install(DIRECTORY cmake
   DESTINATION ${CATKIN_PACKAGE_SHARE_DESTINATION}/

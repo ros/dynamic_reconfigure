@@ -334,7 +334,8 @@ $i.desc=$description $range"""
         constants = string.join(constants, '\n')
         f.write(Template(template).substitute(uname=self.name.upper(), 
             configname=self.name, pkgname = self.pkgname, paramdescr = paramdescr, 
-            members = members, doline = LINEDEBUG, constants = constants))
+            members = members, doline = LINEDEBUG, constants = constants, groups = ''))
+
         f.close()
 
 #def deleteoneobsolete(self, file):
