@@ -1,6 +1,6 @@
 <package>
   <name>dynamic_reconfigure</name>
-  <version>1.5.12</version>
+  <version>1.5.13</version>
   <description brief="A system to allow node parameters to be changed without restarting the node.">
   This unary stack contains the dynamic_reconfigure package which provides a means to change
   node parameters at any time without having to restart the node.
