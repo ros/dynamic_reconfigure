@@ -20,12 +20,13 @@ macro(generate_cfg)
     set(_output_wikidoc ${CATKIN_PACKAGE_SHARE_DESTINATION}/docs/${_cfg_bare}Config.wikidoc)
     set(_output_usage ${CATKIN_PACKAGE_SHARE_DESTINATION}/docs/${_cfg_bare}Config-usage.dox)
 
-    add_custom_command(OUTPUT ${_output_cpp} ${_output_py} 
+message(INFO ${_output_cpp} ${_output_dox} ${_output_usage} ${_output_py} ${_output_wikidoc})
+    add_custom_command(OUTPUT
       ${_output_cpp} ${_output_dox} ${_output_usage} ${_output_py} ${_output_wikidoc}
       COMMAND ${CATKIN_ENV}
       ${_input}
-      ${dynamic_reconfigure_SOURCE_DIR}
-      ${PROJECT_BINARY_DIR}
+      ${dynamic_reconfigure_SELF_DIR}/..
+      ${CATKIN_BUILD_PREFIX}/${CATKIN_PACKAGE_BIN_DESTINATION}
       ${CATKIN_BUILD_PREFIX}/${CATKIN_PACKAGE_INCLUDE_DESTINATION}
       ${CATKIN_BUILD_PREFIX}/${CATKIN_PACKAGE_PYTHON_DESTINATION}
       DEPENDS ${_input} ${gencfg_build_files}

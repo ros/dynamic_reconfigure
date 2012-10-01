@@ -243,7 +243,10 @@ $i.desc=$description $range"""
     
     def generatedoc(self):
         self.mkdirabs("docs")
-        f = open(os.path.join(self.binary_dir, "docs", self.msgname+".dox"), 'w')
+        dir_path = os.path.join(self.binary_dir, "docs")
+        if not os.path.exists(dir_path):
+            os.makedirs(dir_path)
+        f = open(os.path.join(dir_path, self.msgname+".dox"), 'w')
         #print >> f, "/**"
         print >> f, "\\subsubsection parameters ROS parameters"
         print >> f
