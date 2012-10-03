@@ -30,7 +30,10 @@
 # ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 # POSSIBILITY OF SUCH DAMAGE.
 
-import roslib; roslib.load_manifest('dynamic_reconfigure')
+try:
+    import roslib; roslib.load_manifest('dynamic_reconfigure')
+except:
+    pass
 import rospy
 import inspect
 import copy

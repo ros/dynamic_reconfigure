@@ -35,7 +35,10 @@ Python client API for dynamic_reconfigure (L{Client}) as well as
 example server implementation (L{Server}).
 """
 
-import roslib; roslib.load_manifest('dynamic_reconfigure')
+try:
+    import roslib; roslib.load_manifest('dynamic_reconfigure')
+except:
+    pass
 import rospy
 import rosservice
 import os
@@ -63,7 +66,7 @@ def get_parameter_names(descr):
     return descr.defaults.keys()
 
 
-if 'ROS_BUILD' in os.environ:
+if os.environ['ROS_DISTRO'] >= 'groovy':
     import sys
-    import parameter_generator_rosbuild2 as p
+    import parameter_generator_catkin as p
     sys.modules['dynamic_reconfigure.parameter_generator'] = p
