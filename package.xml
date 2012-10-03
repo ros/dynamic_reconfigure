@@ -25,4 +25,7 @@
 
   <run_depend>boost</run_depend>
   <run_depend>roscpp</run_depend>
+  <run_depend>roslib</run_depend>
+  <run_depend>rospy</run_depend>
+  <run_depend>rosservice</run_depend>
 </package>

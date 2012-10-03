@@ -1,33 +1,10 @@
 #!/usr/bin/env python
-
-import os
 from distutils.core import setup
-import sys
-from xml.etree.ElementTree import ElementTree
+from catkin_pkg.package import parse_package_for_distutils
 
-try:
-    root = ElementTree(None, 'package.xml')
-    version = root.findtext('version')
-except Exception, e:
-    print >>sys.stderr, 'Could not extract version from your stack.xml:\n%s' % e
-    sys.exit(-1)
+d = parse_package_for_distutils()
+d['packages'] = ['dynamic_reconfigure']
+d['package_dir'] = {'': 'src'}
+d['install_requires'] = ['roslib', 'rospy', 'rosservice']
 
-sys.path.insert(0, 'src')
-
-setup(name='dynamic_reconfigure',
-      version= version,
-      packages= ['dynamic_reconfigure'],
-      package_dir = {'':'src'},
-      install_requires= ['ros_comm'],
-      author = "", 
-      author_email = "",
-      url = "",
-      download_url = "", 
-      keywords = [],
-      classifiers = [
-        "Programming Language :: Python", 
-        "License :: OSI Approved :: BSD License" ],
-      description = "",
-      long_description = "",
-      license = "BSD"
-      )
+setup(**d)
