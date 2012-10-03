@@ -20,7 +20,6 @@ macro(generate_cfg)
     set(_output_wikidoc ${CATKIN_PACKAGE_SHARE_DESTINATION}/docs/${_cfg_bare}Config.wikidoc)
     set(_output_usage ${CATKIN_PACKAGE_SHARE_DESTINATION}/docs/${_cfg_bare}Config-usage.dox)
 
-message(INFO ${_output_cpp} ${_output_dox} ${_output_usage} ${_output_py} ${_output_wikidoc})
     add_custom_command(OUTPUT
       ${_output_cpp} ${_output_dox} ${_output_usage} ${_output_py} ${_output_wikidoc}
       COMMAND ${CATKIN_ENV}
