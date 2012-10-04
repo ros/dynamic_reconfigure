@@ -16,8 +16,11 @@ macro(generate_cfg)
                     RESULT_VARIABLE RES_VAR
                     OUTPUT_VARIABLE OUT_VAR
                     ERROR_VARIABLE ERR_VAR
+                    OUTPUT_STRIP_TRAILING_WHITESPACE
+                    ERROR_STRIP_TRAILING_WHITESPACE
     )
     message(STATUS "dynamic_reconfigure building ${_cfg}")
+    message(STATUS "dynamic_reconfigure built ${_cfg}: " + ${OUT_VAR})
     if (${ERR_VAR})
       message(ERROR ${ERR_VAR})
     endif()

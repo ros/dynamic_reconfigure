@@ -339,6 +339,7 @@ $i.desc=$description $range"""
             members = members, doline = LINEDEBUG, constants = constants, groups = ''))
 
         f.close()
+        print "Wrote header file in " + os.path.join(self.cpp_gen_dir, self.name+"Config.h")
 
 #def deleteoneobsolete(self, file):
 #         try:
