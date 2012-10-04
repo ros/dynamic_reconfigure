@@ -32,6 +32,29 @@ macro(generate_cfg)
       COMMENT "Generating dynamic reconfigure stuff from ${_cfg}: ${_output_cpp} ${_output_py}"
       )
 
+    execute_process(
+      COMMAND ${CATKIN_ENV}
+      ${_input}
+      ${dynamic_reconfigure_SELF_DIR}/..
+      ${CATKIN_BUILD_PREFIX}/${CATKIN_PACKAGE_BIN_DESTINATION}
+      ${CATKIN_BUILD_PREFIX}/${CATKIN_PACKAGE_INCLUDE_DESTINATION}
+      ${CATKIN_BUILD_PREFIX}/${CATKIN_PACKAGE_PYTHON_DESTINATION}
+      RESULT_VARIABLE RES_VAR
+      OUTPUT_VARIABLE OUT_VAR
+      ERROR_VARIABLE ERR_VAR
+      )
+    message(INFO "${CATKIN_ENV}
+      ${_input}
+      ${dynamic_reconfigure_SELF_DIR}/..
+      ${CATKIN_BUILD_PREFIX}/${CATKIN_PACKAGE_BIN_DESTINATION}
+      ${CATKIN_BUILD_PREFIX}/${CATKIN_PACKAGE_INCLUDE_DESTINATION}
+      ${CATKIN_BUILD_PREFIX}/${CATKIN_PACKAGE_PYTHON_DESTINATION}"
+    )
+    message(INFO ${RES_VAR})
+    message(INFO ${OUT_VAR})
+    message(INFO ${ERR_VAR})
+
+
     list(APPEND ${PROJECT_NAME}_generated
       ${_output_cpp} ${_output_py}
       )
