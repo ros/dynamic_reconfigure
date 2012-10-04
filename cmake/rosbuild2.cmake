@@ -17,8 +17,11 @@ macro(generate_cfg)
                     OUTPUT_VARIABLE OUT_VAR
                     ERROR_VARIABLE ERR_VAR
     )
+    message(STATUS "dynamic_reconfigure building ${_cfg}")
     if (${ERR_VAR})
       message(ERROR ${ERR_VAR})
     endif()
   endforeach(_cfg)
+
+  include_directories(${CATKIN_BUILD_PREFIX}/${CATKIN_PACKAGE_INCLUDE_DESTINATION})
 endmacro()
