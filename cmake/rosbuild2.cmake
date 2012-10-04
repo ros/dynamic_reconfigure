@@ -26,5 +26,5 @@ macro(generate_cfg)
     endif()
   endforeach(_cfg)
 
-  include_directories(${CATKIN_BUILD_PREFIX}/${CATKIN_PACKAGE_INCLUDE_DESTINATION})
+  include_directories(${CATKIN_BUILD_PREFIX}/${CATKIN_GLOBAL_INCLUDE_DESTINATION})
 endmacro()
