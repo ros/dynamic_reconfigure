@@ -1,6 +1,6 @@
 get_filename_component(dynamic_reconfigure_SELF_DIR "${CMAKE_CURRENT_LIST_FILE}" PATH)
 
-macro(generate_cfg)
+macro(generate_dynamic_reconfigure_options)
   set(_autogen "")
   foreach(_cfg ${ARGN})
 
