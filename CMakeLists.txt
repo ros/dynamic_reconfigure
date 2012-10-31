@@ -1,23 +1,16 @@
 cmake_minimum_required(VERSION 2.8)
 project(dynamic_reconfigure)
 
-find_package(catkin REQUIRED)
-catkin_package(LIBRARIES dynamic_reconfigure_config_init_mutex
-               INCLUDE_DIRS include
-               CFG_EXTRAS extras.cmake
-)
-
-catkin_python_setup()
-
 find_package(catkin COMPONENTS genmsg
                                roscpp 
                                std_msgs
 )
 find_package(Boost REQUIRED)
 
-
 include_directories(include)
 include_directories(SYSTEM ${BOOST_INCLUDE_DIRS})
+
+catkin_python_setup()
 
 add_message_files(
   DIRECTORY msg
@@ -30,6 +23,11 @@ add_service_files(
   FILES Reconfigure.srv)
 
 generate_messages()
+
+catkin_package(LIBRARIES dynamic_reconfigure_config_init_mutex
+               INCLUDE_DIRS include
+               CFG_EXTRAS extras.cmake
+)
 
 add_library(dynamic_reconfigure_config_init_mutex SHARED
   src/dynamic_reconfigure_config_init_mutex.cpp)
