@@ -1,18 +1,23 @@
-get_filename_component(dynamic_reconfigure_SELF_DIR "${CMAKE_CURRENT_LIST_FILE}" PATH)
+@[if BUILDSPACE]@
+# base dir in buildspace
+set(dynamic_reconfigure_BASE_DIR @(CMAKE_CURRENT_SOURCE_DIR))
+@[else]@
+# base dir in installspace
+set(dynamic_reconfigure_BASE_DIR @(CMAKE_INSTALL_PREFIX)/@(CATKIN_PACKAGE_SHARE_DESTINATION))
+@[end if]@
 
 macro(generate_dynamic_reconfigure_options)
   set(_autogen "")
   foreach(_cfg ${ARGN})
-
-    # Construct the path to the .cfg file
-    set(_input ${PROJECT_SOURCE_DIR}/${_cfg})
-
-    execute_process(COMMAND ${CATKIN_ENV}
-                            ${_input}
-                            ${dynamic_reconfigure_SELF_DIR}/..
-                            ${CATKIN_BUILD_PREFIX}/${CATKIN_PACKAGE_BIN_DESTINATION}
-                            ${CATKIN_BUILD_PREFIX}/${CATKIN_PACKAGE_INCLUDE_DESTINATION}
-                            ${CATKIN_BUILD_PREFIX}/${CATKIN_PACKAGE_PYTHON_DESTINATION}
+    set(_cmd ${CATKIN_ENV}
+      ${PROJECT_SOURCE_DIR}/${_cfg}
+      ${dynamic_reconfigure_BASE_DIR}
+      ${CATKIN_BUILD_PREFIX}/${CATKIN_PACKAGE_BIN_DESTINATION}
+      ${CATKIN_BUILD_PREFIX}/${CATKIN_PACKAGE_INCLUDE_DESTINATION}
+      ${CATKIN_BUILD_PREFIX}/${CATKIN_PACKAGE_PYTHON_DESTINATION}
+    )
+    message("dynconf cmd: ${_cmd}")
+    execute_process(COMMAND ${_cmd}
                     RESULT_VARIABLE RES_VAR
                     OUTPUT_VARIABLE OUT_VAR
                     ERROR_VARIABLE ERR_VAR
