@@ -1,5 +1,5 @@
-@[if BUILDSPACE]@
-# base dir in buildspace
+@[if DEVELSPACE]@
+# base dir in develspace
 set(dynamic_reconfigure_BASE_DIR @(CMAKE_CURRENT_SOURCE_DIR))
 @[else]@
 # base dir in installspace
@@ -12,9 +12,9 @@ macro(generate_dynamic_reconfigure_options)
     set(_cmd ${CATKIN_ENV}
       ${PROJECT_SOURCE_DIR}/${_cfg}
       ${dynamic_reconfigure_BASE_DIR}
-      ${CATKIN_BUILD_PREFIX}/${CATKIN_PACKAGE_BIN_DESTINATION}
-      ${CATKIN_BUILD_PREFIX}/${CATKIN_PACKAGE_INCLUDE_DESTINATION}
-      ${CATKIN_BUILD_PREFIX}/${CATKIN_PACKAGE_PYTHON_DESTINATION}
+      ${CATKIN_DEVEL_PREFIX}/${CATKIN_PACKAGE_BIN_DESTINATION}
+      ${CATKIN_DEVEL_PREFIX}/${CATKIN_PACKAGE_INCLUDE_DESTINATION}
+      ${CATKIN_DEVEL_PREFIX}/${CATKIN_PACKAGE_PYTHON_DESTINATION}
     )
     message("dynconf cmd: ${_cmd}")
     execute_process(COMMAND ${_cmd}
@@ -31,5 +31,5 @@ macro(generate_dynamic_reconfigure_options)
     endif()
   endforeach(_cfg)
 
-  include_directories(${CATKIN_BUILD_PREFIX}/${CATKIN_GLOBAL_INCLUDE_DESTINATION})
+  include_directories(${CATKIN_DEVEL_PREFIX}/${CATKIN_GLOBAL_INCLUDE_DESTINATION})
 endmacro()
