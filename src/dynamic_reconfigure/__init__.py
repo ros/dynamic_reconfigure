@@ -36,8 +36,6 @@ example server implementation (L{Server}).
 """
 
 import roslib
-import rospy
-import rosservice
 import os
 
 class DynamicReconfigureException(Exception):
@@ -57,6 +55,7 @@ class DynamicReconfigureCallbackException(DynamicReconfigureException):
     pass
 
 def find_reconfigure_services():
+    import rosservice
     return sorted([s[:-len('/set_parameters')] for s in rosservice.get_service_list() if s.endswith('/set_parameters')]) 
 
 def get_parameter_names(descr):
