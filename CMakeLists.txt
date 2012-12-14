@@ -19,11 +19,11 @@ add_service_files(
   DIRECTORY srv
   FILES Reconfigure.srv)
 
-generate_messages()
+generate_messages(DEPENDENCIES std_msgs)
 
 catkin_package(LIBRARIES dynamic_reconfigure_config_init_mutex
                INCLUDE_DIRS include
-               CATKIN_DEPENDS message_runtime
+               CATKIN_DEPENDS message_runtime std_msgs
                CFG_EXTRAS extras.cmake
 )
 
