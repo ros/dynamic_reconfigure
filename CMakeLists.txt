@@ -47,7 +47,7 @@ install(DIRECTORY cmake
 )
 install(DIRECTORY msg
   DESTINATION ${CATKIN_PACKAGE_SHARE_DESTINATION}/)
-install(PROGRAMS scripts/dynaparam
+install(PROGRAMS scripts/dynparam
         DESTINATION ${CATKIN_PACKAGE_BIN_DESTINATION}/)
 install(PROGRAMS scripts/reconfigure_gui
         DESTINATION ${CATKIN_PACKAGE_BIN_DESTINATION}/)
