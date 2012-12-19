@@ -40,7 +40,6 @@
 # Need to check types of min max and default
 # Need to put sane error on exceptions
 
-import roslib.packages
 from string import Template
 import os
 import inspect
