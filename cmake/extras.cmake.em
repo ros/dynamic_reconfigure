@@ -7,6 +7,13 @@ set(dynamic_reconfigure_BASE_DIR @(CMAKE_INSTALL_PREFIX)/@(CATKIN_PACKAGE_SHARE_
 @[end if]@
 
 macro(generate_dynamic_reconfigure_options)
+  if(${PROJECT_NAME}_CATKIN_PACKAGE)
+    message(FATAL_ERROR "generate_dynamic_reconfigure_options() must be called before catkin_package() in project '${PROJECT_NAME}'")
+  endif()
+
+  # ensure that package destination variables are defined
+  catkin_destinations()
+
   set(_autogen "")
   foreach(_cfg ${ARGN})
     # Construct the path to the .cfg file
@@ -54,19 +61,57 @@ macro(generate_dynamic_reconfigure_options)
       COMMENT "Generating dynamic reconfigure files from ${_cfg}: ${_output_cpp} ${_output_py}"
     )
 
-
     list(APPEND ${PROJECT_NAME}_generated
       ${_output_cpp} ${_output_py}
     )
 
     install(FILES ${_output_cpp}
             DESTINATION ${CATKIN_PACKAGE_INCLUDE_DESTINATION})
-    install(FILES ${_output_py}
-            DESTINATION ${CATKIN_PACKAGE_PYTHON_DESTINATION}/cfg)
   endforeach(_cfg)
 
   # gencfg target for hard dependency od dynamic_reconfigure generation
   add_custom_target(${PROJECT_NAME}_gencfg DEPENDS ${${PROJECT_NAME}_generated})
 
-  include_directories(${CATKIN_DEVEL_PREFIX}/${CATKIN_GLOBAL_INCLUDE_DESTINATION})
+  dynreconf_called()
+endmacro()
+
+macro(dynreconf_called)
+  if(NOT dynamic_reconfigure_CALLED)
+    set(dynamic_reconfigure_CALLED TRUE)
+
+    # mark that generate_dynamic_reconfigure_options() was called in order to detect wrong order of calling with catkin_python_setup()
+    set(${PROJECT_NAME}_GENERATE_DYNAMIC_RECONFIGURE TRUE)
+    # check if catkin_python_setup() was called in order to skip installation of generated __init__.py file
+    set(package_has_static_sources ${${PROJECT_NAME}_CATKIN_PYTHON_SETUP})
+
+    # generate empty __init__ to make parent folder of msg/srv a python module
+    if(NOT EXISTS ${CATKIN_DEVEL_PREFIX}/${CATKIN_PACKAGE_PYTHON_DESTINATION}/__init__.py)
+      file(WRITE ${CATKIN_DEVEL_PREFIX}/${CATKIN_PACKAGE_PYTHON_DESTINATION}/__init__.py "")
+    endif()
+    if(NOT package_has_static_sources)
+      # install package __init__.py
+      install(
+        FILES ${CATKIN_DEVEL_PREFIX}/${CATKIN_PACKAGE_PYTHON_DESTINATION}/__init__.py
+        DESTINATION ${CATKIN_PACKAGE_PYTHON_DESTINATION}
+      )
+    endif()
+
+    # make sure we can find generated messages and that they overlay all other includes
+    include_directories(BEFORE ${CATKIN_DEVEL_PREFIX}/${CATKIN_GLOBAL_INCLUDE_DESTINATION})
+    # pass the include directory to catkin_package()
+    list(APPEND ${PROJECT_NAME}_INCLUDE_DIRS ${CATKIN_DEVEL_PREFIX}/${CATKIN_GLOBAL_INCLUDE_DESTINATION})
+
+    # generate cfg module __init__.py
+    if(NOT EXISTS ${CATKIN_DEVEL_PREFIX}/${CATKIN_PACKAGE_PYTHON_DESTINATION}/cfg/__init__.py)
+      file(WRITE ${CATKIN_DEVEL_PREFIX}/${CATKIN_PACKAGE_PYTHON_DESTINATION}/cfg/__init__.py "")
+    endif()
+
+    # compile python code before installing
+    find_package(PythonInterp REQUIRED)
+    install(CODE "execute_process(COMMAND \"${PYTHON_EXECUTABLE}\" -m compileall \"${CATKIN_DEVEL_PREFIX}/${CATKIN_PACKAGE_PYTHON_DESTINATION}/cfg\")")
+    install(
+      DIRECTORY ${CATKIN_DEVEL_PREFIX}/${CATKIN_PACKAGE_PYTHON_DESTINATION}/cfg
+      DESTINATION ${CATKIN_PACKAGE_PYTHON_DESTINATION}
+    )
+  endif()
 endmacro()
