@@ -2,10 +2,10 @@ cmake_minimum_required(VERSION 2.8)
 project(dynamic_reconfigure)
 
 find_package(catkin COMPONENTS message_generation roscpp std_msgs)
-find_package(Boost REQUIRED)
+find_package(Boost REQUIRED COMPONENTS system thread)
 
 include_directories(include ${catkin_INCLUDE_DIRS})
-include_directories(SYSTEM ${BOOST_INCLUDE_DIRS})
+include_directories(SYSTEM ${Boost_INCLUDE_DIRS})
 
 catkin_python_setup()
 
@@ -29,7 +29,7 @@ catkin_package(LIBRARIES dynamic_reconfigure_config_init_mutex
 
 add_library(dynamic_reconfigure_config_init_mutex SHARED
   src/dynamic_reconfigure_config_init_mutex.cpp)
-target_link_libraries(dynamic_reconfigure_config_init_mutex ${BOOST_LIBRARIES})
+target_link_libraries(dynamic_reconfigure_config_init_mutex ${Boost_LIBRARIES})
 
 # TODO test does not compile
 #add_subdirectory(test)
