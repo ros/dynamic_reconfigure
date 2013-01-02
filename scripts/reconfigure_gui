@@ -35,5 +35,5 @@
 
 if __name__ == '__main__':
     print '\033[91m' + "reconfigure_gui has moved!\n" + '\033[0m'
-    print " Try: " + '\033[92m' + "rosrun reconfigure_gui reconfigure_gui\n" + '\033[0m'
+    print " Try: " + '\033[92m' + "rosrun rqt_reconfigure rqt_reconfigure\n" + '\033[0m'
     print " If you see this as part of a tutorial or a script, please update to reflect this change."
