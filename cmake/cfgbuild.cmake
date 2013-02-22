@@ -46,8 +46,8 @@ macro(gencfg_cpp)
 
       get_filename_component(SELF_DIR "${CMAKE_CURRENT_LIST_FILE}" PATH)
       set(gencfg_build_files 
-        ${SELF_DIR}/../templates/ConfigType.py
-        ${SELF_DIR}/../templates/ConfigType.h
+        ${SELF_DIR}/../templates/ConfigType.py.template
+        ${SELF_DIR}/../templates/ConfigType.h.template
       #  ${dynamic_reconfigure_PACKAGE_PATH}/src/dynamic_reconfigure/parameter_generator.py
       )
 
