@@ -73,6 +73,9 @@ macro(generate_dynamic_reconfigure_options)
   # gencfg target for hard dependency on dynamic_reconfigure generation
   add_custom_target(${PROJECT_NAME}_gencfg DEPENDS ${${PROJECT_NAME}_generated})
 
+  # register target for catkin_package(EXPORTED_TARGETS)
+  list(APPEND ${PROJECT_NAME}_EXPORTED_TARGETS ${PROJECT_NAME}_gencfg)
+
   dynreconf_called()
 endmacro()
 
