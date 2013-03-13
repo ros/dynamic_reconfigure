@@ -70,7 +70,7 @@ macro(generate_dynamic_reconfigure_options)
             DESTINATION ${CATKIN_PACKAGE_INCLUDE_DESTINATION})
   endforeach(_cfg)
 
-  # gencfg target for hard dependency od dynamic_reconfigure generation
+  # gencfg target for hard dependency on dynamic_reconfigure generation
   add_custom_target(${PROJECT_NAME}_gencfg DEPENDS ${${PROJECT_NAME}_generated})
 
   dynreconf_called()

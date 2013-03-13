@@ -68,7 +68,7 @@ macro(gencfg_cpp)
         OUTPUT_VARIABLE __gencfg_autodeps
         OUTPUT_STRIP_TRAILING_WHITESPACE)
       if (__gencfg_err)
-        message(ERROR "${__gencfg_err}")
+        message("ERROR ${__gencfg_err}")
       endif(__gencfg_err)
       string(REPLACE "\n" " " ${_input}_AUTODEPS ${__gencfg_autodeps})
       separate_arguments(${_input}_AUTODEPS)
