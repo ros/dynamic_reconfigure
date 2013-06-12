@@ -54,10 +54,12 @@ from dynamic_reconfigure.msg import IntParameter, BoolParameter, StrParameter, D
 from dynamic_reconfigure.encoding import *
 
 class Server(object):
-    def __init__(self, type, callback):
+     def __init__(self, type, callback,namespace_prefix=""):
         self.mutex = threading.Lock()
         self.type = type
         self.config = type.defaults.copy()
+
+	self.namespace_prefix= (rospy.resolve_name("~"+namespace_prefix)+'/').replace("//","/")
 
         self.description = encode_description(type)
         self._copy_from_parameter_server()
@@ -68,13 +70,13 @@ class Server(object):
         self.config['groups'] = get_tree(self.description)
         self.config = initial_config(encode_config(self.config), type.config_description)
 
-        self.descr_topic = rospy.Publisher('~parameter_descriptions', ConfigDescrMsg, latch=True)
+        self.descr_topic = rospy.Publisher(self.namespace_prefix+'parameter_descriptions', ConfigDescrMsg, latch=True)
         self.descr_topic.publish(self.description);
-        
-        self.update_topic = rospy.Publisher('~parameter_updates', ConfigMsg, latch=True)
+
+        self.update_topic = rospy.Publisher(self.namespace_prefix+'parameter_updates', ConfigMsg, latch=True)
         self._change_config(self.config, type.all_level)
         
-        self.set_service = rospy.Service('~set_parameters', ReconfigureSrv, self._set_callback)
+        self.set_service = rospy.Service(self.namespace_prefix+'set_parameters', ReconfigureSrv, self._set_callback)
 
     def update_configuration(self, changes):
         with self.mutex:
@@ -86,13 +88,13 @@ class Server(object):
     def _copy_from_parameter_server(self):
         for param in extract_params(self.type.config_description):
             try:
-                self.config[param['name']] = rospy.get_param("~" + param['name'])
+                self.config[param['name']] = rospy.get_param(self.namespace_prefix + param['name'])
             except KeyError:
                 pass
 
     def _copy_to_parameter_server(self):
         for param in extract_params(self.type.config_description):
-            rospy.set_param('~' + param['name'], self.config[param['name']])
+            rospy.set_param(self.namespace_prefix+ param['name'], self.config[param['name']])
 
     def _change_config(self, config, level):
         self.config = self.callback(config, level)
