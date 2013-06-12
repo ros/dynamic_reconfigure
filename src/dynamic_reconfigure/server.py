@@ -54,12 +54,12 @@ from dynamic_reconfigure.msg import IntParameter, BoolParameter, StrParameter, D
 from dynamic_reconfigure.encoding import *
 
 class Server(object):
-     def __init__(self, type, callback,namespace_prefix=""):
+    def __init__(self, type, callback,namespace_prefix=""):
         self.mutex = threading.Lock()
         self.type = type
         self.config = type.defaults.copy()
 
-	self.namespace_prefix= (rospy.resolve_name("~"+namespace_prefix)+'/').replace("//","/")
+        self.namespace_prefix = (rospy.resolve_name("~"+namespace_prefix)+'/').replace("//","/")
 
         self.description = encode_description(type)
         self._copy_from_parameter_server()
