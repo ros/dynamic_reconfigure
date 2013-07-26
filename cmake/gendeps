@@ -67,7 +67,7 @@ if __name__ == "__main__":
     print >> stderr, "load_module did not return. Unable to determine dependencies for file listed above."
     print >> stderr, "***********************************************************************************"
     raise
-  
+
   end_modules = sys.modules
   for m in end_modules:
     if not m in start_modules:
@@ -75,9 +75,9 @@ if __name__ == "__main__":
         file = inspect.getsourcefile(end_modules[m])
         if type(file) == str:
           for i in range(50): # .eggs on mac are strange, move up the hierarchy until we find the .egg, bail after 50 tries.
-            if os.path.exists(file): 
+            if os.path.exists(file):
               print >> stdout, file
               break
-            file = os.path.dirname(file) 
+            file = os.path.dirname(file)
       except Exception, e:
-        pass 
+        pass
