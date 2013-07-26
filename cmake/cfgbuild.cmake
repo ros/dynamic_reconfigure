@@ -65,11 +65,16 @@ macro(gencfg_cpp)
       execute_process(
         COMMAND ${SELF_DIR}/gendeps ${_input}
         ERROR_VARIABLE __gencfg_err
+        RESULT_VARIABLE __gencfg_result
         OUTPUT_VARIABLE __gencfg_autodeps
         OUTPUT_STRIP_TRAILING_WHITESPACE)
-      if (__gencfg_err)
-        message("ERROR ${__gencfg_err}")
-      endif(__gencfg_err)
+      if (__gencfg_result)
+        message("ERROR [gendeps] ${__gencfg_result} ${__gencfg_err}")
+      else ()
+        if (__gencfg_err)
+          message("[gendeps] ${__gencfg_err}")
+        endif()
+      endif()
       string(REPLACE "\n" " " ${_input}_AUTODEPS ${__gencfg_autodeps})
       separate_arguments(${_input}_AUTODEPS)
       #message("MSG: " ${${_input}_AUTODEPS})
