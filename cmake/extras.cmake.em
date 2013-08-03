@@ -3,7 +3,7 @@
 set(dynamic_reconfigure_BASE_DIR "@(CMAKE_CURRENT_SOURCE_DIR)")
 @[else]@
 # base dir in installspace
-set(dynamic_reconfigure_BASE_DIR "@(CMAKE_INSTALL_PREFIX)/@(CATKIN_PACKAGE_SHARE_DESTINATION)")
+set(dynamic_reconfigure_BASE_DIR "${dynamic_reconfigure_DIR}/..")
 @[end if]@
 
 macro(generate_dynamic_reconfigure_options)
