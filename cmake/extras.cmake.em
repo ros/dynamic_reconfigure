@@ -21,8 +21,8 @@ macro(generate_dynamic_reconfigure_options)
     
     # The .cfg file is its own generator.
     set(gencfg_build_files 
-      ${dynamic_reconfigure_BASE_DIR}/templates/ConfigType.py
-      ${dynamic_reconfigure_BASE_DIR}/templates/ConfigType.h
+      ${dynamic_reconfigure_BASE_DIR}/templates/ConfigType.py.template
+      ${dynamic_reconfigure_BASE_DIR}/templates/ConfigType.h.template
     ) 
 
     get_filename_component(_cfgonly ${_cfg} NAME_WE)
