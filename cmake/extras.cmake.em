@@ -85,8 +85,9 @@ macro(dynreconf_called)
 
     # mark that generate_dynamic_reconfigure_options() was called in order to detect wrong order of calling with catkin_python_setup()
     set(${PROJECT_NAME}_GENERATE_DYNAMIC_RECONFIGURE TRUE)
-    # check if catkin_python_setup() was called in order to skip installation of generated __init__.py file
-    set(package_has_static_sources ${${PROJECT_NAME}_CATKIN_PYTHON_SETUP})
+    # check if catkin_python_setup() installs an __init__.py file for a package with the current project name
+    # in order to skip the installation of a generated __init__.py file
+    set(package_has_static_sources ${${PROJECT_NAME}_CATKIN_PYTHON_SETUP_HAS_PACKAGE_INIT})
 
     # generate empty __init__ to make parent folder of msg/srv a python module
     if(NOT EXISTS ${CATKIN_DEVEL_PREFIX}/${CATKIN_PACKAGE_PYTHON_DESTINATION}/__init__.py)
