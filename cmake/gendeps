@@ -34,6 +34,8 @@
 #
 # Revision $Id$
 
+from __future__ import print_function
+
 import sys
 import inspect
 import imp
@@ -59,25 +61,24 @@ if __name__ == "__main__":
   stderr = sys.stderr
   stdout = sys.stdout
   sys.stdout = stderr # Avoid clobbering our output.
-  print >> stderr, "Finding dependencies for %s"%srcfile
+  print("Finding dependencies for %s" % srcfile, file=stderr)
   try:
     imp.load_module("__main__", f, srcfile, ('.cfg', 'U', 1))
   except:
-    print >> stderr, "***********************************************************************************"
-    print >> stderr, "load_module did not return. Unable to determine dependencies for file listed above."
-    print >> stderr, "***********************************************************************************"
+    errmsg = "load_module did not return. Unable to determine dependencies for file listed above."
+    print('\n'.join(["*" * len(errmsg), errmsg, "*" * len(errmsg)]), file=stderr)
     raise
-  
+
   end_modules = sys.modules
   for m in end_modules:
     if not m in start_modules:
       try:
-        file = inspect.getsourcefile(end_modules[m])
-        if type(file) == str:
+        mod_file = inspect.getsourcefile(end_modules[m])
+        if type(mod_file) == str:
           for i in range(50): # .eggs on mac are strange, move up the hierarchy until we find the .egg, bail after 50 tries.
-            if os.path.exists(file): 
-              print >> stdout, file
+            if os.path.exists(mod_file):
+              print(mod_file, file=stdout)
               break
-            file = os.path.dirname(file) 
-      except Exception, e:
-        pass 
+            mod_file = os.path.dirname(mod_file)
+      except:
+        pass
