@@ -261,13 +261,11 @@ class ParameterGenerator:
     def add_group(self, name, type="", state=True):
         return self.group.add_group(name, type=type, state=state)
 
-    def mkdirabs(self, path, second_attempt = False):
+    def mkdirabs(self, path):
         if os.path.isdir(path):
             pass
         elif os.path.isfile(path):
             raise OSError("Error creating directory %s, a file with the same name exists" %path)
-        elif second_attempt: # An exception occurred, but we still don't know why.
-            raise
         else:
             head, tail = os.path.split(path)
             if head and not os.path.isdir(head):
@@ -276,8 +274,8 @@ class ParameterGenerator:
                 try:
                     os.mkdir(path)
                 except OSError:
-                    # Probably got created by somebody else, lets check.
-                    self.mkdirabs(path, True)
+                    if not os.path.isdir(path):
+                        raise
 
     def mkdir(self, path):
         path = os.path.join(self.pkgpath, path)
