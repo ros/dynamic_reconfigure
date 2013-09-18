@@ -41,17 +41,6 @@ macro(generate_dynamic_reconfigure_options)
       ${CATKIN_DEVEL_PREFIX}/${CATKIN_PACKAGE_PYTHON_DESTINATION}
     )
     debug_message(2 "dynamic reconfigure cmd: ${_cmd}")
-    execute_process(COMMAND ${_cmd}
-                    RESULT_VARIABLE RES_VAR
-                    OUTPUT_VARIABLE OUT_VAR
-                    ERROR_VARIABLE ERR_VAR
-                    OUTPUT_STRIP_TRAILING_WHITESPACE
-                    ERROR_STRIP_TRAILING_WHITESPACE
-    )
-    if(${RES_VAR} OR NOT "${ERR_VAR}" STREQUAL "")
-      message(FATAL_ERROR "Could not run dynamic reconfigure file '${_cfg}': ${ERR_VAR}")
-    endif()
-    message(STATUS "dynamic_reconfigure built ${_cfg}: ${OUT_VAR}")
 
     #file(WRITE ${CATKIN_DEVEL_PREFIX}/${CATKIN_PACKAGE_PYTHON_DESTINATION}/cfg/__init__.py)
 
@@ -71,7 +60,7 @@ macro(generate_dynamic_reconfigure_options)
   endforeach(_cfg)
 
   # gencfg target for hard dependency on dynamic_reconfigure generation
-  add_custom_target(${PROJECT_NAME}_gencfg DEPENDS ${${PROJECT_NAME}_generated})
+  add_custom_target(${PROJECT_NAME}_gencfg ALL DEPENDS ${${PROJECT_NAME}_generated})
 
   # register target for catkin_package(EXPORTED_TARGETS)
   list(APPEND ${PROJECT_NAME}_EXPORTED_TARGETS ${PROJECT_NAME}_gencfg)
@@ -105,6 +94,8 @@ macro(dynreconf_called)
     include_directories(BEFORE ${CATKIN_DEVEL_PREFIX}/${CATKIN_GLOBAL_INCLUDE_DESTINATION})
     # pass the include directory to catkin_package()
     list(APPEND ${PROJECT_NAME}_INCLUDE_DIRS ${CATKIN_DEVEL_PREFIX}/${CATKIN_GLOBAL_INCLUDE_DESTINATION})
+    # ensure that the folder exists
+    file(MAKE_DIRECTORY ${CATKIN_DEVEL_PREFIX}/${CATKIN_GLOBAL_INCLUDE_DESTINATION})
 
     # generate cfg module __init__.py
     if(NOT EXISTS ${CATKIN_DEVEL_PREFIX}/${CATKIN_PACKAGE_PYTHON_DESTINATION}/cfg/__init__.py)
