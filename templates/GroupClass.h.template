@@ -9,7 +9,7 @@ class ${upper}
 
     void setParams(${configname}Config &config, const std::vector<AbstractParamDescriptionConstPtr> params)
     {
-      for (std::vector<AbstractParamDescriptionConstPtr>::const_iterator i = params.begin(); i != params.end(); i++)
+      for (std::vector<AbstractParamDescriptionConstPtr>::const_iterator i = params.begin(); i != params.end(); ++i)
       {
         boost::any val;
         (*i)->getValue(config, val);
