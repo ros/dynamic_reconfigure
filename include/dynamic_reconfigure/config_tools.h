@@ -93,7 +93,7 @@ public:
   template <class VT, class T>
   static bool getParameter(const std::vector<VT> &vec, const std::string &name, T &val)
   {
-    for (typename std::vector<VT>::const_iterator i = vec.begin(); i != vec.end(); i++)
+    for (typename std::vector<VT>::const_iterator i = vec.begin(); i != vec.end(); ++i)
       if (i->name == name)
       {
         val = i->value;
@@ -122,7 +122,7 @@ public:
   template<class T>
   static bool getGroupState(const dynamic_reconfigure::Config &msg, const std::string &name, T &val)
   {
-    for(std::vector<dynamic_reconfigure::GroupState>::const_iterator i = msg.groups.begin(); i != msg.groups.end(); i++)
+    for(std::vector<dynamic_reconfigure::GroupState>::const_iterator i = msg.groups.begin(); i != msg.groups.end(); ++i)
       if(i->name == name)
       {
         val.state = i->state;
