@@ -5,7 +5,7 @@
     This unary stack contains the dynamic_reconfigure package which provides a means to change
     node parameters at any time without having to restart the node.
   </description>
-  <maintainer email="zklapow@willowgarage.com">Ze'ev Klapow</maintainer>
+  <maintainer email="esteve@osrfoundation.org">Esteve Fernandez</maintainer>
   <license>BSD</license>
 
   <url>http://ros.org/wiki/dynamic_reconfigure</url>
