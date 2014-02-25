@@ -40,7 +40,6 @@ macro(generate_dynamic_reconfigure_options)
       ${CATKIN_DEVEL_PREFIX}/${CATKIN_PACKAGE_INCLUDE_DESTINATION}
       ${CATKIN_DEVEL_PREFIX}/${CATKIN_PACKAGE_PYTHON_DESTINATION}
     )
-    debug_message(2 "dynamic reconfigure cmd: ${_cmd}")
 
     #file(WRITE ${CATKIN_DEVEL_PREFIX}/${CATKIN_PACKAGE_PYTHON_DESTINATION}/cfg/__init__.py)
 
