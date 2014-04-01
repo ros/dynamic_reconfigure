@@ -17,7 +17,10 @@ macro(generate_dynamic_reconfigure_options)
   set(_autogen "")
   foreach(_cfg ${ARGN})
     # Construct the path to the .cfg file
-    set(_input ${PROJECT_SOURCE_DIR}/${_cfg})
+    set(_input ${_cfg})
+    if(NOT IS_ABSOLUTE ${_input})
+      set(_input ${PROJECT_SOURCE_DIR}/${_input})
+    endif()
     
     # The .cfg file is its own generator.
     set(gencfg_build_files 
