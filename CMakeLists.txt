@@ -21,18 +21,23 @@ add_service_files(
 
 generate_messages(DEPENDENCIES std_msgs)
 
+if(CATKIN_ENABLE_TESTING)
+  find_package(rostest REQUIRED)
+  set(dynamic_reconfigure_BASE_DIR "${CMAKE_CURRENT_SOURCE_DIR}")
+  include(${dynamic_reconfigure_SOURCE_DIR}/cmake/dynamic_reconfigure-macros.cmake)
+  generate_dynamic_reconfigure_options(cfg/Test.cfg)
+  add_subdirectory(test)
+endif()
+
 catkin_package(LIBRARIES dynamic_reconfigure_config_init_mutex
                INCLUDE_DIRS include
                CATKIN_DEPENDS message_runtime std_msgs
-               CFG_EXTRAS extras.cmake
+               CFG_EXTRAS dynamic_reconfigure-macros.cmake dynamic_reconfigure-extras.cmake
 )
 
 add_library(dynamic_reconfigure_config_init_mutex SHARED
   src/dynamic_reconfigure_config_init_mutex.cpp)
 target_link_libraries(dynamic_reconfigure_config_init_mutex ${Boost_LIBRARIES})
-
-# TODO test does not compile
-#add_subdirectory(test)
 
 install(DIRECTORY include/dynamic_reconfigure/
   DESTINATION ${CATKIN_PACKAGE_INCLUDE_DESTINATION}
