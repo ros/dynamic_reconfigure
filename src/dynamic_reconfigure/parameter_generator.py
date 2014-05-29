@@ -126,7 +126,7 @@ class ParameterGenerator:
                 raise Exception("Max or min specified for %s, which is of string type"%name)
             pattern = r'^[a-zA-Z][a-zA-Z0-9_]*$'
             if not re.match(pattern, name):
-                raise Exception("The name of field \'%s\' is definitely not a valid C++ variable name! Change it accordingly."%name)
+                raise Exception("The name of field \'%s\' does not follow the ROS naming conventions, see http://wiki.ros.org/ROS/Patterns/Conventions"%name)
 
             self.gen.fill_type(newparam)
             self.gen.check_type_fill_default(newparam, 'default', self.gen.defval[paramtype])
