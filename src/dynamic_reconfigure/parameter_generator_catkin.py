@@ -126,7 +126,7 @@ class ParameterGenerator:
                 raise Exception("Max or min specified for %s, which is of string type"%name)
             pattern = r'^[a-zA-Z][a-zA-Z0-9_]*$'
             if not re.match(pattern, name):
-                raise Exception("The name of field \'%s\' is definitely not a valid C++ variable name! Change it accordingly."%name)
+                raise Exception("The name of field \'%s\' does not follow the ROS naming conventions, see http://wiki.ros.org/ROS/Patterns/Conventions"%name)
 
             self.gen.fill_type(newparam)
             self.gen.check_type_fill_default(newparam, 'default', self.gen.defval[paramtype])
@@ -421,7 +421,7 @@ $i.desc=$description $range"""
         setters = []
         params = []
         for p in group.parameters:
-            setters.append(Template("        if(\"${name}\"==(*i)->name){${name} = boost::any_cast<${ctype}>(val);}").substitute(p));
+            setters.append(Template("        if(\"${name}\"==(*_i)->name){${name} = boost::any_cast<${ctype}>(val);}").substitute(p));
             params.append(Template("${ctype} ${name};").substitute(p));
 
         subgroups = "\n".join(subgroups) 
