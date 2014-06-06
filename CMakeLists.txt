@@ -32,7 +32,7 @@ endif()
 catkin_package(LIBRARIES dynamic_reconfigure_config_init_mutex
                INCLUDE_DIRS include
                CATKIN_DEPENDS message_runtime std_msgs
-               CFG_EXTRAS dynamic_reconfigure-macros.cmake dynamic_reconfigure-extras.cmake
+               CFG_EXTRAS dynamic_reconfigure-extras.cmake
 )
 
 add_library(dynamic_reconfigure_config_init_mutex SHARED
