@@ -55,6 +55,8 @@ class TestSimpleDynamicReconfigureClient(unittest.TestCase):
              "bool_": bool_}
         )
 
+        rospy.sleep(1.0)
+
         config = client.get_configuration(timeout=5)
 
         self.assertEqual(int_, config['int_'])
