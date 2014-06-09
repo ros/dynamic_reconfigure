@@ -1,7 +1,7 @@
 cmake_minimum_required(VERSION 2.8)
 project(dynamic_reconfigure)
 
-find_package(catkin COMPONENTS message_generation roscpp std_msgs)
+find_package(catkin REQUIRED COMPONENTS message_generation roscpp std_msgs)
 find_package(Boost REQUIRED COMPONENTS system thread)
 
 include_directories(include ${catkin_INCLUDE_DIRS})
@@ -23,6 +23,7 @@ generate_messages(DEPENDENCIES std_msgs)
 
 if(CATKIN_ENABLE_TESTING)
   find_package(rostest REQUIRED)
+  find_package(catkin REQUIRED COMPONENTS roscpp_serialization)
   set(dynamic_reconfigure_BASE_DIR "${CMAKE_CURRENT_SOURCE_DIR}")
   include(${dynamic_reconfigure_SOURCE_DIR}/cmake/dynamic_reconfigure-macros.cmake)
   generate_dynamic_reconfigure_options(cfg/Test.cfg)

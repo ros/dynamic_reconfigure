@@ -1,6 +1,6 @@
 add_executable(dynamic_reconfigure-ref_server EXCLUDE_FROM_ALL ref_server.cpp)
 add_dependencies(dynamic_reconfigure-ref_server ${PROJECT_NAME}_gencfg)
-target_link_libraries(dynamic_reconfigure-ref_server pthread dynamic_reconfigure_config_init_mutex ${catkin_LIBRARIES})
+target_link_libraries(dynamic_reconfigure-ref_server pthread dynamic_reconfigure_config_init_mutex ${catkin_LIBRARIES} ${roscpp_LIBRARIES})
 
 add_dependencies(tests dynamic_reconfigure-ref_server)
 
