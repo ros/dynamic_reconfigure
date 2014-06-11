@@ -1,11 +1,3 @@
-@[if DEVELSPACE]@
-# base dir in develspace
-set(dynamic_reconfigure_BASE_DIR "@(CMAKE_CURRENT_SOURCE_DIR)")
-@[else]@
-# base dir in installspace
-set(dynamic_reconfigure_BASE_DIR "${dynamic_reconfigure_DIR}/..")
-@[end if]@
-
 macro(generate_dynamic_reconfigure_options)
   if(${PROJECT_NAME}_CATKIN_PACKAGE)
     message(FATAL_ERROR "generate_dynamic_reconfigure_options() must be called before catkin_package() in project '${PROJECT_NAME}'")
