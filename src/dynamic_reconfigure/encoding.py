@@ -167,6 +167,7 @@ def decode_description(msg):
                'max' : maxes[name],
                'default' : defaults[name],
                'type' : param.type,
+               'level': param.level,
                'description' : param.description,
                'edit_method' : param.edit_method,
             })
