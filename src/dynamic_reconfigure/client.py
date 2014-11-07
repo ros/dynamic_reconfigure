@@ -46,6 +46,7 @@ import rosservice
 import sys
 import threading
 import time
+import types
 from dynamic_reconfigure import DynamicReconfigureParameterException
 from dynamic_reconfigure.srv import Reconfigure as ReconfigureSrv
 from dynamic_reconfigure.msg import Config as ConfigMsg
@@ -200,7 +201,10 @@ class Client(object):
                                     changes[name] = val_type(const['value'])
                                     found = True
                         if not found:
-                            changes[name] = dest_type(value)
+                            if type(value) is unicode:
+                                changes[name] = unicode(value)
+                            else:
+                                changes[name] = dest_type(value)
 
                     except ValueError, e:
                         raise DynamicReconfigureParameterException('can\'t set parameter \'%s\' of %s: %s' % (name, str(dest_type), e))
