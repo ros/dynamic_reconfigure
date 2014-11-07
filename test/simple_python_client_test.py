@@ -1,4 +1,5 @@
 #!/usr/bin/env python
+# -*- coding: utf-8 -*-
 # Software License Agreement (BSD License)
 #
 # Copyright (c) 2014, Open Source Robotics Foundation, Inc.
@@ -64,6 +65,22 @@ class TestSimpleDynamicReconfigureClient(unittest.TestCase):
         self.assertEqual(str_, config['str_'])
         self.assertEqual(bool_, config['bool_'])
 
+    def testmultibytestring(self):
+        client = dynamic_reconfigure.client.Client("ref_server", timeout=5)
+        config = client.get_configuration(timeout=5)
+        self.assertEqual('bar', config['mstr_'])
+
+        str_ = u"いろは"
+
+        client.update_configuration(
+            {"mstr_": str_}
+        )
+
+        rospy.sleep(1.0)
+
+        config = client.get_configuration(timeout=5)
+
+        self.assertEqual("いろは", config['mstr_'])
 
 if __name__ == "__main__":
     import rostest
