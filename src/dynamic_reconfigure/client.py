@@ -206,7 +206,7 @@ class Client(object):
                             else:
                                 changes[name] = dest_type(value)
 
-                    except ValueError, e:
+                    except ValueError as e:
                         raise DynamicReconfigureParameterException('can\'t set parameter \'%s\' of %s: %s' % (name, str(dest_type), e))
 
         if 'groups' in changes.keys():
