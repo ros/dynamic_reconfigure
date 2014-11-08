@@ -1,0 +1,52 @@
+language:
+  - python
+python: # copy from https://github.com/ros/catkin/blob/indigo-devel/.travis.yml
+  - "2.7_with_system_site_packages"
+  - "3.3"
+# command to install dependencies
+install:
+  # Fetch "normal" debian python for 3.3
+  - if [ "$TRAVIS_PYTHON_VERSION" == "3.3" ]; then sudo add-apt-repository -y ppa:fkrull/deadsnakes && sudo apt-get -y update && sudo apt-get install python3.3 python3.3-dev && virtualenv -p /usr/bin/python3.3 ~/virtualenvs/3.3_debian && source ~/virtualenvs/3.3_debian/bin/activate; fi
+  - if [ "$TRAVIS_PYTHON_VERSION" == "3.3" ]; then pip install catkin-pkg rospkg empy nose netifaces; fi
+  # Setup ROS
+  - sudo sh -c 'echo "deb http://packages.ros.org/ros/ubuntu precise main" > /etc/apt/sources.list.d/ros-latest.list'
+  - wget http://packages.ros.org/ros.key -O - | sudo apt-key add -
+  - sudo apt-get update -qq
+  - sudo apt-get install python-rosdep python-catkin-pkg python-rosinstall-generator python-nose python-coverage python-wstool pep8 -qq
+  - sudo apt-get install ros-hydro-catkin -qq
+  - sudo rosdep init
+  - rosdep update
+  # Make a workspace
+  - mkdir -p /tmp/dynamic_reconfigure_ws/src
+  # Add this folder to the workspace
+  - ln -s `pwd` /tmp/dynamic_reconfigure_ws/src/dynamic_reconfigure
+  # Install dependencies
+  - cd /tmp/dynamic_reconfigure_ws
+  - if [ "$TRAVIS_PYTHON_VERSION" == "3.3" ]; then wstool init src ; fi
+  - if [ "$TRAVIS_PYTHON_VERSION" == "3.3" ]; then rosinstall_generator dynamic_reconfigure --rosdistro indigo --deps --deps-only | wstool merge -t src -; fi
+  - if [ "$TRAVIS_PYTHON_VERSION" == "3.3" ]; then wstool update -t src -j8; fi
+  - rosdep install --from-paths src --ignore-src --rosdistro hydro -r -y > /dev/null
+  - sudo add-apt-repository ppa:nathan-renniewaldock/ppa -y
+  - sudo apt-get update
+  - sudo apt-get install liblz4-dev -qq
+  - sudo apt-get install ros-hydro-console-bridge -qq
+# command to run tests
+script:
+  # invoke catkin_make
+  - source /opt/ros/hydro/setup.bash
+  - export ROS_PARALLEL_JOBS='-j 2 -l 2'
+  - cd /tmp/dynamic_reconfigure_ws
+  - if [ "$TRAVIS_PYTHON_VERSION" == "3.3" ]; then sudo cp ~/virtualenvs/3.3_debian/lib/python3.3/site-packages/em.py /usr/bin/empy;      fi ## I'm not sure why we need this....
+  - catkin_make
+  - if [ "$TRAVIS_PYTHON_VERSION" == "3.3" ]; then cp devel/lib/python3/dist-packages/roslz4/_roslz4.so devel/lib/python3/dist-packages/; fi ## I'm not sure why we need this....
+  # invoke manually run test
+  - (cd build/dynamic_reconfigure/test; make dynamic_reconfigure-ref_server)
+  - (cd build/dynamic_reconfigure/; make test)
+  - source devel/setup.bash
+  - rostest -t dynamic_reconfigure test_python_simple_client.launch
+  # Check test results
+  - cd build
+  - 'python -c "from catkin.test_results import test_results;import sys;sys.exit(sum([v[1] + v[2] for k, v in test_results(\"test_results\").items()]))" || cat log*'
+  - 'python -c "from catkin.test_results import test_results;import sys;sys.exit(sum([v[1] + v[2] for k, v in test_results(\"test_results\").items()]))"'
+notifications:
+  email: false
