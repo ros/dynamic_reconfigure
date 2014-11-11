@@ -232,7 +232,7 @@ class Client(object):
 
         groups = []
         def update_state(group, description):
-            for p,g in enumerate(description['groups']):
+            for p,g in description['groups'].items():
                 if g['name'] == group:
                     description['groups'][p]['state'] = changes[group]
                 else:
