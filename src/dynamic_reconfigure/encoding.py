@@ -276,6 +276,12 @@ def initial_config(msg, description = None):
     return d 
 
 def decode_config(msg, description = None):
+    if sys.version < '3':
+        for s in msg.strs:
+            try:
+                s.value.decode('ascii')
+            except UnicodeDecodeError:
+                s.value=s.value.decode('utf-8')
     d = Config([(kv.name, kv.value) for kv in msg.bools + msg.ints + msg.strs + msg.doubles])
     if not msg.groups == [] and description is not None:
         d["groups"] = get_tree(msg)

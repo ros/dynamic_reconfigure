@@ -80,7 +80,21 @@ class TestSimpleDynamicReconfigureClient(unittest.TestCase):
 
         config = client.get_configuration(timeout=5)
 
-        self.assertEqual("いろは", config['mstr_'])
+        self.assertEqual(u"いろは", config['mstr_'])
+        self.assertEqual(u"いろは", rospy.get_param('/ref_server/mstr_'))
+
+        str_ = u"にほへ"
+
+        client.update_configuration(
+            {"mstr_": str_}
+        )
+
+        rospy.sleep(1.0)
+
+        config = client.get_configuration(timeout=5)
+
+        self.assertEqual(u"にほへ", config['mstr_'])
+        self.assertEqual(u"にほへ", rospy.get_param('/ref_server/mstr_'))
 
 if __name__ == "__main__":
     import rostest
