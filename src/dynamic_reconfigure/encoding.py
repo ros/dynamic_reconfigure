@@ -37,6 +37,7 @@ except:
 import rospy
 import inspect
 import copy
+import sys
 
 from dynamic_reconfigure.msg import Config as ConfigMsg
 from dynamic_reconfigure.msg import ConfigDescription as ConfigDescrMsg
@@ -115,7 +116,7 @@ def encode_config(config, flat=True):
         if   type(v) == int:   msg.ints.append(IntParameter(k, v))
         elif type(v) == bool:  msg.bools.append(BoolParameter(k, v))
         elif type(v) == str:   msg.strs.append(StrParameter(k, v))
-        elif type(v) == unicode:   msg.strs.append(StrParameter(k, v))
+        elif sys.version < '3' and type(v) == unicode:   msg.strs.append(StrParameter(k, v))
         elif type(v) == float: msg.doubles.append(DoubleParameter(k, v))
         elif type(v) == dict or isinstance(v, Config):
             if flat is True:
