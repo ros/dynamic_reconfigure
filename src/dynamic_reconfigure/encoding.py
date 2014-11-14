@@ -116,7 +116,8 @@ def encode_config(config, flat=True):
         if   type(v) == int:   msg.ints.append(IntParameter(k, v))
         elif type(v) == bool:  msg.bools.append(BoolParameter(k, v))
         elif type(v) == str:   msg.strs.append(StrParameter(k, v))
-        elif sys.version < '3' and type(v) == unicode:   msg.strs.append(StrParameter(k, v))
+        elif sys.version_info.major < 3 and type(v) == unicode:
+            msg.strs.append(StrParameter(k, v))
         elif type(v) == float: msg.doubles.append(DoubleParameter(k, v))
         elif type(v) == dict or isinstance(v, Config):
             if flat is True:
@@ -276,6 +277,14 @@ def initial_config(msg, description = None):
     return d 
 
 def decode_config(msg, description = None):
+    if sys.version_info.major < 3:
+        for s in msg.strs:
+            if not isinstance(s.value, unicode):
+                try:
+                    s.value.decode('ascii')
+                except UnicodeDecodeError:
+                    s.value = s.value.decode('utf-8')
+
     d = Config([(kv.name, kv.value) for kv in msg.bools + msg.ints + msg.strs + msg.doubles])
     if not msg.groups == [] and description is not None:
         d["groups"] = get_tree(msg)

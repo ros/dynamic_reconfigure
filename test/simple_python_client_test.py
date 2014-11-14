@@ -63,6 +63,7 @@ class TestSimpleDynamicReconfigureClient(unittest.TestCase):
         self.assertEqual(int_, config['int_'])
         self.assertEqual(double_, config['double_'])
         self.assertEqual(str_, config['str_'])
+        self.assertEqual(type(str_), type(config['str_']))
         self.assertEqual(bool_, config['bool_'])
 
     def testmultibytestring(self):
@@ -70,7 +71,8 @@ class TestSimpleDynamicReconfigureClient(unittest.TestCase):
         config = client.get_configuration(timeout=5)
         self.assertEqual('bar', config['mstr_'])
 
-        str_ = u"いろは"
+        # Kanji for konnichi wa (hello)
+        str_ = u"今日は"
 
         client.update_configuration(
             {"mstr_": str_}
@@ -80,7 +82,24 @@ class TestSimpleDynamicReconfigureClient(unittest.TestCase):
 
         config = client.get_configuration(timeout=5)
 
-        self.assertEqual("いろは", config['mstr_'])
+        self.assertEqual(u"今日は", config['mstr_'])
+        self.assertEqual(type(u"今日は"), type(config['mstr_']))
+        self.assertEqual(u"今日は", rospy.get_param('/ref_server/mstr_'))
+
+        # Hiragana for konnichi wa (hello)
+        str_ = u"こんにちは"
+
+        client.update_configuration(
+            {"mstr_": str_}
+        )
+
+        rospy.sleep(1.0)
+
+        config = client.get_configuration(timeout=5)
+
+        self.assertEqual(u"こんにちは", config['mstr_'])
+        self.assertEqual(type(u"こんにちは"), type(config['mstr_']))
+        self.assertEqual(u"こんにちは", rospy.get_param('/ref_server/mstr_'))
 
 if __name__ == "__main__":
     import rostest
