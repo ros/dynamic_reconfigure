@@ -68,10 +68,10 @@ class Server(object):
         self.config['groups'] = get_tree(self.description)
         self.config = initial_config(encode_config(self.config), type.config_description)
 
-        self.descr_topic = rospy.Publisher('~parameter_descriptions', ConfigDescrMsg, latch=True)
+        self.descr_topic = rospy.Publisher('~parameter_descriptions', ConfigDescrMsg, latch=True, queue_size=10)
         self.descr_topic.publish(self.description);
         
-        self.update_topic = rospy.Publisher('~parameter_updates', ConfigMsg, latch=True)
+        self.update_topic = rospy.Publisher('~parameter_updates', ConfigMsg, latch=True, queue_size=10)
         self._change_config(self.config, type.all_level)
         
         self.set_service = rospy.Service('~set_parameters', ReconfigureSrv, self._set_callback)
