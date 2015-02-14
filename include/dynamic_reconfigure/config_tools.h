@@ -12,42 +12,42 @@ namespace dynamic_reconfigure
 class ConfigTools
 {
 public:
-  static std::vector<dynamic_reconfigure::BoolParameter> &getVectorForType(dynamic_reconfigure::Config &set, const bool val)
+  static std::vector<dynamic_reconfigure::BoolParameter> &getVectorForType(dynamic_reconfigure::Config &set, const bool /*val*/)
   {
     return set.bools;
   }
   
-  static std::vector<dynamic_reconfigure::IntParameter> &getVectorForType(dynamic_reconfigure::Config &set, const int val)
+  static std::vector<dynamic_reconfigure::IntParameter> &getVectorForType(dynamic_reconfigure::Config &set, const int /*val*/)
   {
     return set.ints;
   }
   
-  static std::vector<dynamic_reconfigure::StrParameter> &getVectorForType(dynamic_reconfigure::Config &set, const std::string &val)
+  static std::vector<dynamic_reconfigure::StrParameter> &getVectorForType(dynamic_reconfigure::Config &set, const std::string& /*val*/)
   {
     return set.strs;
   }
   
-  static std::vector<dynamic_reconfigure::DoubleParameter> &getVectorForType(dynamic_reconfigure::Config &set, const double val)
+  static std::vector<dynamic_reconfigure::DoubleParameter> &getVectorForType(dynamic_reconfigure::Config &set, const double /*val*/)
   {
     return set.doubles;
   }
   
-  static const std::vector<dynamic_reconfigure::BoolParameter> &getVectorForType(const dynamic_reconfigure::Config &set, const bool val)
+  static const std::vector<dynamic_reconfigure::BoolParameter> &getVectorForType(const dynamic_reconfigure::Config &set, const bool /*val*/)
   {
     return set.bools;
   }
   
-  static const std::vector<dynamic_reconfigure::IntParameter> &getVectorForType(const dynamic_reconfigure::Config &set, const int val)
+  static const std::vector<dynamic_reconfigure::IntParameter> &getVectorForType(const dynamic_reconfigure::Config &set, const int /*val*/)
   {
     return set.ints;
   }
   
-  static const std::vector<dynamic_reconfigure::StrParameter> &getVectorForType(const dynamic_reconfigure::Config &set, const std::string &val)
+  static const std::vector<dynamic_reconfigure::StrParameter> &getVectorForType(const dynamic_reconfigure::Config &set, const std::string& /*val*/)
   {
     return set.strs;
   }
   
-  static const std::vector<dynamic_reconfigure::DoubleParameter> &getVectorForType(const dynamic_reconfigure::Config &set, const double val)
+  static const std::vector<dynamic_reconfigure::DoubleParameter> &getVectorForType(const dynamic_reconfigure::Config &set, const double /*val*/)
   {
     return set.doubles;
   }
