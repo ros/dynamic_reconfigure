@@ -295,6 +295,10 @@ Have a nice day
                     raise
 
     def generate(self, pkgname, nodename, name):
+        """
+        name must match the first part of the configuration file.
+        e.g. given Tutorials.cfg, name must be Tutorials
+        """
         try:
             if sys.modules['__main__']._DYNAMIC_RECONFIGURE_GENERATING_DEPENDENCIES:
                 # Done this way because importing this module from gendeps
