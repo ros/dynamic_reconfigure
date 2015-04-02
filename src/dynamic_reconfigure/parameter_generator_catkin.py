@@ -1,6 +1,7 @@
 # Software License Agreement (BSD License)
 #
 # Copyright (c) 2009, Willow Garage, Inc.
+# Copyright (c) 2015, Open Source Robotics Foundation, Inc.
 # All rights reserved.
 #
 # Redistribution and use in source and binary forms, with or without
@@ -31,6 +32,7 @@
 # POSSIBILITY OF SUCH DAMAGE.
 
 # Author: Blaise Gassend
+# Maintainers: Esteve Fernandez, Morgan Quigley
 
 # Given a set of parameters, generates the messages, service types, and
 # classes to allow runtime reconfiguration. Documentation of a node's
@@ -233,6 +235,22 @@ class ParameterGenerator:
         self.group = self.Group(self, "Default", "", True, 0, 0)
         id = 1
         self.constants = []
+        if len(sys.argv) < 5:
+          msg = """
+ahhhh! Unexpected command line syntax!
+
+Are you trying to call a dynamic_reconfigure configuration generation script 
+directly? When you are using dynamic_reconfigure with python, you don't ever 
+need to invoke the configuration generator script yourself; it loads
+automatically. If you are using dynamic_reconfigure from C++, you need to 
+add a call to generate_dynamic_reconfigure_options() in your CMakeLists.txt
+
+For an example, see http://wiki.ros.org/dynamic_reconfigure/Tutorials
+
+Have a nice day
+          """
+          print(msg)
+          sys.exit(1)
         self.dynconfpath = sys.argv[1]  # FIXME this is awful
         self.binary_dir = sys.argv[2]
         self.cpp_gen_dir = sys.argv[3]
