@@ -72,7 +72,7 @@ class Server(object):
         self.descr_topic.publish(self.description);
         
         self.update_topic = rospy.Publisher('~parameter_updates', ConfigMsg, latch=True, queue_size=10)
-        self._change_config(self.config, type.all_level)
+        self._change_config(self.config, ~0) # Consistent with the C++ API, the callback gets called with level=~0 (i.e. -1)
         
         self.set_service = rospy.Service('~set_parameters', ReconfigureSrv, self._set_callback)
 
