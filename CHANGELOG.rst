@@ -2,6 +2,13 @@
 Changelog for package dynamic_reconfigure
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+1.5.39 (2015-04-22)
+-------------------
+* Better error message, to fix `#32 <https://github.com/ros/dynamic_reconfigure/issues/32>`_
+* Make Python callback code consistent with the C++ API
+* Commented unused parameters to avoid compile warnings
+* Contributors: Esteve Fernandez, Morgan Quigley
+
 1.5.38 (2014-12-23)
 -------------------
 * Fixes `#35 <https://github.com/ros/dynamic_reconfigure/issues/35>`_ by setting queue_size to 10 for publishers.
