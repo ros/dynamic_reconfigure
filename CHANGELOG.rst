@@ -2,8 +2,8 @@
 Changelog for package dynamic_reconfigure
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-Forthcoming
------------
+1.5.40 (2016-03-11)
+-------------------
 * updated maintainer
 * Contributors: Mikael Arguedas
 
