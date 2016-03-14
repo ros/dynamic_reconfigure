@@ -27,10 +27,22 @@ macro(generate_dynamic_reconfigure_options)
     set(_output_wikidoc ${CATKIN_DEVEL_PREFIX}/${CATKIN_PACKAGE_SHARE_DESTINATION}/docs/${_cfgonly}Config.wikidoc)
     set(_output_usage ${CATKIN_DEVEL_PREFIX}/${CATKIN_PACKAGE_SHARE_DESTINATION}/docs/${_cfgonly}Config-usage.dox) 
 
+    # in case dynamic_reconfigure has been built within the same CMake context
+    # we need to explicitly add it to the PYTHONPATH
+    set("_CUSTOM_PYTHONPATH_ENV")
+    if(EXISTS "${CATKIN_DEVEL_PREFIX}/${CATKIN_GLOBAL_PYTHON_DESTINATION}/dynamic_reconfigure")
+      configure_file(
+        "${dynamic_reconfigure_BASE_DIR}/cmake/setup_custom_pythonpath.sh.in"
+        "setup_custom_pythonpath.sh"
+        @ONLY
+      )
+      set("_CUSTOM_PYTHONPATH_ENV" "${CMAKE_CURRENT_BINARY_DIR}/setup_custom_pythonpath.sh")
+    endif()
+
     assert(CATKIN_ENV)
     set(_cmd
-      PYTHONPATH=${CATKIN_DEVEL_PREFIX}/${CATKIN_GLOBAL_PYTHON_DESTINATION}:$ENV{PYTHONPATH}
       ${CATKIN_ENV}
+      ${_CUSTOM_PYTHONPATH_ENV}
       ${_input}
       ${dynamic_reconfigure_BASE_DIR}
       ${CATKIN_DEVEL_PREFIX}/${CATKIN_PACKAGE_SHARE_DESTINATION}
