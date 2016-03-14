@@ -28,7 +28,9 @@ macro(generate_dynamic_reconfigure_options)
     set(_output_usage ${CATKIN_DEVEL_PREFIX}/${CATKIN_PACKAGE_SHARE_DESTINATION}/docs/${_cfgonly}Config-usage.dox) 
 
     assert(CATKIN_ENV)
-    set(_cmd ${CATKIN_ENV}
+    set(_cmd
+      PYTHONPATH=${CATKIN_DEVEL_PREFIX}/${CATKIN_GLOBAL_PYTHON_DESTINATION}:$ENV{PYTHONPATH}
+      ${CATKIN_ENV}
       ${_input}
       ${dynamic_reconfigure_BASE_DIR}
       ${CATKIN_DEVEL_PREFIX}/${CATKIN_PACKAGE_SHARE_DESTINATION}
