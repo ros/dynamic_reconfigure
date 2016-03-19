@@ -2,6 +2,11 @@
 Changelog for package dynamic_reconfigure
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+Forthcoming
+-----------
+* add devel space to Python environment to allow .cfg files to import them `#60 <https://github.com/ros/dynamic_reconfigure/issues/60>`_
+* Contributors: Dirk Thomas
+
 1.5.42 (2016-03-15)
 -------------------
 * fix Python environment to make it work on the first run `#59 <https://github.com/ros/dynamic_reconfigure/issues/59>`_
