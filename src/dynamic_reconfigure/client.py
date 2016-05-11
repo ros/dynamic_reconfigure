@@ -178,7 +178,7 @@ class Client(object):
         # Cast the parameters to the appropriate types
         if self.param_description is not None:
             for name, value in list(changes.items())[:]:
-                if not name is 'groups':
+                if name != 'groups':
                     dest_type = self._param_types.get(name)
                     if dest_type is None:
                         raise DynamicReconfigureParameterException('don\'t know parameter: %s' % name)
