@@ -54,8 +54,15 @@ from dynamic_reconfigure.msg import IntParameter, BoolParameter, StrParameter, D
 from dynamic_reconfigure.encoding import *
 
 class Server(object):
-    def __init__(self, type, callback):
+    def __init__(self, type, callback, namespace=""):
         self.mutex = threading.Lock()
+        if not namespace:
+            self.ns = "~"
+        else:
+            if namespace[0] not in ["/", "~"]:
+                namespace = "~" + namespace
+            self.ns = (namespace + "/").replace("//", "/")
+
         self.type = type
         self.config = type.defaults.copy()
 
@@ -68,13 +75,13 @@ class Server(object):
         self.config['groups'] = get_tree(self.description)
         self.config = initial_config(encode_config(self.config), type.config_description)
 
-        self.descr_topic = rospy.Publisher('~parameter_descriptions', ConfigDescrMsg, latch=True, queue_size=10)
+        self.descr_topic = rospy.Publisher(self.ns + 'parameter_descriptions', ConfigDescrMsg, latch=True, queue_size=10)
         self.descr_topic.publish(self.description);
-        
-        self.update_topic = rospy.Publisher('~parameter_updates', ConfigMsg, latch=True, queue_size=10)
+
+        self.update_topic = rospy.Publisher(self.ns + 'parameter_updates', ConfigMsg, latch=True, queue_size=10)
         self._change_config(self.config, ~0) # Consistent with the C++ API, the callback gets called with level=~0 (i.e. -1)
-        
-        self.set_service = rospy.Service('~set_parameters', ReconfigureSrv, self._set_callback)
+
+        self.set_service = rospy.Service(self.ns + 'set_parameters', ReconfigureSrv, self._set_callback)
 
     def update_configuration(self, changes):
         with self.mutex:
@@ -86,13 +93,13 @@ class Server(object):
     def _copy_from_parameter_server(self):
         for param in extract_params(self.type.config_description):
             try:
-                self.config[param['name']] = rospy.get_param("~" + param['name'])
+                self.config[param['name']] = rospy.get_param(self.ns + param['name'])
             except KeyError:
                 pass
 
     def _copy_to_parameter_server(self):
         for param in extract_params(self.type.config_description):
-            rospy.set_param('~' + param['name'], self.config[param['name']])
+            rospy.set_param(self.ns + param['name'], self.config[param['name']])
 
     def _change_config(self, config, level):
         self.config = self.callback(config, level)
