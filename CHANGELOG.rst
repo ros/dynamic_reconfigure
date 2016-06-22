@@ -2,8 +2,8 @@
 Changelog for package dynamic_reconfigure
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-Forthcoming
------------
+1.5.44 (2016-06-22)
+-------------------
 * Add server namespaces (`#56 <https://github.com/ros/dynamic_reconfigure/issues/56>`_)
   * Add optional namespace argument to Python Server
   * Add test for server with multiple namespaces
