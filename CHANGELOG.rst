@@ -2,6 +2,15 @@
 Changelog for package dynamic_reconfigure
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+Forthcoming
+-----------
+* Add server namespaces (`#56 <https://github.com/ros/dynamic_reconfigure/issues/56>`_)
+  * Add optional namespace argument to Python Server
+  * Add test for server with multiple namespaces
+* Merge pull request `#61 <https://github.com/ros/dynamic_reconfigure/issues/61>`_ from vagvaz/Issue_51_Unable_to_reload_parameters_from_file
+  fix issue `#51 <https://github.com/ros/dynamic_reconfigure/issues/51>`_ reloading parameters from dumped file
+* Contributors: Evangelos Vazaios, Mikael Arguedas, v-lopez
+
 1.5.43 (2016-03-19)
 -------------------
 * add devel space to Python environment to allow .cfg files to import them `#60 <https://github.com/ros/dynamic_reconfigure/issues/60>`_
