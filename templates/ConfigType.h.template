@@ -18,6 +18,7 @@ ${doline} ${linenum} "${filename}"
 #include <dynamic_reconfigure/Group.h>
 #include <dynamic_reconfigure/config_init_mutex.h>
 #include <boost/any.hpp>
+#include <boost/thread/recursive_mutex.hpp>
 
 namespace ${pkgname}
 {
@@ -335,6 +336,77 @@ ${doline} ${linenum} "${filename}"
   private:
     static const ${configname}ConfigStatics *__get_statics__();
   };
+  
+  typedef boost::shared_ptr<${configname}Config> ${configname}ConfigPtr;
+
+  class ${configname}ConfigLocking
+  {
+    public:
+      ${configname}ConfigLocking()
+      {
+      }
+
+      ${configname}ConfigLocking(const ${configname}Config& config) : config_(config)
+      {
+      }
+
+      ${configname}ConfigLocking(const ${configname}ConfigLocking& copied_config)
+      {
+          config_ = copied_config.config_;
+      }
+
+      bool __fromMessage__(dynamic_reconfigure::Config &msg)
+      {
+          boost::recursive_mutex::scoped_lock lock(mutex_);
+          return config_.__fromMessage__(msg);
+      }
+
+      void __toMessage__(dynamic_reconfigure::Config &msg,
+                  const std::vector<${configname}Config::AbstractParamDescriptionConstPtr> &__param_descriptions__,
+                  const std::vector<${configname}Config::AbstractGroupDescriptionConstPtr> &__group_descriptions__)
+      {
+          boost::recursive_mutex::scoped_lock lock(mutex_);
+          config_.__toMessage__(msg, __param_descriptions__, __group_descriptions__);
+      }
+
+      void __toMessage__(dynamic_reconfigure::Config &msg)
+      {
+          boost::recursive_mutex::scoped_lock lock(mutex_);
+          config_.__toMessage__(msg);
+      }
+
+      void __toServer__(const ros::NodeHandle &nh)
+      {
+          boost::recursive_mutex::scoped_lock lock(mutex_);
+          config_.__toServer__(nh);
+      }
+
+      void __fromServer__(const ros::NodeHandle &nh)
+      {
+          boost::recursive_mutex::scoped_lock lock(mutex_);
+          config_.__fromServer__(nh);
+      }
+
+      void __clamp__()
+      {
+          boost::recursive_mutex::scoped_lock lock(mutex_);
+          config_.__clamp__();
+      }
+
+      uint32_t __level__(const ${configname}Config &config)
+      {
+          boost::recursive_mutex::scoped_lock lock(mutex_);
+          return config_.__level__(config);
+      }
+
+      ${member_getters}
+
+    protected:
+      ${configname}Config config_;
+      boost::recursive_mutex mutex_;
+  };
+
+  typedef boost::shared_ptr<${configname}ConfigLocking> ${configname}ConfigLockingPtr;
   
   template <> // Max and min are ignored for strings.
   inline void ${configname}Config::ParamDescription<std::string>::clamp(${configname}Config &config, const ${configname}Config &max, const ${configname}Config &min) const

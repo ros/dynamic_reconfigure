@@ -468,7 +468,15 @@ $i.desc=$description $range"""
         paramdescr = []
         groups = []
         members = []
+        member_getters = []
         constants = []
+
+        getter = \
+        "${ctype} get${camel_name}()\n" \
+        "      {\n" \
+        "        boost::recursive_mutex::scoped_lock lock(mutex_);\n" \
+        "        return config_.${name};\n" \
+        "      }"
 
         for const in self.constants:
             self.appendline(constants, "${cconsttype} ${configname}_${name} = $v;", const, "value")
@@ -480,6 +488,10 @@ $i.desc=$description $range"""
                 paramdescr.append(Template("${configname}Config::GroupDescription<${configname}Config::${class}, ${configname}Config::${parentclass}> ${name}(\"${name}\", \"${type}\", ${parent}, ${id}, ${cstate}, &${configname}Config::${field});").safe_substitute(group.to_dict(), configname = self.name))
             for param in group.parameters:
                 self.appendline(members, "${ctype} ${name};", param)
+                camel_param = param
+                camel_param["camel_name"] = ''.join(x.capitalize() or '_' for x in camel_param["name"].split('_'))
+                self.appendline(member_getters, getter, camel_param)
+
                 self.appendline(paramdescr, "__min__.${name} = $v;", param, "min")
                 self.appendline(paramdescr, "__max__.${name} = $v;", param, "max")
                 self.appendline(paramdescr, "__default__.${name} = $v;", param, "default")
@@ -504,11 +516,13 @@ $i.desc=$description $range"""
 
         paramdescr = string.join(paramdescr, '\n')
         members = string.join(members, '\n')
+        member_getters = '\n'.join(member_getters)
         groups = string.join(groups, '\n')
         constants = string.join(constants, '\n')
         f.write(Template(template).substitute(uname=self.name.upper(), 
             configname=self.name, pkgname = self.pkgname, paramdescr = paramdescr,
-            members = members, groups = groups, doline = LINEDEBUG, constants = constants))
+            members = members, member_getters = member_getters, groups = groups,
+            doline = LINEDEBUG, constants = constants))
         f.close()
 
     def deleteoneobsolete(self, file):
