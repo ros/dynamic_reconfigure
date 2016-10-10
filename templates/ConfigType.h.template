@@ -346,9 +346,9 @@ ${doline} ${linenum} "${filename}"
   * with locking getter functions.
   * Other functions (__fromMessage__, __toMessage__) are also locking.
   *
-  * This allows using the same instance in the dynamic reconfigure
-  * callback and other parts of your class running in a different
-  * thread without additional locking.
+  * This allows using the same object in the dynamic reconfigure
+  * callback and other parts of your class (which are probably running
+  * in a different thread) without additional locking.
   *
   */
   class ${configname}LockingConfig
@@ -370,7 +370,7 @@ ${doline} ${linenum} "${filename}"
       /**
       * @brief Copy constructor
       *
-      * Instanciate its own mutex
+      * Instanciates its own mutex
       *
       * @param config : Config getting copied for wrapping.
       */
