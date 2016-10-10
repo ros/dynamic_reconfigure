@@ -475,10 +475,11 @@ $i.desc=$description $range"""
         constants = []
 
         getter_template = \
-        "${ctype} get${camel_cased_name}()\n" \
+        "/** @brief Locking (thread safe) getter */\n" \
+        "      ${ctype} get${camel_cased_name}()\n" \
         "      {\n" \
         "        boost::recursive_mutex::scoped_lock lock(mutex_);\n" \
-        "        return config_.${name};\n" \
+        "        return ${name};\n" \
         "      }"
 
         for const in self.constants:
