@@ -336,21 +336,45 @@ ${doline} ${linenum} "${filename}"
   private:
     static const ${configname}ConfigStatics *__get_statics__();
   };
-  
   typedef boost::shared_ptr<${configname}Config> ${configname}ConfigPtr;
 
-  class ${configname}ConfigLocking
+
+  /**
+  * @brief A ${configname}Config with thread safe functions
+  *
+  * This class wraps a ${configname}Config and exposes the parameters
+  * with locking getter functions.
+  * Other functions (__fromMessage__, __toMessage__) are also locking.
+  *
+  * This allows using the same instance in the dynamic reconfigure
+  * callback and other parts of your class running in a different
+  * thread without additional locking.
+  *
+  */
+  class ${configname}LockingConfig
   {
     public:
-      ${configname}ConfigLocking()
+      ${configname}LockingConfig()
       {
       }
 
-      ${configname}ConfigLocking(const ${configname}Config& config) : config_(config)
+      /**
+      * @brief Constructor wrapping a copy of a given ${configname}Config
+      *
+      * @param config : Config getting copied for wrapping.
+      */
+      ${configname}LockingConfig(const ${configname}Config& config) : config_(config)
       {
       }
-
-      ${configname}ConfigLocking(const ${configname}ConfigLocking& copied_config)
+      
+      /**
+      * @brief Copy constructor
+      *
+      * Instanciate its own mutex
+      *
+      * @param config : Config getting copied for wrapping.
+      */
+      ${configname}LockingConfig(const ${configname}LockingConfig& copied_config)
       {
           config_ = copied_config.config_;
       }
@@ -405,8 +429,8 @@ ${doline} ${linenum} "${filename}"
       ${configname}Config config_;
       boost::recursive_mutex mutex_;
   };
+  typedef boost::shared_ptr<${configname}LockingConfig> ${configname}LockingConfigPtr;
 
-  typedef boost::shared_ptr<${configname}ConfigLocking> ${configname}ConfigLockingPtr;
   
   template <> // Max and min are ignored for strings.
   inline void ${configname}Config::ParamDescription<std::string>::clamp(${configname}Config &config, const ${configname}Config &max, const ${configname}Config &min) const
