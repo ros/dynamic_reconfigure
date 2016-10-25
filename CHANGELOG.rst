@@ -2,8 +2,8 @@
 Changelog for package dynamic_reconfigure
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-Forthcoming
------------
+1.5.45 (2016-10-24)
+-------------------
 * Merge pull request `#65 <https://github.com/ros/dynamic_reconfigure/issues/65>`_ from bulwahn/master
   address gcc6 build error
 * address gcc6 build error
