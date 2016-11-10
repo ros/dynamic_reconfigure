@@ -340,7 +340,7 @@ group.0 {
 name=Dynamically Reconfigurable Parameters
 desc=See the [[dynamic_reconfigure]] package for details on dynamically reconfigurable parameters.""", file=f)
         i=-1
-        for param in self.group.parameters:
+        for param in self.group.get_parameters():
             i=i+1
             range = ""
             try:
