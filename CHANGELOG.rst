@@ -2,6 +2,14 @@
 Changelog for package dynamic_reconfigure
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+Forthcoming
+-----------
+* Add missing group params to wikidoc (`#68 <https://github.com/ros/dynamic_reconfigure/issues/68>`_)
+  The catkin generated wikidoc files were missing parameters defined as groups.
+  Both the Dox and UsageDox file were generated correctly, but the wikidoc was
+  using the wrong method to traverse all groups.
+* Contributors: Mark Horn
+
 1.5.45 (2016-10-24)
 -------------------
 * Merge pull request `#65 <https://github.com/ros/dynamic_reconfigure/issues/65>`_ from bulwahn/master
