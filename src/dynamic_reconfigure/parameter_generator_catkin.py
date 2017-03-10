@@ -62,6 +62,13 @@ double_t = "double"
 
 id = 0
 
+
+def check_name(name):
+    pattern = r'^[a-zA-Z][a-zA-Z0-9_]*$'
+    if not re.match(pattern, name):
+        raise Exception("The name of field \'%s\' does not follow the ROS naming conventions, see http://wiki.ros.org/ROS/Patterns/Conventions"%name)
+
+
 class ParameterGenerator:
     minval = {
             'int' : -0x80000000, #'INT_MIN',
@@ -126,10 +133,7 @@ class ParameterGenerator:
             }
             if type == str_t and (max != None or min != None):
                 raise Exception("Max or min specified for %s, which is of string type"%name)
-            pattern = r'^[a-zA-Z][a-zA-Z0-9_]*$'
-            if not re.match(pattern, name):
-                raise Exception("The name of field \'%s\' does not follow the ROS naming conventions, see http://wiki.ros.org/ROS/Patterns/Conventions"%name)
-
+            check_name(name)
             self.gen.fill_type(newparam)
             self.gen.check_type_fill_default(newparam, 'default', self.gen.defval[paramtype])
             self.gen.check_type_fill_default(newparam, 'max', self.gen.maxval[paramtype])
@@ -265,6 +269,7 @@ Have a nice day
                 'srcfile' : inspect.getsourcefile(inspect.currentframe().f_back.f_code),
                 'description' : descr
                 }
+        check_name(name)
         self.fill_type(newconst)
         self.check_type(newconst, 'value')
         self.constants.append(newconst)
