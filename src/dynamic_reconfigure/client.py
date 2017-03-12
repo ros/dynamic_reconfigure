@@ -196,7 +196,7 @@ class Client(object):
                                  x['name'].lower() == name.lower()][0]
 
                         # Fix not converting bools properly
-                        if dest_type is bool and type(value) is str:
+                        if dest_type is bool and isinstance(value, str):
                             changes[name] = value.lower() in (
                                 "yes", "true", "t", "1")
                             found = True

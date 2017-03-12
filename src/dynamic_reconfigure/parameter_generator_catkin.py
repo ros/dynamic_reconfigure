@@ -236,7 +236,7 @@ class ParameterGenerator:
         name = param['name']
         value = param[field]
         pytype = self.pytype(drtype)
-        if pytype != type(value) and (pytype != float or type(value) != int):
+        if pytype != type(value) and (pytype != float or not isinstance(value, int)):
             raise TypeError("'%s' has type %s, but %s is %s" % (
                 name, drtype, field, repr(value)))
         param[field] = pytype(value)

@@ -117,17 +117,17 @@ def encode_config(config, flat=True):
     msg = ConfigMsg()
     for k, v in config.items():
         # @todo add more checks here?
-        if type(v) == int:
+        if isinstance(v, int):
             msg.ints.append(IntParameter(k, v))
-        elif type(v) == bool:
+        elif isinstance(v, bool):
             msg.bools.append(BoolParameter(k, v))
-        elif type(v) == str:
+        elif isinstance(v, str):
             msg.strs.append(StrParameter(k, v))
-        elif sys.version_info.major < 3 and type(v) == unicode:
+        elif sys.version_info.major < 3 and isinstance(v, unicode):
             msg.strs.append(StrParameter(k, v))
-        elif type(v) == float:
+        elif isinstance(v, float):
             msg.doubles.append(DoubleParameter(k, v))
-        elif type(v) == dict or isinstance(v, Config):
+        elif isinstance(v, dict) or isinstance(v, Config):
             if flat is True:
                 def flatten(g):
                     groups = []
