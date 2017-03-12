@@ -278,7 +278,7 @@ class Client(object):
         """
         Get the current description_callback
         """
-        return self._config_callback
+        return self._description_callback
 
     def set_description_callback(self, value):
         """
