@@ -103,13 +103,13 @@ TEST(dynamic_reconfigure_simple_client, multipleClients) {
   Client<TestConfig> client2("/ref_server", &configurationCallback);
   Client<TestConfig> client3("/ref_server", &configurationCallback);
   client3.setConfiguration(TestConfig::__getDefault__());
-  ros::Duration(0.1).sleep();
+  ros::Duration(0.2).sleep();
   EXPECT_EQ(0, CONFIG.int_);
   client1.setConfiguration(TestConfig::__getMin__());
-  ros::Duration(0.1).sleep();
+  ros::Duration(0.2).sleep();
   EXPECT_EQ(-10, CONFIG.int_);
   client2.setConfiguration(TestConfig::__getMax__());
-  ros::Duration(0.1).sleep();
+  ros::Duration(0.2).sleep();
   EXPECT_EQ(10, CONFIG.int_);
 }
 
