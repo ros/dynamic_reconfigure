@@ -271,7 +271,8 @@ class Client {
       }
     } else {
       ROS_DEBUG(
-          "Configuration callback did not call callback because it was zero.");
+          "Unable to call Configuration callback because none was set.\n" \
+          "See setConfigurationCallback");
     }
   }
 
@@ -292,7 +293,8 @@ class Client {
       }
     } else {
       ROS_DEBUG(
-          "Description callback did not call callback because it was zero.");
+          "Unable to call Description callback because none was set.\n" \
+          "See setDescriptionCallback");
     }
   }
 
