@@ -36,7 +36,7 @@
 
  Author: Aris Synodinos
 
- Handles sychronizing node state with the ActionServer and setting/getting
+ Handles sychronizing node state with the configuration server and setting/getting
  configuration.
 
  */
