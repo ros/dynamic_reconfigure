@@ -95,7 +95,7 @@ TEST(dynamic_reconfigure_simple_client, setConfig) {
   EXPECT_EQ(10, cfg.int_);
 }
 
-TEST(dynamic_reconfigure_simp0le_client, multipleClients) {
+TEST(dynamic_reconfigure_simple_client, multipleClients) {
   Client<TestConfig> client1("/ref_server", &configurationCallback);
   Client<TestConfig> client2("/ref_server", &configurationCallback);
   Client<TestConfig> client3("/ref_server", &configurationCallback);
