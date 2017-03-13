@@ -76,8 +76,11 @@ TEST(dynamic_reconfigure_simple_client, getConfigs) {
                             &descriptionCallback);
   EXPECT_TRUE(client.getCurrentConfiguration(CONFIG));
   EXPECT_TRUE(client.getDefaultConfiguration(CONFIG));
+  EXPECT_EQ(0, CONFIG.int_);
   EXPECT_TRUE(client.getMinConfiguration(CONFIG));
+  EXPECT_EQ(-10, CONFIG.int_);
   EXPECT_TRUE(client.getMaxConfiguration(CONFIG));
+  EXPECT_EQ(10, CONFIG.int_);
 }
 
 TEST(dynamic_reconfigure_simple_client, setConfig) {
