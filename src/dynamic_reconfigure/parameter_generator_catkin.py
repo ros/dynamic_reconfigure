@@ -141,7 +141,6 @@ class ParameterGenerator:
             if type == str_t and (max != None or min != None):
                 raise Exception("Max or min specified for %s, which is of string type"%name)
             check_name(name)
-            check_description(description)
             self.gen.fill_type(newparam)
             self.gen.check_type_fill_default(newparam, 'default', self.gen.defval[paramtype])
             self.gen.check_type_fill_default(newparam, 'max', self.gen.maxval[paramtype])
