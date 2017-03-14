@@ -2,7 +2,7 @@ cmake_minimum_required(VERSION 2.8)
 project(dynamic_reconfigure)
 
 find_package(catkin REQUIRED COMPONENTS message_generation roscpp std_msgs)
-find_package(Boost REQUIRED COMPONENTS system thread)
+find_package(Boost REQUIRED COMPONENTS system thread chrono)
 
 include_directories(include ${catkin_INCLUDE_DIRS} ${Boost_INCLUDE_DIRS})
 
@@ -10,7 +10,7 @@ catkin_python_setup()
 
 add_message_files(
   DIRECTORY msg
-  FILES 
+  FILES
   BoolParameter.msg      Config.msg           Group.msg       IntParameter.msg      SensorLevels.msg
   ConfigDescription.msg  DoubleParameter.msg  GroupState.msg  ParamDescription.msg  StrParameter.msg)
 
@@ -41,7 +41,7 @@ target_link_libraries(dynamic_reconfigure_config_init_mutex ${Boost_LIBRARIES})
 install(DIRECTORY include/dynamic_reconfigure/
   DESTINATION ${CATKIN_PACKAGE_INCLUDE_DESTINATION}
   FILES_MATCHING PATTERN "*.h")
-      
+
 install(TARGETS dynamic_reconfigure_config_init_mutex
   ARCHIVE DESTINATION ${CATKIN_PACKAGE_LIB_DESTINATION}
   LIBRARY DESTINATION ${CATKIN_PACKAGE_LIB_DESTINATION}
