@@ -36,6 +36,7 @@ import unittest
 import rospy
 import dynamic_reconfigure.client
 
+
 class TestSimpleDynamicReconfigureClient(unittest.TestCase):
 
     def testsimple(self):
@@ -45,15 +46,22 @@ class TestSimpleDynamicReconfigureClient(unittest.TestCase):
         self.assertEqual(0.0, config['double_'])
         self.assertEqual('foo', config['str_'])
         self.assertEqual(False, config['bool_'])
+        self.assertEqual(1.0, config['double_no_minmax'])
+        self.assertEqual(2.0, config['double_no_max'])
+        self.assertEqual(-1.0, config['deep_var_double'])
+
 
         int_ = 7
         double_ = 0.75
         str_ = 'bar'
         bool_ = True
+        double_no_max_ = 1e+300
+        double_no_minmax_ = -1e+300
 
         client.update_configuration(
             {"int_": int_, "double_": double_, "str_": str_,
-             "bool_": bool_}
+             "bool_": bool_,
+             "double_no_max": double_no_max_, "double_no_minmax": double_no_minmax_}
         )
 
         rospy.sleep(1.0)
@@ -65,6 +73,8 @@ class TestSimpleDynamicReconfigureClient(unittest.TestCase):
         self.assertEqual(str_, config['str_'])
         self.assertEqual(type(str_), type(config['str_']))
         self.assertEqual(bool_, config['bool_'])
+        self.assertEqual(double_no_max_, config['double_no_max'])
+        self.assertEqual(double_no_minmax_, config['double_no_minmax'])
 
     def testmultibytestring(self):
         client = dynamic_reconfigure.client.Client("ref_server", timeout=5)
