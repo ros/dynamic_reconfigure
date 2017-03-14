@@ -575,6 +575,27 @@ $i.desc=$description $range"""
 #        print >> f, self.msgname, "config", "# What the node's configuration was actually set to."
 #        f.close()
     
+    def _rreplace_str_with_val_in_dict(self, orig_dict, old_str, new_val):
+        # Recursively replace any match of old_str by new_val in a dictionary
+        for k, v in orig_dict.items():
+            if isinstance(v, dict):
+                self._rreplace_str_with_val_in_dict(v, old_str, new_val)
+            elif isinstance(v, list):
+                for idx, i in enumerate(v):
+                    if isinstance(i, str) and i == old_str:
+                        orig_dict[k][idx] = new_val
+                    elif isinstance(i, dict):
+                        self._rreplace_str_with_val_in_dict(i, old_str, new_val)
+            elif isinstance(v, str) and v == old_str:
+                orig_dict[k] = new_val
+        return orig_dict
+
+    def replace_infinity(self, config_dict):
+        config_dict = self._rreplace_str_with_val_in_dict(config_dict, '-std::numeric_limits<double>::infinity()', -float("inf"))
+        config_dict = self._rreplace_str_with_val_in_dict(config_dict, 'std::numeric_limits<double>::infinity()', float("inf"))
+
+        return config_dict
+
     def generatepy(self):
         # Read the configuration manipulator template and insert line numbers and file name into template.
         templatefile = os.path.join(self.dynconfpath, "templates", "ConfigType.py.template")
@@ -586,8 +607,9 @@ $i.desc=$description $range"""
         # Write the configuration manipulator.
         self.mkdirabs(os.path.join(self.py_gen_dir, "cfg"))
         f = open(os.path.join(self.py_gen_dir, "cfg", self.name+"Config.py"), 'w')
+        pycfgdata = self.replace_infinity(self.group.to_dict())
         f.write(Template(template).substitute(name = self.name, 
-            pkgname = self.pkgname, pycfgdata = self.group.to_dict()))
+            pkgname = self.pkgname, pycfgdata = pycfgdata))
         for const in self.constants:
             f.write(Template("${configname}_${name} = $v\n").
                     substitute(const, v = repr(const['value']), 
