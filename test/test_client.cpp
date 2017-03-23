@@ -98,6 +98,28 @@ TEST(dynamic_reconfigure_simple_client, setConfig) {
   EXPECT_EQ(10, cfg.int_);
 }
 
+TEST(dynamic_reconfigure_simple_client, setGetConfig) {
+  ROS_INFO("Setting configuration");
+  Client<TestConfig> client("/ref_server", &configurationCallback,
+                            &descriptionCallback);
+  TestConfig cfg = TestConfig::__getMax__();
+  EXPECT_TRUE(client.setConfiguration(cfg));
+  // int_ goes from -10 to +10
+  cfg.int_ = -11;
+  EXPECT_TRUE(client.setConfiguration(cfg));
+  EXPECT_EQ(-10, cfg.int_);
+  EXPECT_TRUE(client.getCurrentConfiguration(CONFIG));
+  EXPECT_EQ(-10, CONFIG.int_);
+  cfg.int_ = 11;
+  EXPECT_TRUE(client.setConfiguration(cfg));
+  EXPECT_TRUE(client.getCurrentConfiguration(CONFIG));
+  EXPECT_EQ(10, CONFIG.int_);
+  cfg.int_ = 5;
+  EXPECT_TRUE(client.setConfiguration(cfg));
+  EXPECT_TRUE(client.getCurrentConfiguration(CONFIG));
+  EXPECT_EQ(5, CONFIG.int_);
+}
+
 TEST(dynamic_reconfigure_simple_client, multipleClients) {
   Client<TestConfig> client1("/ref_server", &configurationCallback);
   Client<TestConfig> client2("/ref_server", &configurationCallback);
