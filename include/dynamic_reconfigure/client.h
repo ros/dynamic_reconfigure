@@ -152,6 +152,7 @@ class Client {
    */
   bool setConfiguration(ConfigType& configuration) {
     dynamic_reconfigure::Reconfigure srv;
+    received_configuration_ = false;
     configuration.__toMessage__(srv.request.config);
     if (set_service_.call(srv)) {
       configuration.__fromMessage__(srv.response.config);
