@@ -2,8 +2,8 @@
 Changelog for package dynamic_reconfigure
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-Forthcoming
------------
+1.5.47 (2017-03-27)
+-------------------
 * reset received_configuration\_ for every request sent (`#82 <https://github.com/ros/dynamic_reconfigure/issues/82>`_)
 * Rename arguments (with a\_ prefix) to avoid Wshadow warnings. (`#80 <https://github.com/ros/dynamic_reconfigure/issues/80>`_)
   handle infinity in python generation, fixes (`#77 <https://github.com/ros/dynamic_reconfigure/issues/77>`_)
