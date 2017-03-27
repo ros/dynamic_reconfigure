@@ -2,6 +2,16 @@
 Changelog for package dynamic_reconfigure
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+Forthcoming
+-----------
+* reset received_configuration\_ for every request sent (`#82 <https://github.com/ros/dynamic_reconfigure/issues/82>`_)
+* Rename arguments (with a\_ prefix) to avoid Wshadow warnings. (`#80 <https://github.com/ros/dynamic_reconfigure/issues/80>`_)
+  handle infinity in python generation, fixes (`#77 <https://github.com/ros/dynamic_reconfigure/issues/77>`_)
+* Add a c++ Dynamic Reconfigure Client (`#78 <https://github.com/ros/dynamic_reconfigure/issues/78>`_)
+* Enforce valid descriptions in cfg files (`#74 <https://github.com/ros/dynamic_reconfigure/issues/74>`_)
+* Fix callback returned by get_description_callback (`#73 <https://github.com/ros/dynamic_reconfigure/issues/73>`_) from ros/description_cb
+* Contributors: Jeff Eberl, Mikael Arguedas
+
 1.5.46 (2016-11-15)
 -------------------
 * Add missing group params to wikidoc (`#68 <https://github.com/ros/dynamic_reconfigure/issues/68>`_)
