@@ -2,6 +2,12 @@
 Changelog for package dynamic_reconfigure
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+Forthcoming
+-----------
+* [Bugfix] dont enforce ROS names for constants (`#84 <https://github.com/ros/dynamic_reconfigure/issues/84>`_)
+* [Compiler warnings] avoid unused-parameter compiler warnings in specialized ParamDescription<std::string>::clamp() (`#83 <https://github.com/ros/dynamic_reconfigure/issues/83>`_)
+* Contributors: Johannes Meyer, Mikael Arguedas
+
 1.5.47 (2017-03-27)
 -------------------
 * reset received_configuration\_ for every request sent (`#82 <https://github.com/ros/dynamic_reconfigure/issues/82>`_)
