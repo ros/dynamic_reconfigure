@@ -276,7 +276,6 @@ Have a nice day
                 'srcfile' : inspect.getsourcefile(inspect.currentframe().f_back.f_code),
                 'description' : descr
                 }
-        check_name(name)
         check_description(descr)
         self.fill_type(newconst)
         self.check_type(newconst, 'value')
