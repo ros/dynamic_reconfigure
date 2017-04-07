@@ -18,6 +18,7 @@ ${doline} ${linenum} "${filename}"
 #include <dynamic_reconfigure/Group.h>
 #include <dynamic_reconfigure/config_init_mutex.h>
 #include <boost/any.hpp>
+#include <boost/thread/recursive_mutex.hpp>
 
 namespace ${pkgname}
 {
@@ -335,6 +336,90 @@ ${doline} ${linenum} "${filename}"
   private:
     static const ${configname}ConfigStatics *__get_statics__();
   };
+  typedef boost::shared_ptr<${configname}Config> ${configname}ConfigPtr;
+
+
+  /**
+  * @brief A ${configname}Config with thread safe functions
+  *
+  * This class is like ${configname}Config but adds locking getters
+  * for the parameters and locking versions of the functions
+  * ("__functionName_locking__").
+  *
+  * This allows using the same object in the dynamic reconfigure
+  * callback and other parts of your class (which are probably running
+  * in a different thread) without additional locking.
+  *
+  */
+  class ${configname}LockingConfig : ${configname}Config
+  {
+    public:
+      ${configname}LockingConfig() : ${configname}Config()
+      {
+      }
+      
+      /**
+      * @brief Copy constructor
+      *
+      * Instanciates its own mutex
+      *
+      * @param config : Config getting copied
+      */
+      ${configname}LockingConfig(const ${configname}LockingConfig& copied_config) : ${configname}Config(copied_config)
+      {
+      }
+
+      bool __fromMessage_locking__(dynamic_reconfigure::Config &msg)
+      {
+          boost::recursive_mutex::scoped_lock lock(mutex_);
+          return ${configname}Config::__fromMessage__(msg);
+      }
+
+      void __toMessage_locking__(dynamic_reconfigure::Config &msg,
+                  const std::vector<${configname}Config::AbstractParamDescriptionConstPtr> &__param_descriptions__,
+                  const std::vector<${configname}Config::AbstractGroupDescriptionConstPtr> &__group_descriptions__)
+      {
+          boost::recursive_mutex::scoped_lock lock(mutex_);
+          ${configname}Config::__toMessage__(msg, __param_descriptions__, __group_descriptions__);
+      }
+
+      void __toMessage_locking__(dynamic_reconfigure::Config &msg)
+      {
+          boost::recursive_mutex::scoped_lock lock(mutex_);
+          ${configname}Config::__toMessage__(msg);
+      }
+
+      void __toServer_locking__(const ros::NodeHandle &nh)
+      {
+          boost::recursive_mutex::scoped_lock lock(mutex_);
+          ${configname}Config::__toServer__(nh);
+      }
+
+      void __fromServer_locking__(const ros::NodeHandle &nh)
+      {
+          boost::recursive_mutex::scoped_lock lock(mutex_);
+          ${configname}Config::__fromServer__(nh);
+      }
+
+      void __clamp_locking__()
+      {
+          boost::recursive_mutex::scoped_lock lock(mutex_);
+          ${configname}Config::__clamp__();
+      }
+
+      uint32_t __level_locking__(const ${configname}Config &config)
+      {
+          boost::recursive_mutex::scoped_lock lock(mutex_);
+          return ${configname}Config::__level__(config);
+      }
+
+      ${member_getters}
+
+    protected:
+      boost::recursive_mutex mutex_;
+  };
+  typedef boost::shared_ptr<${configname}LockingConfig> ${configname}LockingConfigPtr;
+
   
   template <> // Max and min are ignored for strings.
   inline void ${configname}Config::ParamDescription<std::string>::clamp(${configname}Config &config, const ${configname}Config &max, const ${configname}Config &min) const
