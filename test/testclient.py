@@ -38,8 +38,8 @@ import time
 
 # This example assumes that testserver in dynamic_reconfigure is running
 # with its default node name, and will show how to reconfigure it from
-# python. 
-# 
+# python.
+#
 # Note that testserver often changes the parameters it is given, so the
 # values you get back from it will often be different from the ones you
 # requested. Look at test/testserver.cpp to understand the changes that are
@@ -49,7 +49,7 @@ import time
 # rosrun dynamic_reconfigure testserver
 #
 # In another window do:
-# rosrun dynamic_reconfigure testclient.py 
+# rosrun dynamic_reconfigure testclient.py
 
 def print_config(config):
     for k, v in config.iteritems():
@@ -59,7 +59,7 @@ def print_config(config):
 # The config_callback (introduced below) receives a dictionary containing
 # the current configuration of the server each time the server's
 # configuration changes.
-def config_callback(config): 
+def config_callback(config):
     print "Got callback, configuration is: "
     print_config(config)
 
@@ -75,7 +75,7 @@ def new_config_callback(config):
 # configuration changes. If you do not indicate a timeout, the client is
 # willing to wait forever for the server to be available.
 #
-# Note that the config_callback could get called before the constructor 
+# Note that the config_callback could get called before the constructor
 # returns.
 rospy.init_node('testclient_py', anonymous=True)
 client = DynamicReconfigureClient('/dynamic_reconfigure_test_server', config_callback=config_callback, timeout=5)
