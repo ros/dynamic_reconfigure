@@ -47,8 +47,8 @@ import sys
 import threading
 import time
 import types
-from dynamic_reconfigure import (DynamicReconfigureParameterException,
-                                 DynamicReconfigureCallbackException)
+from dynamic_reconfigure import DynamicReconfigureCallbackException
+from dynamic_reconfigure import DynamicReconfigureParameterException
 from dynamic_reconfigure.srv import Reconfigure as ReconfigureSrv
 from dynamic_reconfigure.msg import Config as ConfigMsg
 from dynamic_reconfigure.msg import ConfigDescription as ConfigDescrMsg
