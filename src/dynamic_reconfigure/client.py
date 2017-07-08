@@ -47,12 +47,14 @@ import sys
 import threading
 import time
 import types
+from dynamic_reconfigure import DynamicReconfigureCallbackException
 from dynamic_reconfigure import DynamicReconfigureParameterException
 from dynamic_reconfigure.srv import Reconfigure as ReconfigureSrv
 from dynamic_reconfigure.msg import Config as ConfigMsg
 from dynamic_reconfigure.msg import ConfigDescription as ConfigDescrMsg
 from dynamic_reconfigure.msg import IntParameter, BoolParameter, StrParameter, DoubleParameter, ParamDescription
 from dynamic_reconfigure.encoding import *
+from rospy.service import ServiceException
 
 class Client(object):
     """
@@ -216,7 +218,12 @@ class Client(object):
             changes['groups'] = self.update_groups(changes['groups'])
 
         config = encode_config(changes)
-        msg    = self._set_service(config).config
+
+        try:
+            msg    = self._set_service(config).config
+        except ServiceException as e:
+            raise DynamicReconfigureCallbackException('service call failed')
+
         if self.group_description is None:
             self.get_group_descriptions()
         resp   = decode_config(msg, self.group_description)
