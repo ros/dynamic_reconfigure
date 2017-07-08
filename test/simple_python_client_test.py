@@ -33,8 +33,10 @@
 # POSSIBILITY OF SUCH DAMAGE.
 
 import unittest
-import rospy
+
 import dynamic_reconfigure.client
+
+import rospy
 
 
 class TestSimpleDynamicReconfigureClient(unittest.TestCase):
@@ -111,7 +113,10 @@ class TestSimpleDynamicReconfigureClient(unittest.TestCase):
         self.assertEqual(type(u"こんにちは"), type(config['mstr_']))
         self.assertEqual(u"こんにちは", rospy.get_param('/ref_server/mstr_'))
 
+
 if __name__ == "__main__":
     import rostest
     rospy.init_node('simple_python_client_test')
-    rostest.rosrun('dynamic_reconfigure', 'test_simple_dynamic_reconfigure_client_python', TestSimpleDynamicReconfigureClient)
+    rostest.rosrun(
+        'dynamic_reconfigure', 'test_simple_dynamic_reconfigure_client_python',
+        TestSimpleDynamicReconfigureClient)

@@ -35,28 +35,32 @@ Python client API for dynamic_reconfigure (L{Client}) as well as
 example server implementation (L{Server}).
 """
 
-import roslib
-import os
 
 class DynamicReconfigureException(Exception):
     """
     dynamic_reconfigure base exception type
     """
     pass
+
+
 class DynamicReconfigureParameterException(DynamicReconfigureException):
     """
     Exception for parameter errors.
     """
     pass
+
+
 class DynamicReconfigureCallbackException(DynamicReconfigureException):
     """
     Exception for callback errors.
     """
     pass
 
+
 def find_reconfigure_services():
     import rosservice
     return sorted([s[:-len('/set_parameters')] for s in rosservice.get_service_list() if s.endswith('/set_parameters')])
+
 
 def get_parameter_names(descr):
     return descr.defaults.keys()
