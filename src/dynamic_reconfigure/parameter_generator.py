@@ -319,8 +319,8 @@ class ParameterGenerator:
         try:
             #print('**************************************************************')
             #print('**************************************************************')
-            print(Template("Generating reconfiguration files for $name in $pkgname").\
-                  substitute(name=self.name, pkgname=self.pkgname))
+            print(Template("Generating reconfiguration files for $name in $pkgname").substitute(
+                name=self.name, pkgname=self.pkgname))
             #print('**************************************************************')
             #print('**************************************************************')
             self.generatecpp()
@@ -370,8 +370,8 @@ class ParameterGenerator:
         #print("/**", file=f)
         print("\\subsubsection usage Usage", file=f)
         print('\\verbatim', file=f)
-        print(Template('<node name="$nodename" pkg="$pkgname" type="$nodename">').\
-              substitute(pkgname=self.pkgname, nodename=self.nodename), file=f)
+        print(Template('<node name="$nodename" pkg="$pkgname" type="$nodename">').substitute(
+            pkgname=self.pkgname, nodename=self.nodename), file=f)
         for param in self.group.get_parameters():
             print(Template('  <param name="$name" type="$type" value="$default" />').substitute(param), file=f)
         print('</node>', file=f)
@@ -400,8 +400,8 @@ class ParameterGenerator:
         #print("/**", file=f)
         print("\\subsubsection usage Usage", file=f)
         print('\\verbatim', file=f)
-        print(Template('<node name="$nodename" pkg="$pkgname" type="$nodename">').\
-              substitute(pkgname=self.pkgname, nodename=self.nodename), file=f)
+        print(Template('<node name="$nodename" pkg="$pkgname" type="$nodename">').substitute(
+            pkgname=self.pkgname, nodename=self.nodename), file=f)
         for param in self.group.get_parameters():
             print(Template('  <param name="$name" type="$type" value="$default" />').substitute(param), file=f)
         print('</node>', file=f)
