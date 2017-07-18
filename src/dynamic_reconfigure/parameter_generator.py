@@ -50,7 +50,7 @@ import string
 import sys
 import re
 
-#LINEDEBUG="#line"
+# LINEDEBUG="#line"
 LINEDEBUG = "//#line"
 
 # Convenience names for types
@@ -77,15 +77,15 @@ def check_name(name):
 
 class ParameterGenerator:
     minval = {
-        'int': -0x80000000, #'INT_MIN',
-        'double': -1e10000,#'-std::numeric_limits<double>::infinity()',
+        'int': -0x80000000,  # 'INT_MIN',
+        'double': -1e10000,  # '-std::numeric_limits<double>::infinity()',
         'str': '',
         'bool': False,
     }
 
     maxval = {
-        'int': 0x7FFFFFFF, #'INT_MAX',
-        'double': 1e10000, #'std::numeric_limits<double>::infinity()',
+        'int': 0x7FFFFFFF,  # 'INT_MAX',
+        'double': 1e10000,  # 'std::numeric_limits<double>::infinity()',
         'str': '',
         'bool': True,
     }
@@ -261,7 +261,7 @@ class ParameterGenerator:
         self.fill_type(newconst)
         self.check_type(newconst, 'value')
         self.constants.append(newconst)
-        return newconst # So that we can assign the value easily.
+        return newconst  # So that we can assign the value easily.
 
     def enum(self, constants, description):
         if len(set(const['type'] for const in constants)) != 1:
@@ -317,12 +317,12 @@ class ParameterGenerator:
         except:
             pass
         try:
-            #print('**************************************************************')
-            #print('**************************************************************')
+            # print('**************************************************************')
+            # print('**************************************************************')
             print(Template("Generating reconfiguration files for $name in $pkgname").substitute(
                 name=self.name, pkgname=self.pkgname))
-            #print('**************************************************************')
-            #print('**************************************************************')
+            # print('**************************************************************')
+            # print('**************************************************************')
             self.generatecpp()
             self.generatedoc()
             self.generatewikidoc()
@@ -367,7 +367,7 @@ class ParameterGenerator:
     def generateusage(self):
         self.mkdir("docs")
         f = open(os.path.join(self.pkgpath, "docs", self.msgname + "-usage.dox"), 'w')
-        #print("/**", file=f)
+        # print("/**", file=f)
         print("\\subsubsection usage Usage", file=f)
         print('\\verbatim', file=f)
         print(Template('<node name="$nodename" pkg="$pkgname" type="$nodename">').substitute(
@@ -377,13 +377,13 @@ class ParameterGenerator:
         print('</node>', file=f)
         print('\\endverbatim', file=f)
         print("", file=f)
-        #print("*/", file=f)
+        # print("*/", file=f)
         f.close()
 
     def generatedoc(self):
         self.mkdir("docs")
         f = open(os.path.join(self.pkgpath, "docs", self.msgname + ".dox"), 'w')
-        #print("/**", file=f)
+        # print("/**", file=f)
         print("\\subsubsection parameters ROS parameters", file=f)
         print("", file=f)
         print("Reads and maintains the following parameters on the ROS server", file=f)
@@ -391,13 +391,13 @@ class ParameterGenerator:
         for param in self.group.get_parameters():
             print(Template("- \\b \"~$name\" : \\b [$type] $description min: $min, default: $default, max: $max").substitute(param), file=f)
         print("", file=f)
-        #print("*/", file=f)
+        # print("*/", file=f)
         f.close()
 
     def generateusage(self):
         self.mkdir("docs")
         f = open(os.path.join(self.pkgpath, "docs", self.msgname + "-usage.dox"), 'w')
-        #print("/**", file=f)
+        # print("/**", file=f)
         print("\\subsubsection usage Usage", file=f)
         print('\\verbatim', file=f)
         print(Template('<node name="$nodename" pkg="$pkgname" type="$nodename">').substitute(
@@ -407,7 +407,7 @@ class ParameterGenerator:
         print('</node>', file=f)
         print('\\endverbatim', file=f)
         print('', file=f)
-        #print("*/", file=f)
+        # print("*/", file=f)
         f.close()
 
     def crepr(self, param, val):
@@ -466,7 +466,7 @@ class ParameterGenerator:
         # Read the configuration manipulator template and insert line numbers and file name into template.
         templatefile = os.path.join(self.dynconfpath, "templates", "ConfigType.h.template")
         templatelines = []
-        templatefilesafe = templatefile.replace('\\', '\\\\') # line directive does backslash expansion.
+        templatefilesafe = templatefile.replace('\\', '\\\\')  # line directive does backslash expansion.
         curline = 1
         f = open(templatefile)
         for line in f:
@@ -537,7 +537,7 @@ class ParameterGenerator:
         except OSError:
             pass
 
-    def deleteobsolete(self): ### @todo remove this after the transition period.
+    def deleteobsolete(self):  ### @todo remove this after the transition period.
         self.deleteoneobsolete(os.path.join(self.pkgpath, "msg", self.msgname + ".msg"))
         self.deleteoneobsolete(os.path.join("msg", "cpp", self.pkgpath, "msg", self.msgname + ".msg"))
         self.deleteoneobsolete(os.path.join(self.pkgpath, "srv", "Get" + self.msgname + ".srv"))

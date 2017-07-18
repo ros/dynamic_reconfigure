@@ -65,7 +65,7 @@ def reconfigure(config, level):
 
     rospy.loginfo("Reconfigured to     : %i %f %s %s %i" % (config['int_'], config['double_'], config['str_'], config['bool_'], config['level']))
 
-    return config # Returns the updated configuration.
+    return config  # Returns the updated configuration.
 
 
 def reconfigure_default(config, level):

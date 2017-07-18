@@ -51,7 +51,7 @@ import string
 import sys
 import re
 
-#LINEDEBUG="#line"
+# LINEDEBUG="#line"
 LINEDEBUG = "//#line"
 
 # Convenience names for types
@@ -78,14 +78,14 @@ def check_name(name):
 
 class ParameterGenerator:
     minval = {
-        'int': -0x80000000, #'INT_MIN',
+        'int': -0x80000000,  # 'INT_MIN',
         'double': '-std::numeric_limits<double>::infinity()',
         'str': '',
         'bool': False,
     }
 
     maxval = {
-        'int': 0x7FFFFFFF, #'INT_MAX',
+        'int': 0x7FFFFFFF,  # 'INT_MAX',
         'double': 'std::numeric_limits<double>::infinity()',
         'str': '',
         'bool': True,
@@ -279,7 +279,7 @@ Have a nice day
         self.fill_type(newconst)
         self.check_type(newconst, 'value')
         self.constants.append(newconst)
-        return newconst # So that we can assign the value easily.
+        return newconst  # So that we can assign the value easily.
 
     def enum(self, constants, description):
         if len(set(const['type'] for const in constants)) != 1:
@@ -324,18 +324,18 @@ Have a nice day
             self.name = name
             self.nodename = nodename
             self.msgname = name + "Config"
-            #print('**************************************************************')
-            #print('**************************************************************')
+            # print('**************************************************************')
+            # print('**************************************************************')
             print(Template("Generating reconfiguration files for $name in $pkgname").
                   substitute(name=self.name, pkgname=self.pkgname))
-            #print('**************************************************************')
-            #print('**************************************************************')
+            # print('**************************************************************')
+            # print('**************************************************************')
             self.generatecpp()
             self.generatedoc()
             self.generatewikidoc()
             self.generateusage()
             self.generatepy()
-            #self.deleteobsolete()
+            # self.deleteobsolete()
         except Exception:
             print("Error building srv %s.srv" % name)
             import traceback
@@ -374,7 +374,7 @@ Have a nice day
     def generateusage(self):
         self.mkdirabs("docs")
         f = open(os.path.join(self.binary_dir, "docs", self.msgname + "-usage.dox"), 'w')
-        #print("/**", file=f)
+        # print("/**", file=f)
         print("\\subsubsection usage Usage", file=f)
         print('\\verbatim', file=f)
         print(Template('<node name="$nodename" pkg="$pkgname" type="$nodename">').substitute(
@@ -384,7 +384,7 @@ Have a nice day
         print('</node>', file=f)
         print('\\endverbatim', file=f)
         print('', file=f)
-        #print("*/", file=f)
+        # print("*/", file=f)
         f.close()
 
     def generatedoc(self):
@@ -392,7 +392,7 @@ Have a nice day
         dir_path = os.path.join(self.binary_dir, "docs")
         self.mkdirabs(dir_path)
         f = open(os.path.join(dir_path, self.msgname + ".dox"), 'w')
-        #print("/**", file=f)
+        # print("/**", file=f)
         print("\\subsubsection parameters ROS parameters", file=f)
         print("", file=f)
         print("Reads and maintains the following parameters on the ROS server", file=f)
@@ -400,13 +400,13 @@ Have a nice day
         for param in self.group.get_parameters():
             print(Template("- \\b \"~$name\" : \\b [$type] $description min: $min, default: $default, max: $max").substitute(param), file=f)
         print("", file=f)
-        #print("*/", file=f)
+        # print("*/", file=f)
         f.close()
 
     def generateusage(self):
         self.mkdirabs("docs")
         f = open(os.path.join(self.binary_dir, "docs", self.msgname + "-usage.dox"), 'w')
-        #print("/**", file=f)
+        # print("/**", file=f)
         print("\\subsubsection usage Usage", file=f)
         print('\\verbatim', file=f)
         print(Template('<node name="$nodename" pkg="$pkgname" type="$nodename">').substitute(
@@ -416,7 +416,7 @@ Have a nice day
         print('</node>', file=f)
         print('\\endverbatim', file=f)
         print("", file=f)
-        #print("*/", file=f)
+        # print("*/", file=f)
         f.close()
 
     def crepr(self, param, val):
@@ -468,7 +468,7 @@ Have a nice day
         # Read the configuration manipulator template and insert line numbers and file name into template.
         templatefile = os.path.join(self.dynconfpath, "templates", "ConfigType.h.template")
         templatelines = []
-        templatefilesafe = templatefile.replace('\\', '\\\\') # line directive does backslash expansion.
+        templatefilesafe = templatefile.replace('\\', '\\\\')  # line directive does backslash expansion.
         curline = 1
         f = open(templatefile)
         for line in f:
@@ -531,52 +531,52 @@ Have a nice day
         f.close()
         print("Wrote header file in " + os.path.join(self.cpp_gen_dir, self.name + "Config.h"))
 
-#def deleteoneobsolete(self, file):
-#         try:
-#             os.unlink(file)
-#         except OSError:
-#             pass
+# def deleteoneobsolete(self, file):
+#          try:
+#              os.unlink(file)
+#          except OSError:
+#              pass
 
-#    def deleteobsolete(self): ### @todo remove this after the transition period.
-#         self.deleteoneobsolete(os.path.join(self.pkgpath, "msg", self.msgname+".msg"))
-#         self.deleteoneobsolete(os.path.join("msg", "cpp", self.pkgpath, "msg", self.msgname+".msg"))
-#         self.deleteoneobsolete(os.path.join(self.pkgpath, "srv", "Get"+self.msgname+".srv"))
-#         self.deleteoneobsolete(os.path.join("srv", "cpp", self.pkgpath, "srv", "Get"+self.msgname+".srv"))
-#         self.deleteoneobsolete(os.path.join(self.pkgpath, "srv", "Set"+self.msgname+".srv"))
-#         self.deleteoneobsolete(os.path.join("srv", "cpp", self.pkgpath, "srv", "Set"+self.msgname+".srv"))
+#     def deleteobsolete(self): ### @todo remove this after the transition period.
+#          self.deleteoneobsolete(os.path.join(self.pkgpath, "msg", self.msgname+".msg"))
+#          self.deleteoneobsolete(os.path.join("msg", "cpp", self.pkgpath, "msg", self.msgname+".msg"))
+#          self.deleteoneobsolete(os.path.join(self.pkgpath, "srv", "Get"+self.msgname+".srv"))
+#          self.deleteoneobsolete(os.path.join("srv", "cpp", self.pkgpath, "srv", "Get"+self.msgname+".srv"))
+#          self.deleteoneobsolete(os.path.join(self.pkgpath, "srv", "Set"+self.msgname+".srv"))
+#          self.deleteoneobsolete(os.path.join("srv", "cpp", self.pkgpath, "srv", "Set"+self.msgname+".srv"))
 
-#    def msgtype(self, type):
-#        return { 'int' : 'int32', 'bool' : 'int8', 'str' : 'string', 'double' : 'float64' }[type]
+#     def msgtype(self, type):
+#         return { 'int' : 'int32', 'bool' : 'int8', 'str' : 'string', 'double' : 'float64' }[type]
 #
-#    def generatemsg(self):
-#        self.mkdir("msg")
-#        f = open(os.path.join(self.pkgpath, "msg", self.msgname+".msg"), 'w')
-#        print("# This is an autogerenated file. Please do not edit.", file=f)
-#        print("", file=f)
-#        for param in self.parameters:
-#            print(Template("$type $name # $description").substitute(param, type=self.msgtype(param['type'])), file=f)
-#        f.close()
+#     def generatemsg(self):
+#         self.mkdir("msg")
+#         f = open(os.path.join(self.pkgpath, "msg", self.msgname+".msg"), 'w')
+#         print("# This is an autogerenated file. Please do not edit.", file=f)
+#         print("", file=f)
+#         for param in self.parameters:
+#             print(Template("$type $name # $description").substitute(param, type=self.msgtype(param['type'])), file=f)
+#         f.close()
 #
-#    def generategetsrv(self):
-#        self.mkdir("srv")
-#        f = open(os.path.join(self.pkgpath, "srv", "Get"+self.msgname+".srv"), 'w')
-#        print("# This is an autogerenated file. Please do not edit.", file=f)
-#        print("", file=f)
-#        print("---", file=f)
-#        print(self.msgname, "config", "# Current configuration of node.", file=f)
-#        print(self.msgname, "defaults", "# Minimum values where appropriate.", file=f)
-#        print(self.msgname, "min", "# Minimum values where appropriate.", file=f)
-#        print(self.msgname, "max", "# Maximum values where appropriate.", file=f)
-#        f.close()
+#     def generategetsrv(self):
+#         self.mkdir("srv")
+#         f = open(os.path.join(self.pkgpath, "srv", "Get"+self.msgname+".srv"), 'w')
+#         print("# This is an autogerenated file. Please do not edit.", file=f)
+#         print("", file=f)
+#         print("---", file=f)
+#         print(self.msgname, "config", "# Current configuration of node.", file=f)
+#         print(self.msgname, "defaults", "# Minimum values where appropriate.", file=f)
+#         print(self.msgname, "min", "# Minimum values where appropriate.", file=f)
+#         print(self.msgname, "max", "# Maximum values where appropriate.", file=f)
+#         f.close()
 #
-#    def generatesetsrv(self):
-#        self.mkdir("srv")
-#        f = open(os.path.join(self.pkgpath, "srv", "Set"+self.msgname+".srv"), 'w')
-#        print("# This is an autogerenated file. Please do not edit.", file=f)
-#        print(self.msgname, "config", "# Requested node configuration.", file=f)
-#        print("---", file=f)
-#        print(self.msgname, "config", "# What the node's configuration was actually set to.", file=f)
-#        f.close()
+#     def generatesetsrv(self):
+#         self.mkdir("srv")
+#         f = open(os.path.join(self.pkgpath, "srv", "Set"+self.msgname+".srv"), 'w')
+#         print("# This is an autogerenated file. Please do not edit.", file=f)
+#         print(self.msgname, "config", "# Requested node configuration.", file=f)
+#         print("---", file=f)
+#         print(self.msgname, "config", "# What the node's configuration was actually set to.", file=f)
+#         f.close()
 
     def _rreplace_str_with_val_in_dict(self, orig_dict, old_str, new_val):
         # Recursively replace any match of old_str by new_val in a dictionary
