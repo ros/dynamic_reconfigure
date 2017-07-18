@@ -51,7 +51,7 @@ import sys
 import re
 
 #LINEDEBUG="#line"
-LINEDEBUG="//#line"
+LINEDEBUG = "//#line"
 
 # Convenience names for types
 str_t = "str"
@@ -72,30 +72,30 @@ def check_description(description):
 def check_name(name):
     pattern = r'^[a-zA-Z][a-zA-Z0-9_]*$'
     if not re.match(pattern, name):
-        raise Exception("The name of field \'%s\' does not follow the ROS naming conventions, see http://wiki.ros.org/ROS/Patterns/Conventions"%name)
+        raise Exception("The name of field \'%s\' does not follow the ROS naming conventions, see http://wiki.ros.org/ROS/Patterns/Conventions" % name)
 
 
 class ParameterGenerator:
     minval = {
-            'int' : -0x80000000, #'INT_MIN',
-            'double' : -1e10000,#'-std::numeric_limits<double>::infinity()',
-            'str' : '',
-            'bool' : False,
-            }
+        'int': -0x80000000, #'INT_MIN',
+        'double': -1e10000,#'-std::numeric_limits<double>::infinity()',
+        'str': '',
+        'bool': False,
+    }
 
     maxval = {
-            'int' : 0x7FFFFFFF, #'INT_MAX',
-            'double' : 1e10000, #'std::numeric_limits<double>::infinity()',
-            'str' : '',
-            'bool' : True,
-            }
+        'int': 0x7FFFFFFF, #'INT_MAX',
+        'double': 1e10000, #'std::numeric_limits<double>::infinity()',
+        'str': '',
+        'bool': True,
+    }
 
     defval = {
-            'int' : 0,
-            'double' : 0,
-            'str' : '',
-            'bool' : False,
-            }
+        'int': 0,
+        'double': 0,
+        'str': '',
+        'bool': False,
+    }
 
     class Group:
         instances = {}
@@ -104,7 +104,7 @@ class ParameterGenerator:
             self.name = name.replace(" ", "_")
             self.type = type
             self.groups = []
-            self.parameters =[]
+            self.parameters = []
             self.gen = gen
             self.id = id
             self.parent = parent
@@ -125,21 +125,21 @@ class ParameterGenerator:
             self.groups.append(group)
             return group
 
-        def add(self, name, paramtype, level, description, default = None, min = None, max = None, edit_method = ""):
+        def add(self, name, paramtype, level, description, default=None, min=None, max=None, edit_method=""):
             newparam = {
-                    'name' : name,
-                    'type' : paramtype,
-                    'default' : default,
-                    'level' : level,
-                    'description' : description,
-                    'min' : min,
-                    'max' : max,
-                    'srcline' : inspect.currentframe().f_back.f_lineno,
-                    'srcfile' : inspect.getsourcefile(inspect.currentframe().f_back.f_code),
-                    'edit_method' : edit_method,
+                'name': name,
+                'type': paramtype,
+                'default': default,
+                'level': level,
+                'description': description,
+                'min': min,
+                'max': max,
+                'srcline': inspect.currentframe().f_back.f_lineno,
+                'srcfile': inspect.getsourcefile(inspect.currentframe().f_back.f_code),
+                'edit_method': edit_method,
             }
             if type == str_t and (max != None or min != None):
-                raise Exception("Max or min specified for %s, which is of string type"%name)
+                raise Exception("Max or min specified for %s, which is of string type" % name)
 
             check_name(name)
             check_description(description)
@@ -180,7 +180,7 @@ class ParameterGenerator:
                     ret.append(string.upper(x))
             return string.join(ret, "::")
 
-        def get_class(self, parent = False):
+        def get_class(self, parent=False):
             cls = []
             cls.extend(self.get_parents())
             cls = [string.upper(x) for x in cls]
@@ -190,34 +190,34 @@ class ParameterGenerator:
 
         # dictionary used to create the generated classes
         def to_dict(self):
-          if self.id == 0:
-              name = "groups"
-          else:
-              name = self.name
-          if self.state:
-              state = 'true'
-          else:
-              state = 'false'
-          return {
-              'name': self.name,
-              'type': self.type,
-              'state': self.state,
-              'cstate': state,
-              'id':self.id, 'parent':self.parent,
-              'parameters': self.parameters,
-              'groups' : [group.to_dict() for group in self.groups],
-              'srcline' : self.srcline,
-              'srcfile' : self.srcfile,
-              'class' : self.get_class(),
-              'parentclass': self.get_class(parent=True),
-              'parentname': self.get_group(self.parent).name,
-              'field' : self.get_field(),
-              'upper': string.upper(self.name),
-              'lower': string.lower(name)
-          }
+            if self.id == 0:
+                name = "groups"
+            else:
+                name = self.name
+            if self.state:
+                state = 'true'
+            else:
+                state = 'false'
+            return {
+                'name': self.name,
+                'type': self.type,
+                'state': self.state,
+                'cstate': state,
+                'id': self.id, 'parent': self.parent,
+                'parameters': self.parameters,
+                'groups': [group.to_dict() for group in self.groups],
+                'srcline': self.srcline,
+                'srcfile': self.srcfile,
+                'class': self.get_class(),
+                'parentclass': self.get_class(parent=True),
+                'parentname': self.get_group(self.parent).name,
+                'field': self.get_field(),
+                'upper': string.upper(self.name),
+                'lower': string.lower(name)
+            }
 
     def pytype(self, drtype):
-      return { 'str':str, 'int':int, 'double':float, 'bool':bool }[drtype]
+        return {'str': str, 'int': int, 'double': float, 'bool': bool}[drtype]
 
     def check_type(self, param, field):
         drtype = param['type']
@@ -225,12 +225,12 @@ class ParameterGenerator:
         value = param[field]
         pytype = self.pytype(drtype)
         if pytype != type(value) and (pytype != float or type(value) != int):
-            raise TypeError("'%s' has type %s, but %s is %s"%(name, drtype, field, repr(value)))
+            raise TypeError("'%s' has type %s, but %s is %s" % (name, drtype, field, repr(value)))
         param[field] = pytype(value)
 
     def fill_type(self, param):
-        param['ctype'] = { 'str':'std::string', 'int':'int', 'double':'double', 'bool':'bool' }[param['type']]
-        param['cconsttype'] = { 'str':'const char * const', 'int':'const int', 'double':'const double', 'bool':'const bool' }[param['type']]
+        param['ctype'] = {'str': 'std::string', 'int': 'int', 'double': 'double', 'bool': 'bool'}[param['type']]
+        param['cconsttype'] = {'str': 'const char * const', 'int': 'const int', 'double': 'const double', 'bool': 'const bool'}[param['type']]
 
     def check_type_fill_default(self, param, field, default):
         value = param[field]
@@ -250,13 +250,13 @@ class ParameterGenerator:
 
     def const(self, name, type, value, descr):
         newconst = {
-                'name':name,
-                'type':type,
-                'value':value,
-                'srcline' : inspect.currentframe().f_back.f_lineno,
-                'srcfile' : inspect.getsourcefile(inspect.currentframe().f_back.f_code),
-                'description' : descr
-                }
+            'name': name,
+            'type': type,
+            'value': value,
+            'srcline': inspect.currentframe().f_back.f_lineno,
+            'srcfile': inspect.getsourcefile(inspect.currentframe().f_back.f_code),
+            'description': descr
+            }
         check_description(descr)
         self.fill_type(newconst)
         self.check_type(newconst, 'value')
@@ -267,10 +267,10 @@ class ParameterGenerator:
         if len(set(const['type'] for const in constants)) != 1:
             raise Exception("Inconsistent types in enum!")
         check_description(description)
-        return repr({ 'enum' : constants, 'enum_description' : description })
+        return repr({'enum': constants, 'enum_description': description})
 
     # Wrap add and add_group for the default group
-    def add(self, name, paramtype, level, description, default = None, min = None, max = None, edit_method = ""):
+    def add(self, name, paramtype, level, description, default=None, min=None, max=None, edit_method=""):
         self.group.add(name, paramtype, level, description, default, min, max, edit_method)
 
     def add_group(self, name, type="", state=True):
@@ -280,7 +280,7 @@ class ParameterGenerator:
         if os.path.isdir(path):
             pass
         elif os.path.isfile(path):
-            raise OSError("Error creating directory %s, a file with the same name exists" %path)
+            raise OSError("Error creating directory %s, a file with the same name exists" % path)
         else:
             head, tail = os.path.split(path)
             if head and not os.path.isdir(head):
@@ -301,12 +301,12 @@ class ParameterGenerator:
         self.pkgpath = roslib.packages.get_pkg_dir(pkgname)
         self.name = name
         self.nodename = nodename
-        self.msgname = name+"Config"
+        self.msgname = name + "Config"
 
         # Don't regenerate headers if the config hasn't been modfied
         cpp_header = os.path.realpath(os.path.join(self.pkgpath, "cpp", pkgname, self.msgname + ".h"))
         if os.path.exists(cpp_header) and os.path.getmtime(os.path.realpath(__file__)) < os.path.getmtime(cpp_header):
-              exit(0)
+            exit(0)
 
         try:
             if sys.modules['__main__']._DYNAMIC_RECONFIGURE_GENERATING_DEPENDENCIES:
@@ -320,7 +320,7 @@ class ParameterGenerator:
             #print('**************************************************************')
             #print('**************************************************************')
             print(Template("Generating reconfiguration files for $name in $pkgname").\
-                    substitute(name=self.name, pkgname = self.pkgname))
+                  substitute(name=self.name, pkgname=self.pkgname))
             #print('**************************************************************')
             #print('**************************************************************')
             self.generatecpp()
@@ -330,48 +330,48 @@ class ParameterGenerator:
             self.generatepy()
             self.deleteobsolete()
         except Exception as e:
-            print("Error building srv %s.srv"%name)
+            print("Error building srv %s.srv" % name)
             import traceback
             traceback.print_exc()
             exit(1)
 
     def generatewikidoc(self):
         self.mkdir("docs")
-        f = open(os.path.join(self.pkgpath, "docs", self.msgname+".wikidoc"), 'w')
+        f = open(os.path.join(self.pkgpath, "docs", self.msgname + ".wikidoc"), 'w')
         print(
-"""# Autogenerated param section. Do not hand edit.
-param {
-group.0 {
-name=Dynamically Reconfigurable Parameters
-desc=See the [[dynamic_reconfigure]] package for details on dynamically reconfigurable parameters.""", file=f)
-        i=-1
+            """# Autogenerated param section. Do not hand edit.
+            param {
+            group.0 {
+            name=Dynamically Reconfigurable Parameters
+            desc=See the [[dynamic_reconfigure]] package for details on dynamically reconfigurable parameters.""", file=f)
+        i = -1
         for param in self.group.get_parameters():
-            i=i+1
+            i = i + 1
             range = ""
             try:
-              enum = eval(param['edit_method'])['enum']
-              range = ", ".join(Template("$name ($value): $description").substitute(const) for const in enum)
-              range = "Possible values are: " + range
+                enum = eval(param['edit_method'])['enum']
+                range = ", ".join(Template("$name ($value): $description").substitute(const) for const in enum)
+                range = "Possible values are: " + range
             except:
-              if param['type'] == int_t or param['type'] == double_t:
-                  range = Template("Range: $min to $max").substitute(param)
+                if param['type'] == int_t or param['type'] == double_t:
+                    range = Template("Range: $min to $max").substitute(param)
             print(Template(
-"""$i.name= ~$name
-$i.default= $default
-$i.type= $type
-$i.desc=$description $range"""
-).substitute(param, range = range, i = i), file=f)
+                """$i.name= ~$name
+                $i.default= $default
+                $i.type= $type
+                $i.desc=$description $range"""
+                ).substitute(param, range=range, i=i), file=f)
         print("}\n}\n# End of autogenerated section. You may edit below.", file=f)
         f.close()
 
     def generateusage(self):
         self.mkdir("docs")
-        f = open(os.path.join(self.pkgpath, "docs", self.msgname+"-usage.dox"), 'w')
+        f = open(os.path.join(self.pkgpath, "docs", self.msgname + "-usage.dox"), 'w')
         #print("/**", file=f)
         print("\\subsubsection usage Usage", file=f)
         print('\\verbatim', file=f)
         print(Template('<node name="$nodename" pkg="$pkgname" type="$nodename">').\
-                substitute(pkgname = self.pkgname, nodename = self.nodename), file=f)
+              substitute(pkgname=self.pkgname, nodename=self.nodename), file=f)
         for param in self.group.get_parameters():
             print(Template('  <param name="$name" type="$type" value="$default" />').substitute(param), file=f)
         print('</node>', file=f)
@@ -382,7 +382,7 @@ $i.desc=$description $range"""
 
     def generatedoc(self):
         self.mkdir("docs")
-        f = open(os.path.join(self.pkgpath, "docs", self.msgname+".dox"), 'w')
+        f = open(os.path.join(self.pkgpath, "docs", self.msgname + ".dox"), 'w')
         #print("/**", file=f)
         print("\\subsubsection parameters ROS parameters", file=f)
         print("", file=f)
@@ -396,12 +396,12 @@ $i.desc=$description $range"""
 
     def generateusage(self):
         self.mkdir("docs")
-        f = open(os.path.join(self.pkgpath, "docs", self.msgname+"-usage.dox"), 'w')
+        f = open(os.path.join(self.pkgpath, "docs", self.msgname + "-usage.dox"), 'w')
         #print("/**", file=f)
         print("\\subsubsection usage Usage", file=f)
         print('\\verbatim', file=f)
         print(Template('<node name="$nodename" pkg="$pkgname" type="$nodename">').\
-                substitute(pkgname = self.pkgname, nodename = self.nodename), file=f)
+              substitute(pkgname=self.pkgname, nodename=self.nodename), file=f)
         for param in self.group.get_parameters():
             print(Template('  <param name="$name" type="$type" value="$default" />').substitute(param), file=f)
         print('</node>', file=f)
@@ -413,7 +413,7 @@ $i.desc=$description $range"""
     def crepr(self, param, val):
         type = param["type"]
         if type == 'str':
-            return '"'+val+'"'
+            return '"' + val + '"'
         if type == 'int':
             return str(val)
         if type == 'double':
@@ -423,28 +423,28 @@ $i.desc=$description $range"""
                 return '-std::numeric_limits<double>::infinity()'
             else:
                 return str(val)
-        if  type == 'bool':
-            return { True : 1, False : 0 }[val]
+        if type == 'bool':
+            return {True: 1, False: 0}[val]
         raise TypeError(type)
 #        if type == 'string':
-#            return '"'+val+'"'
+#            return '"' + val + '"'
 #        if 'uint' in type:
-#            return str(val)+'ULL'
+#            return str(val) + 'ULL'
 #        if 'int' in type:
-#            return str(val)+'LL'
+#            return str(val) + 'LL'
 #        if 'time' in type:
-#            return 'ros::Time('+str(val)+')'
+#            return 'ros::Time(' + str(val) + ')'
 #        if 'duration' in type:
-#            return 'ros::Duration('+str(val)+')'
-#        if  'float' in types:
+#            return 'ros::Duration(' + str(val) + ')'
+#        if 'float' in types:
 #            return str(val)
 
-    def appendline(self, list, text, param, value = None):
+    def appendline(self, list, text, param, value=None):
         if value == None:
             val = ""
         else:
             val = self.crepr(param, param[value])
-        list.append(Template('${doline} $srcline "$srcfile"\n      '+text).safe_substitute(param, v=val, doline=LINEDEBUG, configname=self.name))
+        list.append(Template('${doline} $srcline "$srcfile"\n      ' + text).safe_substitute(param, v=val, doline=LINEDEBUG, configname=self.name))
 
     def appendgroup(self, list, group):
         subgroups = []
@@ -460,7 +460,7 @@ $i.desc=$description $range"""
         setters = string.join(setters, "\n")
         params = string.join(params, "\n")
         grouptemplate = open(os.path.join(self.dynconfpath, "templates", "GroupClass.h.template")).read()
-        list.append(Template(grouptemplate).safe_substitute(group.to_dict(), subgroups = subgroups, setters = setters, params = params, configname = self.name))
+        list.append(Template(grouptemplate).safe_substitute(group.to_dict(), subgroups=subgroups, setters=setters, params=params, configname=self.name))
 
     def generatecpp(self):
         # Read the configuration manipulator template and insert line numbers and file name into template.
@@ -471,14 +471,14 @@ $i.desc=$description $range"""
         f = open(templatefile)
         for line in f:
             curline = curline + 1
-            templatelines.append(Template(line).safe_substitute(linenum=curline,filename=templatefilesafe))
+            templatelines.append(Template(line).safe_substitute(linenum=curline, filename=templatefilesafe))
         f.close()
         template = ''.join(templatelines)
 
         # Write the configuration manipulator.
         cfg_cpp_dir = os.path.join("cfg", "cpp", self.pkgname)
         self.mkdir(cfg_cpp_dir)
-        f = open(os.path.join(self.pkgpath, cfg_cpp_dir, self.name+"Config.h"), 'w')
+        f = open(os.path.join(self.pkgpath, cfg_cpp_dir, self.name + "Config.h"), 'w')
 
         paramdescr = []
         groups = []
@@ -490,19 +490,23 @@ $i.desc=$description $range"""
 
         def write_params(group):
             if group.id == 0:
-                paramdescr.append(Template("${configname}Config::GroupDescription<${configname}Config::${class}, ${configname}Config> ${name}(\"${name}\", \"${type}\", ${parent}, ${id}, ${cstate}, &${configname}Config::${lower});").safe_substitute(group.to_dict(), configname = self.name))
+                paramdescr.append(Template("${configname}Config::GroupDescription<${configname}Config::${class}, ${configname}Config> ${name}(\"${name}\", \"${type}\", ${parent}, ${id}, ${cstate}, &${configname}Config::${lower});").safe_substitute(group.to_dict(), configname=self.name))
             else:
-                paramdescr.append(Template("${configname}Config::GroupDescription<${configname}Config::${class}, ${configname}Config::${parentclass}> ${name}(\"${name}\", \"${type}\", ${parent}, ${id}, ${cstate}, &${configname}Config::${field});").safe_substitute(group.to_dict(), configname = self.name))
+                paramdescr.append(Template("${configname}Config::GroupDescription<${configname}Config::${class}, ${configname}Config::${parentclass}> ${name}(\"${name}\", \"${type}\", ${parent}, ${id}, ${cstate}, &${configname}Config::${field});").safe_substitute(group.to_dict(), configname=self.name))
             for param in group.parameters:
                 self.appendline(members, "${ctype} ${name};", param)
                 self.appendline(paramdescr, "__min__.${name} = $v;", param, "min")
                 self.appendline(paramdescr, "__max__.${name} = $v;", param, "max")
                 self.appendline(paramdescr, "__default__.${name} = $v;", param, "default")
-                self.appendline(paramdescr, group.to_dict()['name']+".abstract_parameters.push_back(${configname}Config::AbstractParamDescriptionConstPtr(new ${configname}Config::ParamDescription<${ctype}>(\"${name}\", \"${type}\", ${level}, "\
-                        "\"${description}\", \"${edit_method}\", &${configname}Config::${name})));", param)
-                self.appendline(paramdescr,
-                        "__param_descriptions__.push_back(${configname}Config::AbstractParamDescriptionConstPtr(new ${configname}Config::ParamDescription<${ctype}>(\"${name}\", \"${type}\", ${level}, "\
-                        "\"${description}\", \"${edit_method}\", &${configname}Config::${name})));", param)
+                self.appendline(
+                    paramdescr,
+                    group.to_dict()['name'] +
+                    ".abstract_parameters.push_back(${configname}Config::AbstractParamDescriptionConstPtr(new ${configname}Config::ParamDescription<${ctype}>(\"${name}\", \"${type}\", ${level}, "
+                    "\"${description}\", \"${edit_method}\", &${configname}Config::${name})));", param)
+                self.appendline(
+                    paramdescr,
+                    "__param_descriptions__.push_back(${configname}Config::AbstractParamDescriptionConstPtr(new ${configname}Config::ParamDescription<${ctype}>(\"${name}\", \"${type}\", ${level}, "
+                    "\"${description}\", \"${edit_method}\", &${configname}Config::${name})));", param)
 
             for g in group.groups:
                 write_params(g)
@@ -521,27 +525,28 @@ $i.desc=$description $range"""
         members = string.join(members, '\n')
         groups = string.join(groups, '\n')
         constants = string.join(constants, '\n')
-        f.write(Template(template).substitute(uname=self.name.upper(),
-            configname=self.name, pkgname = self.pkgname, paramdescr = paramdescr,
-            members = members, groups = groups, doline = LINEDEBUG, constants = constants))
+        f.write(Template(template).substitute(
+            uname=self.name.upper(),
+            configname=self.name, pkgname=self.pkgname, paramdescr=paramdescr,
+            members=members, groups=groups, doline=LINEDEBUG, constants=constants))
         f.close()
 
     def deleteoneobsolete(self, file):
-         try:
-             os.unlink(file)
-         except OSError:
-             pass
+        try:
+            os.unlink(file)
+        except OSError:
+            pass
 
     def deleteobsolete(self): ### @todo remove this after the transition period.
-         self.deleteoneobsolete(os.path.join(self.pkgpath, "msg", self.msgname+".msg"))
-         self.deleteoneobsolete(os.path.join("msg", "cpp", self.pkgpath, "msg", self.msgname+".msg"))
-         self.deleteoneobsolete(os.path.join(self.pkgpath, "srv", "Get"+self.msgname+".srv"))
-         self.deleteoneobsolete(os.path.join("srv", "cpp", self.pkgpath, "srv", "Get"+self.msgname+".srv"))
-         self.deleteoneobsolete(os.path.join(self.pkgpath, "srv", "Set"+self.msgname+".srv"))
-         self.deleteoneobsolete(os.path.join("srv", "cpp", self.pkgpath, "srv", "Set"+self.msgname+".srv"))
+        self.deleteoneobsolete(os.path.join(self.pkgpath, "msg", self.msgname + ".msg"))
+        self.deleteoneobsolete(os.path.join("msg", "cpp", self.pkgpath, "msg", self.msgname + ".msg"))
+        self.deleteoneobsolete(os.path.join(self.pkgpath, "srv", "Get" + self.msgname + ".srv"))
+        self.deleteoneobsolete(os.path.join("srv", "cpp", self.pkgpath, "srv", "Get" + self.msgname + ".srv"))
+        self.deleteoneobsolete(os.path.join(self.pkgpath, "srv", "Set" + self.msgname + ".srv"))
+        self.deleteoneobsolete(os.path.join("srv", "cpp", self.pkgpath, "srv", "Set" + self.msgname + ".srv"))
 
 #    def msgtype(self, type):
-#        return { 'int' : 'int32', 'bool' : 'int8', 'str' : 'string', 'double' : 'float64' }[type]
+#        return {'int': 'int32', 'bool': 'int8', 'str': 'string', 'double': 'float64'}[type]
 #
 #    def generatemsg(self):
 #        self.mkdir("msg")
@@ -583,13 +588,14 @@ $i.desc=$description $range"""
 
         # Write the configuration manipulator.
         self.mkdir(os.path.join("src", self.pkgname, "cfg"))
-        f = open(os.path.join(self.pkgpath, "src", self.pkgname, "cfg", self.name+"Config.py"), 'w')
-        f.write(Template(template).substitute(name = self.name,
-            pkgname = self.pkgname, pycfgdata = self.group.to_dict()))
+        f = open(os.path.join(self.pkgpath, "src", self.pkgname, "cfg", self.name + "Config.py"), 'w')
+        f.write(Template(template).substitute(
+            name=self.name,
+            pkgname=self.pkgname, pycfgdata=self.group.to_dict()))
         for const in self.constants:
-            f.write(Template("${configname}_${name} = $v\n").
-                    substitute(const, v = repr(const['value']),
-                        configname=self.name))
+            f.write(Template("${configname}_${name} = $v\n").substitute(
+                const, v=repr(const['value']),
+                configname=self.name))
         f.close()
 
         f = open(os.path.join(self.pkgpath, "src", self.pkgname, "cfg", "__init__.py"), 'a')

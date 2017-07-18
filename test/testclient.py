@@ -96,11 +96,11 @@ time.sleep(1)
 # returns out the full new configuration of the server (which may differ
 # from what you requested if you asked for something illegal).
 print("Configuration after setting int_ to 4:")
-print_config(client.update_configuration({'int_' : 4}))
+print_config(client.update_configuration({'int_': 4}))
 time.sleep(1)
 
 print("Configuration after setting int_ to 0 and bool_ to True:")
-print_config(client.update_configuration({'int_' : 0, 'bool_' : True}))
+print_config(client.update_configuration({'int_': 0, 'bool_': True}))
 time.sleep(1)
 
 # You can access constants defined in Test.cfg file in the following way:
@@ -109,7 +109,7 @@ print("Medium is a constant that is set to 1:", Config.Test_Medium)
 
 # This is useful for setting enums:
 print("Configuration after setting int_enum_ to Medium:")
-print_config(client.update_configuration({'int_enum_' : Config.Test_Medium}))
+print_config(client.update_configuration({'int_enum_': Config.Test_Medium}))
 time.sleep(1)
 
 # You can use the get_config_callback and set_config_callback methods to
