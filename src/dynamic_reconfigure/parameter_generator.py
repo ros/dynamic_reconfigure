@@ -453,8 +453,8 @@ $i.desc=$description $range"""
         setters = []
         params = []
         for p in group.parameters:
-            setters.append(Template("        if(\"${name}\"==(*_i)->name){${name} = boost::any_cast<${ctype}>(val);}").substitute(p));
-            params.append(Template("${ctype} ${name};").substitute(p));
+            setters.append(Template("        if(\"${name}\"==(*_i)->name){${name} = boost::any_cast<${ctype}>(val);}").substitute(p))
+            params.append(Template("${ctype} ${name};").substitute(p))
 
         subgroups = string.join(subgroups, "\n")
         setters = string.join(setters, "\n")

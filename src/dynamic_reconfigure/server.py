@@ -77,7 +77,7 @@ class Server(object):
         self.config = initial_config(encode_config(self.config), type.config_description)
 
         self.descr_topic = rospy.Publisher(self.ns + 'parameter_descriptions', ConfigDescrMsg, latch=True, queue_size=10)
-        self.descr_topic.publish(self.description);
+        self.descr_topic.publish(self.description)
 
         self.update_topic = rospy.Publisher(self.ns + 'parameter_updates', ConfigMsg, latch=True, queue_size=10)
         self._change_config(self.config, ~0) # Consistent with the C++ API, the callback gets called with level=~0 (i.e. -1)

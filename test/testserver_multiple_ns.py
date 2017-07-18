@@ -57,11 +57,11 @@ def main():
 def reconfigure(config, level):
     print(config)
 
-    config['int_'] |= 1;
-    config['double_'] = -config['double_'];
-    config['str_'] += "A";
-    config['bool_'] = not config['bool_'];
-    config['level'] = level;
+    config['int_'] |= 1
+    config['double_'] = -config['double_']
+    config['str_'] += "A"
+    config['bool_'] = not config['bool_']
+    config['level'] = level
 
     rospy.loginfo("Reconfigured to     : %i %f %s %s %i"%(config['int_'], config['double_'], config['str_'], config['bool_'], config['level']))
 
