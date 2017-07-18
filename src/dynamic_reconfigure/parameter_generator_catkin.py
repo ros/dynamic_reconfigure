@@ -602,7 +602,6 @@ Have a nice day
     def generatepy(self):
         # Read the configuration manipulator template and insert line numbers and file name into template.
         templatefile = os.path.join(self.dynconfpath, "templates", "ConfigType.py.template")
-        templatelines = []
         f = open(templatefile)
         template = f.read()
         f.close()
