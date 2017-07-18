@@ -30,6 +30,7 @@
 # LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN
 # ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 # POSSIBILITY OF SUCH DAMAGE.
+from __future__ import print_function
 
 import roslib; roslib.load_manifest('dynamic_reconfigure')
 import rospy
@@ -53,22 +54,22 @@ import time
 
 def print_config(config):
     for k, v in config.iteritems():
-        print k, ":", v
-    print
+        print(k, ":", v)
+    print('')
 
 # The config_callback (introduced below) receives a dictionary containing
 # the current configuration of the server each time the server's
 # configuration changes.
 def config_callback(config):
-    print "Got callback, configuration is: "
+    print("Got callback, configuration is: ")
     print_config(config)
 
 def new_config_callback(config):
     global old_callback
-    print "New callback is calling old callback..."
+    print("New callback is calling old callback...")
     old_callback(config)
-    print "New callback is done..."
-    print
+    print("New callback is done...")
+    print('')
 
 # First you need to connect to the server. You can optionally specify a
 # timeout and a config_callback that is called each time the server's
@@ -82,7 +83,7 @@ client = DynamicReconfigureClient('/dynamic_reconfigure_test_server', config_cal
 time.sleep(1)
 
 # You can also get the configuration manually by calling get_configuration.
-print "Configuration from get_configuration:"
+print("Configuration from get_configuration:")
 print_config(client.get_configuration(timeout=5))
 time.sleep(1)
 
@@ -90,20 +91,20 @@ time.sleep(1)
 # You can set any subset of the node's parameters using this method. It
 # returns out the full new configuration of the server (which may differ
 # from what you requested if you asked for something illegal).
-print "Configuration after setting int_ to 4:"
+print("Configuration after setting int_ to 4:")
 print_config(client.update_configuration({'int_' : 4}))
 time.sleep(1)
 
-print "Configuration after setting int_ to 0 and bool_ to True:"
+print("Configuration after setting int_ to 0 and bool_ to True:")
 print_config(client.update_configuration({'int_' : 0, 'bool_' : True}))
 time.sleep(1)
 
 # You can access constants defined in Test.cfg file in the following way:
 import dynamic_reconfigure.cfg.TestConfig as Config
-print "Medium is a constant that is set to 1:", Config.Test_Medium
+print("Medium is a constant that is set to 1:", Config.Test_Medium)
 
 # This is useful for setting enums:
-print "Configuration after setting int_enum_ to Medium:"
+print("Configuration after setting int_enum_ to Medium:")
 print_config(client.update_configuration({'int_enum_' : Config.Test_Medium}))
 time.sleep(1)
 

@@ -33,6 +33,7 @@
 # POSSIBILITY OF SUCH DAMAGE.
 #
 # Revision $Id$
+from __future__ import print_function
 
 NAME='dynparam'
 import roslib; roslib.load_manifest('dynamic_reconfigure')
@@ -46,7 +47,7 @@ def do_list():
     connect()
     list = dynamic_reconfigure.find_reconfigure_services()
     for s in list:
-        print s
+        print(s)
 
 def do_set_from_parameters():
     usage = """Usage: %prog set_from_parameters [options] node
@@ -120,9 +121,9 @@ Examples:
     try:
         set_params(node, values_dict, timeout=options.timeout)
     except rospy.service.ServiceException:
-        print 'couldn\'t set parameters at node %s' % node
+        print('couldn\'t set parameters at node %s' % node)
     except rospy.exceptions.ROSException:
-        print 'couldn\'t set parameters at node %s' % node
+        print('couldn\'t set parameters at node %s' % node)
 
 def do_get():
     usage = "Usage: %prog get [options] node"
@@ -139,7 +140,7 @@ def do_get():
     connect()
     params = get_params(node, timeout=options.timeout)
     if params is not None:
-        print params
+        print(params)
 
 def do_load():
     usage = "Usage: %prog load [options] node file"
@@ -190,7 +191,7 @@ def do_dump():
         finally:
             f.close()
 
-    print "couldn't get parameters from node %s" % node
+    print("couldn't get parameters from node %s" % node)
 
 def get_params(node, timeout=None):
     client = dynamic_reconfigure.client.Client(node, timeout=timeout)
@@ -200,14 +201,14 @@ def set_params(node, params, timeout=None):
     client = dynamic_reconfigure.client.Client(node, timeout=timeout)
     try:
         client.update_configuration(params)
-    except dynamic_reconfigure.DynamicReconfigureParameterException, e:
-        print 'error updating parameters: ' + str(e)
+    except dynamic_reconfigure.DynamicReconfigureParameterException as e:
+        print('error updating parameters: ' + str(e))
 
 def add_timeout_option(parser):
     parser.add_option('-t', '--timeout', action='store', type='float', default=None, help='timeout in secs')
 
 def print_usage():
-    print """dynparam is a command-line tool for getting, setting, and
+    print("""dynparam is a command-line tool for getting, setting, and
 deleting parameters of a dynamically configurable node.
 
 Commands:
@@ -219,7 +220,7 @@ Commands:
 \tdynparam list                 list configurable nodes
 
 Type dynparam <command> -h for more detailed usage, e.g. 'dynparam get -h'
-"""
+""")
     sys.exit(1)
 
 def connect():

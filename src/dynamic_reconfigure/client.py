@@ -35,7 +35,7 @@ Python client API for dynamic_reconfigure (L{DynamicReconfigureClient}) as well 
 example server implementation (L{DynamicReconfigureServer}).
 """
 
-from __future__ import with_statement
+from __future__ import print_function, with_statement
 
 try:
     import roslib; roslib.load_manifest('dynamic_reconfigure')
@@ -99,7 +99,7 @@ class Client(object):
         """
         if timeout is None or timeout == 0.0:
             if self.get_configuration(timeout=1.0) is None:
-                print >> sys.stderr, 'Waiting for configuration...'
+                print('Waiting for configuration...', file=sys.stderr)
 
                 with self._cv:
                     while self.config is None:
@@ -306,7 +306,7 @@ class Client(object):
             try:
                 rospy.wait_for_service(service_name, 1.0)
             except rospy.exceptions.ROSException:
-                print >> sys.stderr, 'Waiting for service %s...' % service_name
+                print('Waiting for service %s...' % service_name, file=sys.stderr)
                 rospy.wait_for_service(service_name, timeout)
         else:
             rospy.wait_for_service(service_name, timeout)
