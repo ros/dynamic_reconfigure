@@ -53,6 +53,7 @@ from dynamic_reconfigure.msg import ConfigDescription as ConfigDescrMsg
 from dynamic_reconfigure.msg import IntParameter, BoolParameter, StrParameter, DoubleParameter, ParamDescription
 from dynamic_reconfigure.encoding import *
 
+
 class Server(object):
     def __init__(self, type, callback, namespace=""):
         self.mutex = threading.Lock()

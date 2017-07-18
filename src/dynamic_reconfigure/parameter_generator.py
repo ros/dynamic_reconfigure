@@ -99,6 +99,7 @@ class ParameterGenerator:
 
     class Group:
         instances = {}
+
         def __init__(self, gen, name, type, state, id, parent):
             self.name = name.replace(" ", "_")
             self.type = type
@@ -214,7 +215,6 @@ class ParameterGenerator:
               'upper': string.upper(self.name),
               'lower': string.lower(name)
           }
-
 
     def pytype(self, drtype):
       return { 'str':str, 'int':int, 'double':float, 'bool':bool }[drtype]

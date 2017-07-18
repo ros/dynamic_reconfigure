@@ -52,10 +52,12 @@ import time
 # In another window do:
 # rosrun dynamic_reconfigure testclient.py
 
+
 def print_config(config):
     for k, v in config.iteritems():
         print(k, ":", v)
     print('')
+
 
 # The config_callback (introduced below) receives a dictionary containing
 # the current configuration of the server each time the server's
@@ -64,12 +66,14 @@ def config_callback(config):
     print("Got callback, configuration is: ")
     print_config(config)
 
+
 def new_config_callback(config):
     global old_callback
     print("New callback is calling old callback...")
     old_callback(config)
     print("New callback is done...")
     print('')
+
 
 # First you need to connect to the server. You can optionally specify a
 # timeout and a config_callback that is called each time the server's

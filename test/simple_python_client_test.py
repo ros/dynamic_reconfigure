@@ -50,7 +50,6 @@ class TestSimpleDynamicReconfigureClient(unittest.TestCase):
         self.assertEqual(2.0, config['double_no_max'])
         self.assertEqual(-1.0, config['deep_var_double'])
 
-
         int_ = 7
         double_ = 0.75
         str_ = 'bar'
@@ -110,6 +109,7 @@ class TestSimpleDynamicReconfigureClient(unittest.TestCase):
         self.assertEqual(u"こんにちは", config['mstr_'])
         self.assertEqual(type(u"こんにちは"), type(config['mstr_']))
         self.assertEqual(u"こんにちは", rospy.get_param('/ref_server/mstr_'))
+
 
 if __name__ == "__main__":
     import rostest

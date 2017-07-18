@@ -56,6 +56,7 @@ from dynamic_reconfigure.msg import IntParameter, BoolParameter, StrParameter, D
 from dynamic_reconfigure.encoding import *
 from rospy.service import ServiceException
 
+
 class Client(object):
     """
     Python dynamic_reconfigure client API
@@ -241,6 +242,7 @@ class Client(object):
         descr = self.get_group_descriptions()
 
         groups = []
+
         def update_state(group, description):
             for p,g in description['groups'].items():
                 if g['name'] == group:

@@ -45,6 +45,7 @@ from dynamic_reconfigure.msg import Group as GroupMsg
 from dynamic_reconfigure.msg import GroupState
 from dynamic_reconfigure.msg import IntParameter, BoolParameter, StrParameter, DoubleParameter, ParamDescription
 
+
 class Config(dict):
     def __init__(self, *args, **kwargs):
         dict.__init__(self, *args, **kwargs)
@@ -90,6 +91,7 @@ def encode_description(descr):
     msg.groups = encode_groups(None, descr.config_description)
     return msg
 
+
 def encode_groups(parent, group):
     group_list = []
 
@@ -108,6 +110,7 @@ def encode_groups(parent, group):
         group_list.extend(encode_groups(msg, next))
 
     return group_list
+
 
 def encode_config(config, flat=True):
     msg = ConfigMsg()
@@ -134,6 +137,7 @@ def encode_config(config, flat=True):
 
     return msg
 
+
 def group_dict(group):
     try:
         state = group.state
@@ -152,6 +156,7 @@ def group_dict(group):
         'groups' : Config({}),
         'parameters' : Config({}),
     })
+
 
 def decode_description(msg):
     mins = decode_config(msg.min)
@@ -200,6 +205,7 @@ def decode_description(msg):
 
     return groups
 
+
 def get_tree(m, group = None):
     if group is None:
         for x in m.groups:
@@ -223,8 +229,10 @@ def get_tree(m, group = None):
     else:
         return children
 
+
 def initial_config(msg, description = None):
     d = Config([(kv.name, kv.value) for kv in msg.bools + msg.ints + msg.strs + msg.doubles])
+
     def gt(m, descr, group = None):
         # get the default group
         if group is None:
@@ -276,6 +284,7 @@ def initial_config(msg, description = None):
 
     return d
 
+
 def decode_config(msg, description = None):
     if sys.version_info.major < 3:
         for s in msg.strs:
@@ -302,6 +311,7 @@ def decode_config(msg, description = None):
 
     return d
 
+
 def extract_params(group):
     params = []
     params.extend(group['parameters'])
@@ -312,6 +322,7 @@ def extract_params(group):
         for g in group['groups']:
             params.extend(extract_params(g))
     return params
+
 
 def get_parents(group, descriptions):
     parents = []

@@ -40,11 +40,13 @@ import dynamic_reconfigure.server
 from dynamic_reconfigure.cfg import TestConfig
 import time
 
+
 def main():
     rospy.init_node("python_test_server")
     dynamic_reconfigure.server.Server(TestConfig, reconfigure)
     while not rospy.is_shutdown():
         time.sleep(0.1)
+
 
 def reconfigure(config, level):
     print(config)
