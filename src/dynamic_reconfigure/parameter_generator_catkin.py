@@ -325,12 +325,12 @@ Have a nice day
             self.name = name
             self.nodename = nodename
             self.msgname = name+"Config"
-            #print '**************************************************************'
-            #print '**************************************************************'
+            #print('**************************************************************')
+            #print('**************************************************************')
             print(Template("Generating reconfiguration files for $name in $pkgname").\
                     substitute(name=self.name, pkgname = self.pkgname))
-            #print '**************************************************************'
-            #print '**************************************************************'
+            #print('**************************************************************')
+            #print('**************************************************************')
             self.generatecpp()
             self.generatedoc()
             self.generatewikidoc()
@@ -375,17 +375,17 @@ $i.desc=$description $range"""
     def generateusage(self):
         self.mkdirabs("docs")
         f = open(os.path.join(self.binary_dir, "docs", self.msgname+"-usage.dox"), 'w')
-        #print >> f, "/**"
-        print >> f, "\\subsubsection usage Usage"
-        print >> f, '\\verbatim'
-        print >> f, Template('<node name="$nodename" pkg="$pkgname" type="$nodename">').\
-                substitute(pkgname = self.pkgname, nodename = self.nodename)
+        #print("/**", file=f)
+        print("\\subsubsection usage Usage", file=f)
+        print('\\verbatim', file=f)
+        print(Template('<node name="$nodename" pkg="$pkgname" type="$nodename">').\
+                substitute(pkgname = self.pkgname, nodename = self.nodename), file=f)
         for param in self.group.get_parameters():
-            print >> f, Template('  <param name="$name" type="$type" value="$default" />').substitute(param)
-        print >> f, '</node>'
-        print >> f, '\\endverbatim'
-        print >> f
-        #print >> f, "*/"
+            print(Template('  <param name="$name" type="$type" value="$default" />').substitute(param), file=f)
+        print('</node>', file=f)
+        print('\\endverbatim', file=f)
+        print('', file=f)
+        #print("*/", file=f)
         f.close()
 
     def generatedoc(self):
@@ -393,7 +393,7 @@ $i.desc=$description $range"""
         dir_path = os.path.join(self.binary_dir, "docs")
         self.mkdirabs(dir_path)
         f = open(os.path.join(dir_path, self.msgname+".dox"), 'w')
-        #print >> f, "/**"
+        #print("/**", file=f)
         print("\\subsubsection parameters ROS parameters", file=f)
         print("", file=f)
         print("Reads and maintains the following parameters on the ROS server", file=f)
@@ -401,13 +401,13 @@ $i.desc=$description $range"""
         for param in self.group.get_parameters():
             print(Template("- \\b \"~$name\" : \\b [$type] $description min: $min, default: $default, max: $max").substitute(param), file=f)
         print("", file=f)
-        #print >> f, "*/"
+        #print("*/", file=f)
         f.close()
 
     def generateusage(self):
         self.mkdirabs("docs")
         f = open(os.path.join(self.binary_dir, "docs", self.msgname+"-usage.dox"), 'w')
-        #print >> f, "/**"
+        #print("/**", file=f)
         print("\\subsubsection usage Usage", file=f)
         print('\\verbatim', file=f)
         print(Template('<node name="$nodename" pkg="$pkgname" type="$nodename">').\
@@ -417,7 +417,7 @@ $i.desc=$description $range"""
         print('</node>', file=f)
         print('\\endverbatim', file=f)
         print("", file=f)
-        #print >> f, "*/"
+        #print("*/", file=f)
         f.close()
 
     def crepr(self, param, val):
@@ -547,31 +547,31 @@ $i.desc=$description $range"""
 #    def generatemsg(self):
 #        self.mkdir("msg")
 #        f = open(os.path.join(self.pkgpath, "msg", self.msgname+".msg"), 'w')
-#        print >> f, "# This is an autogerenated file. Please do not edit."
-#        print >> f, ""
+#        print("# This is an autogerenated file. Please do not edit.", file=f)
+#        print("", file=f)
 #        for param in self.parameters:
-#            print >> f, Template("$type $name # $description").substitute(param, type=self.msgtype(param['type']))
+#            print(Template("$type $name # $description").substitute(param, type=self.msgtype(param['type'])), file=f)
 #        f.close()
 #
 #    def generategetsrv(self):
 #        self.mkdir("srv")
 #        f = open(os.path.join(self.pkgpath, "srv", "Get"+self.msgname+".srv"), 'w')
-#        print >> f, "# This is an autogerenated file. Please do not edit."
-#        print >> f, ""
-#        print >> f, "---"
-#        print >> f, self.msgname, "config", "# Current configuration of node."
-#        print >> f, self.msgname, "defaults", "# Minimum values where appropriate."
-#        print >> f, self.msgname, "min", "# Minimum values where appropriate."
-#        print >> f, self.msgname, "max", "# Maximum values where appropriate."
+#        print("# This is an autogerenated file. Please do not edit.", file=f)
+#        print("", file=f)
+#        print("---", file=f)
+#        print(self.msgname, "config", "# Current configuration of node.", file=f)
+#        print(self.msgname, "defaults", "# Minimum values where appropriate.", file=f)
+#        print(self.msgname, "min", "# Minimum values where appropriate.", file=f)
+#        print(self.msgname, "max", "# Maximum values where appropriate.", file=f)
 #        f.close()
 #
 #    def generatesetsrv(self):
 #        self.mkdir("srv")
 #        f = open(os.path.join(self.pkgpath, "srv", "Set"+self.msgname+".srv"), 'w')
-#        print >> f, "# This is an autogerenated file. Please do not edit."
-#        print >> f, self.msgname, "config", "# Requested node configuration."
-#        print >> f, "---"
-#        print >> f, self.msgname, "config", "# What the node's configuration was actually set to."
+#        print("# This is an autogerenated file. Please do not edit.", file=f)
+#        print(self.msgname, "config", "# Requested node configuration.", file=f)
+#        print("---", file=f)
+#        print(self.msgname, "config", "# What the node's configuration was actually set to.", file=f)
 #        f.close()
 
     def _rreplace_str_with_val_in_dict(self, orig_dict, old_str, new_val):
