@@ -138,7 +138,7 @@ class ParameterGenerator:
                 'srcfile': inspect.getsourcefile(inspect.currentframe().f_back.f_code),
                 'edit_method': edit_method,
             }
-            if type == str_t and (max != None or min != None):
+            if type == str_t and (max is not None or min is not None):
                 raise Exception("Max or min specified for %s, which is of string type" % name)
 
             check_name(name)
@@ -184,7 +184,7 @@ class ParameterGenerator:
             cls = []
             cls.extend(self.get_parents())
             cls = [string.upper(x) for x in cls]
-            if parent == True:
+            if parent is True:
                 cls.pop()
             return string.join(cls, "::")
 
@@ -235,7 +235,7 @@ class ParameterGenerator:
     def check_type_fill_default(self, param, field, default):
         value = param[field]
         # If no value, use default.
-        if value == None:
+        if value is None:
             param[field] = default
             return
         # Check that value type is compatible with type.
@@ -440,7 +440,7 @@ class ParameterGenerator:
 #            return str(val)
 
     def appendline(self, list, text, param, value=None):
-        if value == None:
+        if value is None:
             val = ""
         else:
             val = self.crepr(param, param[value])
