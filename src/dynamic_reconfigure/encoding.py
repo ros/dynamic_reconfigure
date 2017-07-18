@@ -34,16 +34,14 @@ try:
     import roslib; roslib.load_manifest('dynamic_reconfigure')
 except:
     pass
-import rospy
-import inspect
 import copy
 import sys
 
+from dynamic_reconfigure.msg import BoolParameter, DoubleParameter, IntParameter, ParamDescription, StrParameter
 from dynamic_reconfigure.msg import Config as ConfigMsg
 from dynamic_reconfigure.msg import ConfigDescription as ConfigDescrMsg
 from dynamic_reconfigure.msg import Group as GroupMsg
 from dynamic_reconfigure.msg import GroupState
-from dynamic_reconfigure.msg import IntParameter, BoolParameter, StrParameter, DoubleParameter, ParamDescription
 
 
 class Config(dict):

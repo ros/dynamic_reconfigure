@@ -42,18 +42,16 @@ try:
 except:
     pass
 import rospy
-import rosservice
 import sys
 import threading
 import time
-import types
+
 from dynamic_reconfigure import DynamicReconfigureCallbackException
 from dynamic_reconfigure import DynamicReconfigureParameterException
-from dynamic_reconfigure.srv import Reconfigure as ReconfigureSrv
+from dynamic_reconfigure.encoding import decode_config, decode_description, encode_config, extract_params
 from dynamic_reconfigure.msg import Config as ConfigMsg
 from dynamic_reconfigure.msg import ConfigDescription as ConfigDescrMsg
-from dynamic_reconfigure.msg import IntParameter, BoolParameter, StrParameter, DoubleParameter, ParamDescription
-from dynamic_reconfigure.encoding import *
+from dynamic_reconfigure.srv import Reconfigure as ReconfigureSrv
 from rospy.service import ServiceException
 
 
