@@ -40,6 +40,7 @@ import dynamic_reconfigure.server
 from dynamic_reconfigure.cfg import TestConfig
 import time
 
+
 def main():
     rospy.init_node("python_test_multiple_ns_server")
     dynamic_reconfigure.server.Server(TestConfig, reconfigure)
@@ -52,34 +53,40 @@ def main():
     while not rospy.is_shutdown():
         time.sleep(0.1)
 
+
 def reconfigure(config, level):
     print(config)
 
-    config['int_'] |= 1;
-    config['double_'] = -config['double_'];
-    config['str_'] += "A";
-    config['bool_'] = not config['bool_'];
-    config['level'] = level;
+    config['int_'] |= 1
+    config['double_'] = -config['double_']
+    config['str_'] += "A"
+    config['bool_'] = not config['bool_']
+    config['level'] = level
 
-    rospy.loginfo("Reconfigured to     : %i %f %s %s %i"%(config['int_'], config['double_'], config['str_'], config['bool_'], config['level']))
+    rospy.loginfo("Reconfigured to     : %i %f %s %s %i" % (config['int_'], config['double_'], config['str_'], config['bool_'], config['level']))
 
-    return config # Returns the updated configuration.
+    return config  # Returns the updated configuration.
 
-def reconfigure_default(config,level):
+
+def reconfigure_default(config, level):
     rospy.loginfo("Reconfigure request on default ns")
     return reconfigure(config, level)
 
-def reconfigure_alternate_ns(config,level):
+
+def reconfigure_alternate_ns(config, level):
     rospy.loginfo("Reconfigure request on alternate_ns")
     return reconfigure(config, level)
 
-def reconfigure_2lvls_ns(config,level):
+
+def reconfigure_2lvls_ns(config, level):
     rospy.loginfo("Reconfigure request on alternate_ns/second_lvl")
     return reconfigure(config, level)
 
-def reconfigure_absolute_ns(config,level):
+
+def reconfigure_absolute_ns(config, level):
     rospy.loginfo("Reconfigure request on /absolute_ns")
     return reconfigure(config, level)
+
 
 if __name__ == '__main__':
     main()

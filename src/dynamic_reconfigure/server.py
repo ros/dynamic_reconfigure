@@ -42,16 +42,15 @@ try:
 except:
     pass
 import rospy
-import rosservice
 import threading
-import time
 import copy
+
 from dynamic_reconfigure import DynamicReconfigureCallbackException
-from dynamic_reconfigure.srv import Reconfigure as ReconfigureSrv
+from dynamic_reconfigure.encoding import decode_config, encode_config, encode_description, extract_params, get_tree, initial_config
 from dynamic_reconfigure.msg import Config as ConfigMsg
 from dynamic_reconfigure.msg import ConfigDescription as ConfigDescrMsg
-from dynamic_reconfigure.msg import IntParameter, BoolParameter, StrParameter, DoubleParameter, ParamDescription
-from dynamic_reconfigure.encoding import *
+from dynamic_reconfigure.srv import Reconfigure as ReconfigureSrv
+
 
 class Server(object):
     def __init__(self, type, callback, namespace=""):
@@ -76,10 +75,10 @@ class Server(object):
         self.config = initial_config(encode_config(self.config), type.config_description)
 
         self.descr_topic = rospy.Publisher(self.ns + 'parameter_descriptions', ConfigDescrMsg, latch=True, queue_size=10)
-        self.descr_topic.publish(self.description);
+        self.descr_topic.publish(self.description)
 
         self.update_topic = rospy.Publisher(self.ns + 'parameter_updates', ConfigMsg, latch=True, queue_size=10)
-        self._change_config(self.config, ~0) # Consistent with the C++ API, the callback gets called with level=~0 (i.e. -1)
+        self._change_config(self.config, ~0)  # Consistent with the C++ API, the callback gets called with level=~0 (i.e. -1)
 
         self.set_service = rospy.Service(self.ns + 'set_parameters', ReconfigureSrv, self._set_callback)
 

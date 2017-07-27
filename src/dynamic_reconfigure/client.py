@@ -42,19 +42,18 @@ try:
 except:
     pass
 import rospy
-import rosservice
 import sys
 import threading
 import time
-import types
+
 from dynamic_reconfigure import DynamicReconfigureCallbackException
 from dynamic_reconfigure import DynamicReconfigureParameterException
-from dynamic_reconfigure.srv import Reconfigure as ReconfigureSrv
+from dynamic_reconfigure.encoding import decode_config, decode_description, encode_config, extract_params
 from dynamic_reconfigure.msg import Config as ConfigMsg
 from dynamic_reconfigure.msg import ConfigDescription as ConfigDescrMsg
-from dynamic_reconfigure.msg import IntParameter, BoolParameter, StrParameter, DoubleParameter, ParamDescription
-from dynamic_reconfigure.encoding import *
+from dynamic_reconfigure.srv import Reconfigure as ReconfigureSrv
 from rospy.service import ServiceException
+
 
 class Client(object):
     """
@@ -71,8 +70,8 @@ class Client(object):
         @param config_callback: callback for server parameter changes
         @param description_callback: internal use only as the API has not stabilized
         """
-        self.name              = name
-        self.config            = None
+        self.name = name
+        self.config = None
         self.param_description = None
         self.group_description = None
 
@@ -80,12 +79,12 @@ class Client(object):
 
         self._cv = threading.Condition()
 
-        self._config_callback      = config_callback
+        self._config_callback = config_callback
         self._description_callback = description_callback
 
-        self._set_service      = self._get_service_proxy('set_parameters', timeout)
+        self._set_service = self._get_service_proxy('set_parameters', timeout)
         self._descriptions_sub = self._get_subscriber('parameter_descriptions', ConfigDescrMsg, self._descriptions_msg)
-        self._updates_sub      = self._get_subscriber('parameter_updates',      ConfigMsg,      self._updates_msg)
+        self._updates_sub = self._get_subscriber('parameter_updates', ConfigMsg, self._updates_msg)
 
     def get_configuration(self, timeout=None):
         """
@@ -220,13 +219,13 @@ class Client(object):
         config = encode_config(changes)
 
         try:
-            msg    = self._set_service(config).config
+            msg = self._set_service(config).config
         except ServiceException as e:
             raise DynamicReconfigureCallbackException('service call failed')
 
         if self.group_description is None:
             self.get_group_descriptions()
-        resp   = decode_config(msg, self.group_description)
+        resp = decode_config(msg, self.group_description)
 
         return resp
 
@@ -240,9 +239,8 @@ class Client(object):
 
         descr = self.get_group_descriptions()
 
-        groups = []
         def update_state(group, description):
-            for p,g in description['groups'].items():
+            for p, g in description['groups'].items():
                 if g['name'] == group:
                     description['groups'][p]['state'] = changes[group]
                 else:
@@ -345,9 +343,13 @@ class Client(object):
             self._description_callback(self.param_description)
 
     def _param_type_from_string(self, type_str):
-        if   type_str == 'int':    return int
-        elif type_str == 'double': return float
-        elif type_str == 'str':    return str
-        elif type_str == 'bool':   return bool
+        if type_str == 'int':
+            return int
+        elif type_str == 'double':
+            return float
+        elif type_str == 'str':
+            return str
+        elif type_str == 'bool':
+            return bool
         else:
             raise DynamicReconfigureParameterException('parameter has unknown type: %s. This is a bug in dynamic_reconfigure.' % type_str)
