@@ -2,6 +2,16 @@
 Changelog for package dynamic_reconfigure
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+Forthcoming
+-----------
+* Pep8 (`#93 <https://github.com/ros/dynamic_reconfigure/issues/93>`_)
+* Python3 use print function and not statement (`#92 <https://github.com/ros/dynamic_reconfigure/issues/92>`_)
+* add shebang line in setup_custom_pythonpath.sh.in template (`#91 <https://github.com/ros/dynamic_reconfigure/issues/91>`_)
+* switch to package format 2 (`#89 <https://github.com/ros/dynamic_reconfigure/issues/89>`_)
+* remove trailing whitespaces (`#88 <https://github.com/ros/dynamic_reconfigure/issues/88>`_)
+* Reraising DynamicReconfigureCallbackException in case of a failing service call (`#87 <https://github.com/ros/dynamic_reconfigure/issues/87>`_)
+* Contributors: Arne Hitzmann, Mikael Arguedas
+
 1.5.48 (2017-04-07)
 -------------------
 * [Bugfix] dont enforce ROS names for constants (`#84 <https://github.com/ros/dynamic_reconfigure/issues/84>`_)
