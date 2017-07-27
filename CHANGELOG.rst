@@ -2,8 +2,8 @@
 Changelog for package dynamic_reconfigure
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-Forthcoming
------------
+1.5.49 (2017-07-27)
+-------------------
 * Pep8 (`#93 <https://github.com/ros/dynamic_reconfigure/issues/93>`_)
 * Python3 use print function and not statement (`#92 <https://github.com/ros/dynamic_reconfigure/issues/92>`_)
 * add shebang line in setup_custom_pythonpath.sh.in template (`#91 <https://github.com/ros/dynamic_reconfigure/issues/91>`_)
