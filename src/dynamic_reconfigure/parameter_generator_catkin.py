@@ -64,18 +64,25 @@ double_t = "double"
 id = 0
 
 
-def check_description(description):
-    quotes = ['"', "'"]
-    for quote in quotes:
-        if description.find(quote) != -1:
-            raise Exception(r"""quotes not allowed in description string `%s`""" % description)
-
-
 def check_name(name):
     pattern = r'^[a-zA-Z][a-zA-Z0-9_]*$'
     if not re.match(pattern, name):
         raise Exception("The name of field \'%s\' does not follow the ROS naming conventions, see http://wiki.ros.org/ROS/Patterns/Conventions" % name)
 
+def cquote(s):
+    """ quote a string for inclusion in C source """
+    escape = {
+        '\\': r'\\',
+        '"':  r'\"',
+        '\r': r'\r',
+        '\n': r'\n',
+        '\0': r'\0'
+    }
+    return '"{}"'.format(re.sub(
+        '|'.join(re.escape(c) for c in escape),
+        lambda m: escape[m.group(0)],
+        s
+    ))
 
 class ParameterGenerator(object):
     minval = {
@@ -274,7 +281,6 @@ class ParameterGenerator(object):
             'srcfile': inspect.getsourcefile(inspect.currentframe().f_back.f_code),
             'description': descr
         }
-        check_description(descr)
         self.fill_type(newconst)
         self.check_type(newconst, 'value')
         self.constants.append(newconst)
@@ -283,7 +289,6 @@ class ParameterGenerator(object):
     def enum(self, constants, description):
         if len(set(const['type'] for const in constants)) != 1:
             raise Exception("Inconsistent types in enum!")
-        check_description(description)
         return repr({'enum': constants, 'enum_description': description})
 
     # Wrap add and add_group for the default group
@@ -418,7 +423,7 @@ class ParameterGenerator(object):
     def crepr(self, param, val):
         type = param["type"]
         if type == 'str':
-            return '"' + val + '"'
+            return cquote(val)
         if type in ['int', 'double']:
             return str(val)
         if type == 'bool':
@@ -437,12 +442,15 @@ class ParameterGenerator(object):
 #        if  'float' in types:
 #            return str(val)
 
-    def appendline(self, list, text, param, value=None):
+    def appendline(self, list, text, param, value=None, **kwarg):
         if value is None:
             val = ""
         else:
             val = self.crepr(param, param[value])
-        list.append(Template('${doline} $srcline "$srcfile"\n      ' + text).safe_substitute(param, v=val, doline=LINEDEBUG, configname=self.name))
+        list.append(
+            Template('${doline} $srcline "$srcfile"\n      ' + text)
+            .safe_substitute(param, v=val, doline=LINEDEBUG, configname=self.name, **kwarg
+        ))
 
     def appendgroup(self, list, group):
         subgroups = []
@@ -496,11 +504,17 @@ class ParameterGenerator(object):
                     paramdescr,
                     group.to_dict()['name'] +
                     ".abstract_parameters.push_back(${configname}Config::AbstractParamDescriptionConstPtr(new ${configname}Config::ParamDescription<${ctype}>(\"${name}\", \"${type}\", ${level}, "
-                    "\"${description}\", \"${edit_method}\", &${configname}Config::${name})));", param)
+                    "${description}, ${edit_method}, &${configname}Config::${name})));",
+                    param,
+                    description=cquote(param['description']),
+                    edit_method=cquote(param['edit_method']))
                 self.appendline(
                     paramdescr,
                     "__param_descriptions__.push_back(${configname}Config::AbstractParamDescriptionConstPtr(new ${configname}Config::ParamDescription<${ctype}>(\"${name}\", \"${type}\", ${level}, "
-                    "\"${description}\", \"${edit_method}\", &${configname}Config::${name})));", param)
+                    "${description}, ${edit_method}, &${configname}Config::${name})));",
+                    param,
+                    description=cquote(param['description']),
+                    edit_method=cquote(param['edit_method']))
 
             for g in group.groups:
                 write_params(g)
