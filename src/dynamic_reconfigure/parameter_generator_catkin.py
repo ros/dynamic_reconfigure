@@ -50,6 +50,7 @@ import inspect
 import string
 import sys
 import re
+import textwrap
 
 # LINEDEBUG="#line"
 LINEDEBUG = "//#line"
@@ -246,21 +247,19 @@ class ParameterGenerator:
         id = 1
         self.constants = []
         if len(sys.argv) < 5:
-            msg = """
-ahhhh! Unexpected command line syntax!
+            raise SystemExit(textwrap.dedent("""\
+            ahhhh! Unexpected command line syntax!
 
-Are you trying to call a dynamic_reconfigure configuration generation script
-directly? When you are using dynamic_reconfigure with python, you don't ever
-need to invoke the configuration generator script yourself; it loads
-automatically. If you are using dynamic_reconfigure from C++, you need to
-add a call to generate_dynamic_reconfigure_options() in your CMakeLists.txt
+            Are you trying to call a dynamic_reconfigure configuration generation script
+            directly? When you are using dynamic_reconfigure with python, you don't ever
+            need to invoke the configuration generator script yourself; it loads
+            automatically. If you are using dynamic_reconfigure from C++, you need to
+            add a call to generate_dynamic_reconfigure_options() in your CMakeLists.txt
 
-For an example, see http://wiki.ros.org/dynamic_reconfigure/Tutorials
+            For an example, see http://wiki.ros.org/dynamic_reconfigure/Tutorials
 
-Have a nice day
-            """
-            print(msg)
-            sys.exit(1)
+            Have a nice day
+            """))
         self.dynconfpath = sys.argv[1]  # FIXME this is awful
         self.binary_dir = sys.argv[2]
         self.cpp_gen_dir = sys.argv[3]
