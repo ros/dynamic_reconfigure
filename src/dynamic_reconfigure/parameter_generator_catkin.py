@@ -77,7 +77,7 @@ def check_name(name):
         raise Exception("The name of field \'%s\' does not follow the ROS naming conventions, see http://wiki.ros.org/ROS/Patterns/Conventions" % name)
 
 
-class ParameterGenerator:
+class ParameterGenerator(object):
     minval = {
         'int': -0x80000000,  # 'INT_MIN',
         'double': '-std::numeric_limits<double>::infinity()',
@@ -99,7 +99,7 @@ class ParameterGenerator:
         'bool': False,
     }
 
-    class Group:
+    class Group(object):
         instances = {}
 
         def __init__(self, gen, name, type, state, id, parent):
