@@ -46,6 +46,8 @@ namespace ${pkgname}
       virtual bool fromMessage(const dynamic_reconfigure::Config &msg, ${configname}Config &config) const = 0;
       virtual void toMessage(dynamic_reconfigure::Config &msg, const ${configname}Config &config) const = 0;
       virtual void getValue(const ${configname}Config &config, boost::any &val) const = 0;
+
+      virtual ~AbstractParamDescription() {};
     };
 
     typedef boost::shared_ptr<AbstractParamDescription> AbstractParamDescriptionPtr;
