@@ -54,7 +54,7 @@ import time
 
 
 def print_config(config):
-    for k, v in config.iteritems():
+    for k, v in config.items():
         print(k, ":", v)
     print('')
 

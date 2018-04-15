@@ -75,7 +75,7 @@ class Config(dict):
 
     def __deepcopy__(self, memo):
         c = type(self)({})
-        for key, value in self.iteritems():
+        for key, value in self.items():
             c[copy.deepcopy(key)] = copy.deepcopy(value)
 
         return c
