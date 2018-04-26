@@ -32,7 +32,7 @@
 
 try:
     import roslib; roslib.load_manifest('dynamic_reconfigure')
-except:
+except Exception:
     pass
 import copy
 import sys
@@ -75,7 +75,7 @@ class Config(dict):
 
     def __deepcopy__(self, memo):
         c = type(self)({})
-        for key, value in self.iteritems():
+        for key, value in self.items():
             c[copy.deepcopy(key)] = copy.deepcopy(value)
 
         return c
@@ -128,7 +128,7 @@ def encode_config(config, flat=True):
             if flat is True:
                 def flatten(g):
                     groups = []
-                    for name, group in g['groups'].items():
+                    for _name, group in g['groups'].items():
                         groups.extend(flatten(group))
                         groups.append(GroupState(group['name'], group['state'], group['id'], group['parent']))
                     return groups
@@ -277,7 +277,7 @@ def initial_config(msg, description=None):
         def add_params(group, descr):
             for param in descr['parameters']:
                 group['parameters'][param['name']] = d[param['name']]
-            for n, g in group['groups'].items():
+            for _n, g in group['groups'].items():
                 for dr in descr['groups']:
                     if dr['name'] == g['name']:
                         add_params(g, dr)
@@ -304,8 +304,8 @@ def decode_config(msg, description=None):
             for param in descr['parameters']:
                 if param['name'] in d.keys():
                     group[param['name']] = d[param['name']]
-            for n, g in group['groups'].items():
-                for nr, dr in descr['groups'].items():
+            for _n, g in group['groups'].items():
+                for _nr, dr in descr['groups'].items():
                     if dr['name'] == g['name']:
                         add_params(g, dr)
 
@@ -318,7 +318,7 @@ def extract_params(group):
     params = []
     params.extend(group['parameters'])
     try:
-        for n, g in group['groups'].items():
+        for _n, g in group['groups'].items():
             params.extend(extract_params(g))
     except AttributeError:
         for g in group['groups']:

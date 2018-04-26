@@ -36,7 +36,6 @@ example server implementation (L{Server}).
 """
 
 import roslib
-import os
 
 
 class DynamicReconfigureException(Exception):

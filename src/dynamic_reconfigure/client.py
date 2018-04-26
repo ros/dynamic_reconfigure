@@ -39,7 +39,7 @@ from __future__ import print_function, with_statement
 
 try:
     import roslib; roslib.load_manifest('dynamic_reconfigure')
-except:
+except Exception:
     pass
 import rospy
 import sys
