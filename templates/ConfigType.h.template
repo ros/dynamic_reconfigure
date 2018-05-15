@@ -32,6 +32,10 @@ namespace ${pkgname}
   class ${configname}Config
   {
   public:
+    ${configname}Config()
+    ${paraminit}
+    {
+    }
     class AbstractParamDescription : public dynamic_reconfigure::ParamDescription
     {
     public:

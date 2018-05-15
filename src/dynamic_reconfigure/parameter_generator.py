@@ -480,6 +480,7 @@ class ParameterGenerator:
         f = open(os.path.join(self.pkgpath, cfg_cpp_dir, self.name + "Config.h"), 'w')
 
         paramdescr = []
+        paraminit = []
         groups = []
         members = []
         constants = []
@@ -493,6 +494,10 @@ class ParameterGenerator:
             else:
                 paramdescr.append(Template("${configname}Config::GroupDescription<${configname}Config::${class}, ${configname}Config::${parentclass}> ${name}(\"${name}\", \"${type}\", ${parent}, ${id}, ${cstate}, &${configname}Config::${field});").safe_substitute(group.to_dict(), configname=self.name))
             for param in group.parameters:
+                if len(paraminit) > 0:
+                    self.appendline(paraminit, "${name}($v), ", param, "default")
+                else:
+                    self.appendline(paraminit, " : ${name}($v), ", param, "default")
                 self.appendline(members, "${ctype} ${name};", param)
                 self.appendline(paramdescr, "__min__.${name} = $v;", param, "min")
                 self.appendline(paramdescr, "__max__.${name} = $v;", param, "max")
@@ -521,12 +526,16 @@ class ParameterGenerator:
         self.appendgroup(groups, self.group)
 
         paramdescr = '\n'.join(paramdescr)
+        paraminit = ' '.join(paraminit)
+        # chop off trailing ", "
+        paraminit = paraminit[:-2]
         members = '\n'.join(members)
         groups = '\n'.join(groups)
         constants = '\n'.join(constants)
         f.write(Template(template).substitute(
             uname=self.name.upper(),
             configname=self.name, pkgname=self.pkgname, paramdescr=paramdescr,
+            paraminit=paraminit,
             members=members, groups=groups, doline=LINEDEBUG, constants=constants))
         f.close()
 
