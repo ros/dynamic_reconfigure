@@ -101,7 +101,7 @@ def encode_groups(parent, group):
     msg.type = group['type']
 
     for param in group['parameters']:
-        msg.parameters.append(ParamDescription(param['name'], param['type'], param['level'], param['description'], param['edit_method']))
+        msg.parameters.append(ParamDescription(param['name'], param['type'], param['level'], param['description'], param['edit_method'], param['enable_if']))
 
     group_list.append(msg)
     for next in group['groups']:
@@ -180,6 +180,7 @@ def decode_description(msg):
                 'level': param.level,
                 'description': param.description,
                 'edit_method': param.edit_method,
+                'enable_if': param.enable_if,
             })
         return params
 
