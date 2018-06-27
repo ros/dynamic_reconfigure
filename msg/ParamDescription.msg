@@ -3,3 +3,4 @@ string type
 uint32 level
 string description
 string edit_method
+string display_name
