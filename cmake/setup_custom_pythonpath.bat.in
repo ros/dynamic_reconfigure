@@ -1,0 +1,4 @@
+REM generated from dynamic_reconfigure/cmake/setup_custom_pythonpath.bat.in
+
+set PYTHONPATH=@CATKIN_DEVEL_PREFIX@/@CATKIN_GLOBAL_PYTHON_DESTINATION@;%PYTHONPATH%
+call python %*

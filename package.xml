@@ -21,6 +21,7 @@
 
   <buildtool_depend version_gte="0.5.87">catkin</buildtool_depend>
 
+  <build_depend>cpp_common</build_depend>
   <build_depend>message_generation</build_depend>
   <build_depend>roscpp_serialization</build_depend>
   <build_depend>rostest</build_depend>
