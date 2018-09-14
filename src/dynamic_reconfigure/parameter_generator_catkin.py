@@ -62,18 +62,18 @@ double_t = "double"
 id = 0
 
 
-def check_default(name, default, min, max):
-    if min is not None and default < min:
-        raise Exception("The default value for {name} ({default}) is smaller than the specified minimum({min}).".format(name=name, min=min, default=default))
-    if max is not None and default > max:
-        raise Exception("The default value for {name} ({default}) is greater than the specified maximum({max}).".format(name=name, max=max, default=default))
+def check_default(name, default, min_, max_):
+    if min_ is not None and default < min_:
+        raise Exception("The default value for {name} ({default}) is smaller than the specified minimum({min_}).".format(name=name, min_=min_, default=default))
+    if max_ is not None and default > max_:
+        raise Exception("The default value for {name} ({default}) is greater than the specified maximum({max_}).".format(name=name, max_=max_, default=default))
 
 
-def check_range(name, min, max):
-    if min is None or max is None:
+def check_range(name, min_, max_):
+    if min_ is None or max_ is None:
         return
-    if min >= max:
-        raise Exception("No valid range specified for {name}. Minimum {min} is equal to or greater than maximum {max}".format(name=name, min=min, max=max))
+    if min_ >= max_:
+        raise Exception("No valid range specified for {name}. Minimum {min_} is equal to or greater than maximum {max_}".format(name=name, min_=min_, max_=max_))
 
 
 def check_description(description):
