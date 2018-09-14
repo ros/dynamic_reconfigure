@@ -140,5 +140,7 @@ int main(int argc, char** argv) {
   testing::InitGoogleTest(&argc, argv);
   ros::AsyncSpinner spinner(2);
   spinner.start();
-  return RUN_ALL_TESTS();
+  int res = RUN_ALL_TESTS();
+  ros::shutdown();
+  return res;
 }
