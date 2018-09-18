@@ -139,7 +139,7 @@ class ParameterGenerator(object):
                 'srcfile': inspect.getsourcefile(inspect.currentframe().f_back.f_code),
                 'edit_method': edit_method,
             }
-            if type == str_t and (max is not None or min is not None):
+            if paramtype == str_t and (max is not None or min is not None):
                 raise Exception("Max or min specified for %s, which is of string type" % name)
             check_name(name)
             self.gen.fill_type(newparam)
