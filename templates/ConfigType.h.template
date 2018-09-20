@@ -57,6 +57,8 @@ namespace ${pkgname}
     typedef boost::shared_ptr<AbstractParamDescription> AbstractParamDescriptionPtr;
     typedef boost::shared_ptr<const AbstractParamDescription> AbstractParamDescriptionConstPtr;
 
+    // Final keyword added to class because it has virtual methods and inherits 
+    // from a class with a non-virtual destructor.
     template <class T>
     class ParamDescription DYNAMIC_RECONFIGURE_FINAL : public AbstractParamDescription
     {
@@ -143,6 +145,8 @@ namespace ${pkgname}
     typedef boost::shared_ptr<AbstractGroupDescription> AbstractGroupDescriptionPtr;
     typedef boost::shared_ptr<const AbstractGroupDescription> AbstractGroupDescriptionConstPtr;
 
+    // Final keyword added to class because it has virtual methods and inherits 
+    // from a class with a non-virtual destructor.
     template<class T, class PT>
     class GroupDescription DYNAMIC_RECONFIGURE_FINAL : public AbstractGroupDescription
     {
