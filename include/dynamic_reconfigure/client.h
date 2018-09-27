@@ -71,9 +71,9 @@ class Client {
       const boost::function<void(const dynamic_reconfigure::ConfigDescription&)>
           description_callback = 0)
       : name_(name),
-        nh_(name),
         received_configuration_(false),
         received_description_(false),
+        nh_(name),
         config_callback_(config_callback),
         description_callback_(description_callback) {
     set_service_ =
@@ -102,9 +102,9 @@ class Client {
       const boost::function<void(const dynamic_reconfigure::ConfigDescription&)>
           description_callback = 0)
       : name_(name),
-        nh_(nh),
         received_configuration_(false),
         received_description_(false),
+        nh_(nh),
         config_callback_(config_callback),
         description_callback_(description_callback) {
     set_service_ =
