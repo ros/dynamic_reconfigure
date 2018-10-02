@@ -2,6 +2,12 @@
 Changelog for package dynamic_reconfigure
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+Forthcoming
+-----------
+* fix check preventing range for string and bool parameters (`#122 <https://github.com/ros/dynamic_reconfigure/issues/122>`_)
+* Fix build issue on Windows (`#114 <https://github.com/ros/dynamic_reconfigure/issues/114>`_)
+* Contributors: Johnson Shih, Mikael Arguedas
+
 1.5.50 (2018-10-02)
 -------------------
 * final-keyword (`#113 <https://github.com/ros/dynamic_reconfigure/issues/113>`_)
