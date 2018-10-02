@@ -2,6 +2,23 @@
 Changelog for package dynamic_reconfigure
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+Forthcoming
+-----------
+* final-keyword (`#113 <https://github.com/ros/dynamic_reconfigure/issues/113>`_)
+  * Add final keyword to child class since parent has virtual methods and grand parent doesn't have a virtual destructor. This allows the code to be compiled by clang version 6.0 and above.
+* [indentation fixups]
+  * Use textwrap dedent for multiline strings
+  * Remove extra indentation in wikidoc
+  * Use textwrap.dedent to form the error message
+* [test fix] call shutdown to prevent test from hanging (`#119 <https://github.com/ros/dynamic_reconfigure/issues/119>`_)
+* Modernize Python code (`#102 <https://github.com/ros/dynamic_reconfigure/issues/102>`_)
+  * Use new-style classes
+  * Use with statement to ensure files are closed
+* Python 3 compatibility (`#105 <https://github.com/ros/dynamic_reconfigure/issues/105>`_)
+  * some randon python cleanup
+  * remove iter* method for their 2/3 compatible equivalent
+* Contributors: Eric Wieser, Jason Mercer, Mikael Arguedas
+
 1.5.49 (2017-07-27)
 -------------------
 * Pep8 (`#93 <https://github.com/ros/dynamic_reconfigure/issues/93>`_)
