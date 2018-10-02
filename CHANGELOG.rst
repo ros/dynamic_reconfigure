@@ -2,8 +2,8 @@
 Changelog for package dynamic_reconfigure
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-Forthcoming
------------
+1.5.50 (2018-10-02)
+-------------------
 * final-keyword (`#113 <https://github.com/ros/dynamic_reconfigure/issues/113>`_)
   * Add final keyword to child class since parent has virtual methods and grand parent doesn't have a virtual destructor. This allows the code to be compiled by clang version 6.0 and above.
 * [indentation fixups]

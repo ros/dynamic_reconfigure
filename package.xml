@@ -2,7 +2,7 @@
 <?xml-model href="http://download.ros.org/schema/package_format2.xsd" schematypens="http://www.w3.org/2001/XMLSchema"?>
 <package format="2">
   <name>dynamic_reconfigure</name>
-  <version>1.5.49</version>
+  <version>1.5.50</version>
   <description>
     This unary stack contains the dynamic_reconfigure package which provides a means to change
     node parameters at any time without having to restart the node.
