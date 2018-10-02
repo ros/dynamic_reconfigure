@@ -31,12 +31,21 @@ macro(generate_dynamic_reconfigure_options)
     # since it might contain dynamic_reconfigure or Python code of the current package
     set("_CUSTOM_PYTHONPATH_ENV")
     if(EXISTS "${CATKIN_DEVEL_PREFIX}/${CATKIN_GLOBAL_PYTHON_DESTINATION}")
-      configure_file(
-        "${dynamic_reconfigure_BASE_DIR}/cmake/setup_custom_pythonpath.sh.in"
-        "setup_custom_pythonpath.sh"
-        @ONLY
-      )
-      set("_CUSTOM_PYTHONPATH_ENV" "${CMAKE_CURRENT_BINARY_DIR}/setup_custom_pythonpath.sh")
+      if(WIN32)
+        configure_file(
+          "${dynamic_reconfigure_BASE_DIR}/cmake/setup_custom_pythonpath.bat.in"
+          "setup_custom_pythonpath.bat"
+          @ONLY
+        )
+        set("_CUSTOM_PYTHONPATH_ENV" "${CMAKE_CURRENT_BINARY_DIR}/setup_custom_pythonpath.bat")
+      else()
+        configure_file(
+          "${dynamic_reconfigure_BASE_DIR}/cmake/setup_custom_pythonpath.sh.in"
+          "setup_custom_pythonpath.sh"
+          @ONLY
+        )
+        set("_CUSTOM_PYTHONPATH_ENV" "${CMAKE_CURRENT_BINARY_DIR}/setup_custom_pythonpath.sh")
+      endif()
     endif()
 
     assert(CATKIN_ENV)
