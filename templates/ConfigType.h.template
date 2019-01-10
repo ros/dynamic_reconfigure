@@ -125,7 +125,7 @@ namespace ${pkgname}
       virtual bool fromMessage(const dynamic_reconfigure::Config &msg, boost::any &config) const =0;
       virtual void updateParams(boost::any &cfg, ${configname}Config &top) const= 0;
       virtual void setInitialState(boost::any &cfg) const = 0;
-      
+
       virtual ~AbstractGroupDescription() {}
 
       void convertParams()
