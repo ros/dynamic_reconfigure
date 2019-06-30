@@ -6,8 +6,11 @@ macro(generate_dynamic_reconfigure_options)
   # ensure that package destination variables are defined
   catkin_destinations()
 
+  # parse arguments to separate configuration files from dependencies
+  cmake_parse_arguments(CFG_FILES "" "" "DEPENDS" ${ARGN})
+
   set(_autogen "")
-  foreach(_cfg ${ARGN})
+  foreach(_cfg ${CFG_FILES_UNPARSED_ARGUMENTS})
     # Construct the path to the .cfg file
     set(_input ${_cfg})
     if(NOT IS_ABSOLUTE ${_input})
@@ -70,7 +73,7 @@ macro(generate_dynamic_reconfigure_options)
     add_custom_command(OUTPUT
       ${_output_cpp} ${_output_dox} ${_output_usage} ${_output_py} ${_output_wikidoc}
       COMMAND ${_cmd}
-      DEPENDS ${_input} ${gencfg_build_files}
+      DEPENDS ${_input} ${gencfg_build_files} ${CFG_FILES_DEPENDS}
       COMMENT "Generating dynamic reconfigure files from ${_cfg}: ${_output_cpp} ${_output_py}"
     )
 
