@@ -69,7 +69,7 @@ namespace ${pkgname}
         field(a_f)
       {}
 
-      T (${configname}Config::* field);
+      T ${configname}Config::* field;
 
       virtual void clamp(${configname}Config &config, const ${configname}Config &max, const ${configname}Config &min) const
       {
@@ -216,7 +216,7 @@ namespace ${pkgname}
         }
       }
 
-      T (PT::* field);
+      T PT::* field;
       std::vector<${configname}Config::AbstractGroupDescriptionConstPtr> groups;
     };
 
