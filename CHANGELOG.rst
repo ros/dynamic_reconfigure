@@ -2,8 +2,8 @@
 Changelog for package dynamic_reconfigure
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-Forthcoming
------------
+1.6.1 (2019-08-22)
+------------------
 * Add SYSTEM to include_directories
 * Use SYSTEM on generated headers
 * Fix GCC8 error for unnecessary parentheses (`#132 <https://github.com/pal-robotics-forks/dynamic_reconfigure/issues/132>`_)
