@@ -76,7 +76,7 @@ Example launch file:
     try:
         params = rospy.get_param("~")
     except KeyError:
-        print >> sys.stderr, 'error updating parameters: no parameters found on parameter server'
+        print('error updating parameters: no parameters found on parameter server', file=sys.stderr)
         return
 
     set_params(node, params, timeout=options.timeout)
