@@ -54,10 +54,12 @@ macro(generate_dynamic_reconfigure_options)
       set("_CUSTOM_PYTHONPATH_ENV" "${PYTHON_EXECUTABLE}")
     endif()
 
+    find_package(PythonInterp REQUIRED)
     assert(CATKIN_ENV)
     set(_cmd
       ${CATKIN_ENV}
       ${_CUSTOM_PYTHONPATH_ENV}
+      ${PYTHON_EXECUTABLE}
       ${_input}
       ${dynamic_reconfigure_BASE_DIR}
       ${CATKIN_DEVEL_PREFIX}/${CATKIN_PACKAGE_SHARE_DESTINATION}
