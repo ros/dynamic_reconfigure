@@ -2,8 +2,8 @@
 Changelog for package dynamic_reconfigure
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-Forthcoming
------------
+1.7.0 (2020-03-05)
+------------------
 * Fixing compile error with cpp client when using -Werror=reorder. (`#118 <https://github.com/ros/dynamic_reconfigure/issues/118>`_)
 * ConfigType.h.template: fixed warnings (`#136 <https://github.com/ros/dynamic_reconfigure/issues/136>`_) (`#149 <https://github.com/ros/dynamic_reconfigure/issues/149>`_)
 * Bump CMake minimum version to use CMP0048 (`#148 <https://github.com/ros/dynamic_reconfigure/issues/148>`_)
