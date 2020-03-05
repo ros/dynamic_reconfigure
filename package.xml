@@ -4,8 +4,8 @@
   <name>dynamic_reconfigure</name>
   <version>1.6.0</version>
   <description>
-    This unary stack contains the dynamic_reconfigure package which provides a means to change
-    node parameters at any time without having to restart the node.
+    The dynamic_reconfigure package provides a means to update parameters
+    at runtime without having to restart the node.
   </description>
   <maintainer email="michael@openrobotics.org">Michael Carroll</maintainer>
   <license>BSD</license>

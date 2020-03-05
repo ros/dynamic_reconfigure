@@ -46,11 +46,9 @@ macro(generate_dynamic_reconfigure_options)
         )
         set("_CUSTOM_PYTHONPATH_ENV" "${CMAKE_CURRENT_BINARY_DIR}/setup_custom_pythonpath.sh")
       endif()
-    elseif(WIN32)
+    else()
       # Package could have no ${CATKIN_GLOBAL_PYTHON_DESTINATION} if it doesn't call
-      # catkin_python_setup().
-      # However, since Windows doesn't support shebang, we still need python to be added
-      # into the _cmd later.
+      # catkin_python_setup(), however we still need to use the correct Python.
       set("_CUSTOM_PYTHONPATH_ENV" "${PYTHON_EXECUTABLE}")
     endif()
 
