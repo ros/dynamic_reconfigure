@@ -44,6 +44,7 @@ namespace ${pkgname}
         description = d;
         edit_method = e;
       }
+      virtual ~AbstractParamDescription() = default;
 
       virtual void clamp(${configname}Config &config, const ${configname}Config &max, const ${configname}Config &min) const = 0;
       virtual void calcLevel(uint32_t &level, const ${configname}Config &config1, const ${configname}Config &config2) const = 0;
@@ -71,7 +72,7 @@ namespace ${pkgname}
 
       T ${configname}Config::* field;
 
-      virtual void clamp(${configname}Config &config, const ${configname}Config &max, const ${configname}Config &min) const
+      virtual void clamp(${configname}Config &config, const ${configname}Config &max, const ${configname}Config &min) const override
       {
         if (config.*field > max.*field)
           config.*field = max.*field;
@@ -80,33 +81,33 @@ namespace ${pkgname}
           config.*field = min.*field;
       }
 
-      virtual void calcLevel(uint32_t &comb_level, const ${configname}Config &config1, const ${configname}Config &config2) const
+      virtual void calcLevel(uint32_t &comb_level, const ${configname}Config &config1, const ${configname}Config &config2) const override
       {
         if (config1.*field != config2.*field)
           comb_level |= level;
       }
 
-      virtual void fromServer(const ros::NodeHandle &nh, ${configname}Config &config) const
+      virtual void fromServer(const ros::NodeHandle &nh, ${configname}Config &config) const override
       {
         nh.getParam(name, config.*field);
       }
 
-      virtual void toServer(const ros::NodeHandle &nh, const ${configname}Config &config) const
+      virtual void toServer(const ros::NodeHandle &nh, const ${configname}Config &config) const override
       {
         nh.setParam(name, config.*field);
       }
 
-      virtual bool fromMessage(const dynamic_reconfigure::Config &msg, ${configname}Config &config) const
+      virtual bool fromMessage(const dynamic_reconfigure::Config &msg, ${configname}Config &config) const override
       {
         return dynamic_reconfigure::ConfigTools::getParameter(msg, name, config.*field);
       }
 
-      virtual void toMessage(dynamic_reconfigure::Config &msg, const ${configname}Config &config) const
+      virtual void toMessage(dynamic_reconfigure::Config &msg, const ${configname}Config &config) const override
       {
         dynamic_reconfigure::ConfigTools::appendParameter(msg, name, config.*field);
       }
 
-      virtual void getValue(const ${configname}Config &config, boost::any &val) const
+      virtual void getValue(const ${configname}Config &config, boost::any &val) const override
       {
         val = config.*field;
       }
@@ -123,6 +124,8 @@ namespace ${pkgname}
         state = s;
         id = i;
       }
+
+      virtual ~AbstractGroupDescription() = default;
 
       std::vector<AbstractParamDescriptionConstPtr> abstract_parameters;
       bool state;
@@ -161,7 +164,7 @@ namespace ${pkgname}
         abstract_parameters = g.abstract_parameters;
       }
 
-      virtual bool fromMessage(const dynamic_reconfigure::Config &msg, boost::any &cfg) const
+      virtual bool fromMessage(const dynamic_reconfigure::Config &msg, boost::any &cfg) const override
       {
         PT* config = boost::any_cast<PT*>(cfg);
         if(!dynamic_reconfigure::ConfigTools::getGroupState(msg, name, (*config).*field))
@@ -177,7 +180,7 @@ namespace ${pkgname}
         return true;
       }
 
-      virtual void setInitialState(boost::any &cfg) const
+      virtual void setInitialState(boost::any &cfg) const override
       {
         PT* config = boost::any_cast<PT*>(cfg);
         T* group = &((*config).*field);
@@ -191,7 +194,7 @@ namespace ${pkgname}
 
       }
 
-      virtual void updateParams(boost::any &cfg, ${configname}Config &top) const
+      virtual void updateParams(boost::any &cfg, ${configname}Config &top) const override
       {
         PT* config = boost::any_cast<PT*>(cfg);
 
@@ -205,7 +208,7 @@ namespace ${pkgname}
         }
       }
 
-      virtual void toMessage(dynamic_reconfigure::Config &msg, const boost::any &cfg) const
+      virtual void toMessage(dynamic_reconfigure::Config &msg, const boost::any &cfg) const override
       {
         const PT config = boost::any_cast<PT>(cfg);
         dynamic_reconfigure::ConfigTools::appendGroup<T>(msg, name, id, parent, config.*field);
