@@ -2,6 +2,19 @@
 Changelog for package dynamic_reconfigure
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+Forthcoming
+-----------
+* Fixing compile error with cpp client when using -Werror=reorder. (`#118 <https://github.com/ros/dynamic_reconfigure/issues/118>`_)
+* ConfigType.h.template: fixed warnings (`#136 <https://github.com/ros/dynamic_reconfigure/issues/136>`_) (`#149 <https://github.com/ros/dynamic_reconfigure/issues/149>`_)
+* Bump CMake minimum version to use CMP0048 (`#148 <https://github.com/ros/dynamic_reconfigure/issues/148>`_)
+* Use PYTHON_EXECUTABLE to generate config headers. (`#146 <https://github.com/ros/dynamic_reconfigure/issues/146>`_)
+* Python3 compatibility (`#135 <https://github.com/ros/dynamic_reconfigure/issues/135>`_)
+* Use system on gen headers (`#140 <https://github.com/ros/dynamic_reconfigure/issues/140>`_)
+* Fix GCC8 error for unnecessary parentheses (`#132 <https://github.com/ros/dynamic_reconfigure/issues/132>`_)
+* fix generate_dynamic_reconfigure_options (`#10 <https://github.com/ros/dynamic_reconfigure/issues/10>`_) (`#134 <https://github.com/ros/dynamic_reconfigure/issues/134>`_)
+* Make Michael Carroll the maintainer (`#125 <https://github.com/ros/dynamic_reconfigure/issues/125>`_)
+* Contributors: Christopher Wecht, Markus Grimm, Michael Carroll, Mikael Arguedas, Nicolas Limpert, Sean Yen [MSFT], Victor Lopez
+
 1.6.0 (2018-10-02)
 ------------------
 * fix check preventing range for string and bool parameters (`#122 <https://github.com/ros/dynamic_reconfigure/issues/122>`_)
@@ -95,7 +108,7 @@ Changelog for package dynamic_reconfigure
 
 1.5.41 (2016-03-14)
 -------------------
-* fix Python environment to make it work on the first run `#58 <https://github.com/ros/dynamic_reconfigure/issues/58>`_ 
+* fix Python environment to make it work on the first run `#58 <https://github.com/ros/dynamic_reconfigure/issues/58>`_
 * Contributors: Dirk Thomas, Mikael Arguedas
 
 1.5.40 (2016-03-11)
