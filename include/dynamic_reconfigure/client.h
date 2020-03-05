@@ -323,13 +323,13 @@ class Client {
   }
 
   std::string name_;
+  ros::NodeHandle nh_;
   bool received_configuration_;
   ConfigType latest_configuration_;
   bool received_description_;
   dynamic_reconfigure::ConfigDescription latest_description_;
   boost::condition_variable cv_;
   boost::mutex mutex_;
-  ros::NodeHandle nh_;
   ros::ServiceClient set_service_;
   ros::Subscriber descr_sub_;
   ros::Subscriber config_sub_;
