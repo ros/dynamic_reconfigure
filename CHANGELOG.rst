@@ -2,8 +2,8 @@
 Changelog for package dynamic_reconfigure
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-Forthcoming
------------
+1.6.1 (2020-03-05)
+------------------
 * Use PYTHON_EXECUTABLE to generate config headers. (`#146 <https://github.com/ros/dynamic_reconfigure/issues/146>`_)
 * Python3 compatibility (`#135 <https://github.com/ros/dynamic_reconfigure/issues/135>`_)
 * Use system on gen headers (`#140 <https://github.com/ros/dynamic_reconfigure/issues/140>`_)
