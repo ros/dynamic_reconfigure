@@ -2,8 +2,8 @@
 Changelog for package dynamic_reconfigure
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-Forthcoming
------------
+1.6.2 (2020-03-19)
+------------------
 * Set right order of SYSTEM/BEFORE options in dynamic_reconfigure-macros.cmake. Fix `#150 <https://github.com/ros/dynamic_reconfigure/issues/150>`_ (`#151 <https://github.com/ros/dynamic_reconfigure/issues/151>`_)
 * Contributors: Alexander
 
