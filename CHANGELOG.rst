@@ -2,6 +2,11 @@
 Changelog for package dynamic_reconfigure
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+Forthcoming
+-----------
+* Set right order of SYSTEM/BEFORE options in dynamic_reconfigure-macros.cmake. Fix `#150 <https://github.com/ros/dynamic_reconfigure/issues/150>`_ (`#151 <https://github.com/ros/dynamic_reconfigure/issues/151>`_)
+* Contributors: Alexander
+
 1.6.1 (2020-03-05)
 ------------------
 * Use PYTHON_EXECUTABLE to generate config headers. (`#146 <https://github.com/ros/dynamic_reconfigure/issues/146>`_)
