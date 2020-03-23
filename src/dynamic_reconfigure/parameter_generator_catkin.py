@@ -71,7 +71,7 @@ def check_description(description):
 
 
 def check_name(name):
-    pattern = r'^[a-zA-Z][a-zA-Z0-9_]*$'
+    pattern = r'^[a-zA-Z][a-zA-Z0-9_/]*$'
     if not re.match(pattern, name):
         raise Exception("The name of field \'%s\' does not follow the ROS naming conventions, see http://wiki.ros.org/ROS/Patterns/Conventions" % name)
 
@@ -126,7 +126,7 @@ class ParameterGenerator(object):
             self.groups.append(group)
             return group
 
-        def add(self, name, paramtype, level, description, default=None, min=None, max=None, edit_method=""):
+        def add(self, name, paramtype, level, description, default=None, min=None, max=None, edit_method="", display_name=""):
             newparam = {
                 'name': name,
                 'type': paramtype,
@@ -138,6 +138,7 @@ class ParameterGenerator(object):
                 'srcline': inspect.currentframe().f_back.f_lineno,
                 'srcfile': inspect.getsourcefile(inspect.currentframe().f_back.f_code),
                 'edit_method': edit_method,
+                'display_name': display_name,
             }
             if (paramtype == str_t or paramtype == bool_t) and (max is not None or min is not None):
                 raise Exception(
@@ -287,8 +288,8 @@ class ParameterGenerator(object):
         return repr({'enum': constants, 'enum_description': description})
 
     # Wrap add and add_group for the default group
-    def add(self, name, paramtype, level, description, default=None, min=None, max=None, edit_method=""):
-        self.group.add(name, paramtype, level, description, default, min, max, edit_method)
+    def add(self, name, paramtype, level, description, default=None, min=None, max=None, edit_method="", display_name=""):
+        self.group.add(name, paramtype, level, description, default, min, max, edit_method, display_name)
 
     def add_group(self, name, type="", state=True):
         return self.group.add_group(name, type=type, state=state)
@@ -481,11 +482,11 @@ class ParameterGenerator(object):
                     paramdescr,
                     group.to_dict()['name'] +
                     ".abstract_parameters.push_back(${configname}Config::AbstractParamDescriptionConstPtr(new ${configname}Config::ParamDescription<${ctype}>(\"${name}\", \"${type}\", ${level}, "
-                    "\"${description}\", \"${edit_method}\", &${configname}Config::${name})));", param)
+                    "\"${description}\", \"${edit_method}\", \"${display_name}\", &${configname}Config::${name})));", param)
                 self.appendline(
                     paramdescr,
                     "__param_descriptions__.push_back(${configname}Config::AbstractParamDescriptionConstPtr(new ${configname}Config::ParamDescription<${ctype}>(\"${name}\", \"${type}\", ${level}, "
-                    "\"${description}\", \"${edit_method}\", &${configname}Config::${name})));", param)
+                    "\"${description}\", \"${edit_method}\", \"${display_name}\", &${configname}Config::${name})));", param)
 
             for g in group.groups:
                 write_params(g)

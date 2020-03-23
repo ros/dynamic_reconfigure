@@ -36,13 +36,14 @@ namespace ${pkgname}
     {
     public:
       AbstractParamDescription(std::string n, std::string t, uint32_t l,
-          std::string d, std::string e)
+          std::string d, std::string e, std::string dn)
       {
         name = n;
         type = t;
         level = l;
         description = d;
         edit_method = e;
+        display_name = dn;
       }
 
       virtual void clamp(${configname}Config &config, const ${configname}Config &max, const ${configname}Config &min) const = 0;
@@ -64,8 +65,8 @@ namespace ${pkgname}
     {
     public:
       ParamDescription(std::string a_name, std::string a_type, uint32_t a_level,
-          std::string a_description, std::string a_edit_method, T ${configname}Config::* a_f) :
-        AbstractParamDescription(a_name, a_type, a_level, a_description, a_edit_method),
+          std::string a_description, std::string a_edit_method, std::string a_display_name, T ${configname}Config::* a_f) :
+        AbstractParamDescription(a_name, a_type, a_level, a_description, a_edit_method, a_display_name),
         field(a_f)
       {}
 

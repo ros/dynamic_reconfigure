@@ -172,6 +172,7 @@ def do_dump():
 
     parser = optparse.OptionParser(usage=usage, prog=NAME)
     add_timeout_option(parser)
+    add_minimaldump_option(parser)
     options, args = parser.parse_args(myargv[2:])
     if len(args) == 0:
         parser.error("invalid arguments. Please specify a node name")
@@ -186,7 +187,12 @@ def do_dump():
     if params is not None:
         f = file(path, 'w')
         try:
-            yaml.dump(params, f)
+            if options.minimal:
+                params2 = dict(params)
+                params2.pop('groups', None)
+                yaml.dump(params2, f, default_flow_style=False)
+            else:
+                yaml.dump(params, f)
             return
         finally:
             f.close()
@@ -206,6 +212,9 @@ def set_params(node, params, timeout=None):
 
 def add_timeout_option(parser):
     parser.add_option('-t', '--timeout', action='store', type='float', default=None, help='timeout in secs')
+
+def add_minimaldump_option(parser):
+    parser.add_option('-m', '--minimal', action='store_true', default=False, dest='minimal', help='dump parameters and values only, no group data')
 
 def print_usage():
     print("""dynparam is a command-line tool for getting, setting, and
