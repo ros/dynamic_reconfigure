@@ -49,7 +49,7 @@ class Config(dict):
         dict.__init__(self, *args, **kwargs)
 
     def __getstate__(self):
-        return self.__dict__.items()
+        return list(self.__dict__.items())
 
     def __setstate__(self, items):
         for key, val in items:
@@ -75,7 +75,7 @@ class Config(dict):
 
     def __deepcopy__(self, memo):
         c = type(self)({})
-        for key, value in self.items():
+        for key, value in list(self.items()):
             c[copy.deepcopy(key)] = copy.deepcopy(value)
 
         return c
@@ -112,7 +112,7 @@ def encode_groups(parent, group):
 
 def encode_config(config, flat=True):
     msg = ConfigMsg()
-    for k, v in config.items():
+    for k, v in list(config.items()):
         ## @todo add more checks here?
         if type(v) == int:
             msg.ints.append(IntParameter(k, v))
@@ -120,7 +120,7 @@ def encode_config(config, flat=True):
             msg.bools.append(BoolParameter(k, v))
         elif type(v) == str:
             msg.strs.append(StrParameter(k, v))
-        elif sys.version_info.major < 3 and isinstance(v, unicode):
+        elif sys.version_info.major < 3 and isinstance(v, str):
             msg.strs.append(StrParameter(k, v))
         elif type(v) == float:
             msg.doubles.append(DoubleParameter(k, v))
@@ -128,7 +128,7 @@ def encode_config(config, flat=True):
             if flat is True:
                 def flatten(g):
                     groups = []
-                    for _name, group in g['groups'].items():
+                    for _name, group in list(g['groups'].items()):
                         groups.extend(flatten(group))
                         groups.append(GroupState(group['name'], group['state'], group['id'], group['parent']))
                     return groups
@@ -277,7 +277,7 @@ def initial_config(msg, description=None):
         def add_params(group, descr):
             for param in descr['parameters']:
                 group['parameters'][param['name']] = d[param['name']]
-            for _n, g in group['groups'].items():
+            for _n, g in list(group['groups'].items()):
                 for dr in descr['groups']:
                     if dr['name'] == g['name']:
                         add_params(g, dr)
@@ -290,7 +290,7 @@ def initial_config(msg, description=None):
 def decode_config(msg, description=None):
     if sys.version_info.major < 3:
         for s in msg.strs:
-            if not isinstance(s.value, unicode):
+            if not isinstance(s.value, str):
                 try:
                     s.value.decode('ascii')
                 except UnicodeDecodeError:
@@ -302,10 +302,10 @@ def decode_config(msg, description=None):
 
         def add_params(group, descr):
             for param in descr['parameters']:
-                if param['name'] in d.keys():
+                if param['name'] in list(d.keys()):
                     group[param['name']] = d[param['name']]
-            for _n, g in group['groups'].items():
-                for _nr, dr in descr['groups'].items():
+            for _n, g in list(group['groups'].items()):
+                for _nr, dr in list(descr['groups'].items()):
                     if dr['name'] == g['name']:
                         add_params(g, dr)
 
@@ -318,7 +318,7 @@ def extract_params(group):
     params = []
     params.extend(group['parameters'])
     try:
-        for _n, g in group['groups'].items():
+        for _n, g in list(group['groups'].items()):
             params.extend(extract_params(g))
     except AttributeError:
         for g in group['groups']:

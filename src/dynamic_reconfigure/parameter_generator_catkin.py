@@ -42,7 +42,7 @@
 # Need to check types of min max and default
 # Need to put sane error on exceptions
 
-from __future__ import print_function
+
 
 import inspect
 import os
@@ -560,7 +560,7 @@ class ParameterGenerator(object):
 
     def _rreplace_str_with_val_in_dict(self, orig_dict, old_str, new_val):
         # Recursively replace any match of old_str by new_val in a dictionary
-        for k, v in orig_dict.items():
+        for k, v in list(orig_dict.items()):
             if isinstance(v, dict):
                 self._rreplace_str_with_val_in_dict(v, old_str, new_val)
             elif isinstance(v, list):

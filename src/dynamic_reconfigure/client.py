@@ -35,7 +35,7 @@ Python client API for dynamic_reconfigure (L{DynamicReconfigureClient}) as well 
 example server implementation (L{DynamicReconfigureServer}).
 """
 
-from __future__ import print_function, with_statement
+
 
 try:
     import roslib; roslib.load_manifest('dynamic_reconfigure')
@@ -203,8 +203,8 @@ class Client(object):
                                     found = True
                         if not found:
                             if sys.version_info.major < 3:
-                                if type(value) is unicode:
-                                    changes[name] = unicode(value)
+                                if type(value) is str:
+                                    changes[name] = str(value)
                                 else:
                                     changes[name] = dest_type(value)
                             else:
@@ -213,7 +213,7 @@ class Client(object):
                     except ValueError as e:
                         raise DynamicReconfigureParameterException('can\'t set parameter \'%s\' of %s: %s' % (name, str(dest_type), e))
 
-        if 'groups' in changes.keys():
+        if 'groups' in list(changes.keys()):
             changes['groups'] = self.update_groups(changes['groups'])
 
         config = encode_config(changes)
@@ -240,7 +240,7 @@ class Client(object):
         descr = self.get_group_descriptions()
 
         def update_state(group, description):
-            for p, g in description['groups'].items():
+            for p, g in list(description['groups'].items()):
                 if g['name'] == group:
                     description['groups'][p]['state'] = changes[group]
                 else:
