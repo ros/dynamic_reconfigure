@@ -81,7 +81,7 @@ class TestSimpleDynamicReconfigureClient(unittest.TestCase):
         self.assertEqual('bar', config['mstr_'])
 
         # Kanji for konnichi wa (hello)
-        str_ = u"今日は"
+        str_ = "今日は"
 
         client.update_configuration(
             {"mstr_": str_}
@@ -91,12 +91,12 @@ class TestSimpleDynamicReconfigureClient(unittest.TestCase):
 
         config = client.get_configuration(timeout=5)
 
-        self.assertEqual(u"今日は", config['mstr_'])
-        self.assertEqual(type(u"今日は"), type(config['mstr_']))
-        self.assertEqual(u"今日は", rospy.get_param('/ref_server/mstr_'))
+        self.assertEqual("今日は", config['mstr_'])
+        self.assertEqual(type("今日は"), type(config['mstr_']))
+        self.assertEqual("今日は", rospy.get_param('/ref_server/mstr_'))
 
         # Hiragana for konnichi wa (hello)
-        str_ = u"こんにちは"
+        str_ = "こんにちは"
 
         client.update_configuration(
             {"mstr_": str_}
@@ -106,9 +106,9 @@ class TestSimpleDynamicReconfigureClient(unittest.TestCase):
 
         config = client.get_configuration(timeout=5)
 
-        self.assertEqual(u"こんにちは", config['mstr_'])
-        self.assertEqual(type(u"こんにちは"), type(config['mstr_']))
-        self.assertEqual(u"こんにちは", rospy.get_param('/ref_server/mstr_'))
+        self.assertEqual("こんにちは", config['mstr_'])
+        self.assertEqual(type("こんにちは"), type(config['mstr_']))
+        self.assertEqual("こんにちは", rospy.get_param('/ref_server/mstr_'))
 
 
 if __name__ == "__main__":

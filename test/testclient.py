@@ -30,7 +30,7 @@
 # LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN
 # ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 # POSSIBILITY OF SUCH DAMAGE.
-from __future__ import print_function
+
 
 import roslib; roslib.load_manifest('dynamic_reconfigure')
 import rospy
@@ -54,8 +54,8 @@ import time
 
 
 def print_config(config):
-    for k, v in config.items():
-        print(k, ":", v)
+    for k, v in list(config.items()):
+        print((k, ":", v))
     print('')
 
 
@@ -105,7 +105,7 @@ time.sleep(1)
 
 # You can access constants defined in Test.cfg file in the following way:
 import dynamic_reconfigure.cfg.TestConfig as Config
-print("Medium is a constant that is set to 1:", Config.Test_Medium)
+print(("Medium is a constant that is set to 1:", Config.Test_Medium))
 
 # This is useful for setting enums:
 print("Configuration after setting int_enum_ to Medium:")

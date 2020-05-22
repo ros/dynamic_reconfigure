@@ -35,7 +35,7 @@ Python client API for dynamic_reconfigure (L{DynamicReconfigureClient}) as well 
 example server implementation (L{DynamicReconfigureServer}).
 """
 
-from __future__ import with_statement
+
 
 try:
     import roslib; roslib.load_manifest('dynamic_reconfigure')

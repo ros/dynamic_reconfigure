@@ -65,4 +65,4 @@ def find_reconfigure_services():
 
 
 def get_parameter_names(descr):
-    return descr.defaults.keys()
+    return list(descr.defaults.keys())
