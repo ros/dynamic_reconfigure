@@ -156,7 +156,7 @@ def do_load():
         parser.error("too many arguments")
     node, path = args[0], args[1]
 
-    f = file(path, 'r')
+    f = open(path, 'r')
     try:
         params = {}
         for doc in yaml.load_all(f.read()):
@@ -184,7 +184,7 @@ def do_dump():
     connect()
     params = get_params(node, timeout=options.timeout)
     if params is not None:
-        f = file(path, 'w')
+        f = open(path, 'w')
         try:
             yaml.dump(params, f)
             return
