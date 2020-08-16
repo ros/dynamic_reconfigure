@@ -26,7 +26,10 @@
   <build_depend>roscpp_serialization</build_depend>
   <build_depend>rostest</build_depend>
 
-  <depend>boost</depend>
+  <build_export_depend>libboost-chrono-dev</build_export_depend>
+  <build_export_depend>libboost-thread-dev</build_export_depend>
+
+  <depend>libboost-dev</depend>
   <depend>roscpp</depend>
   <depend>std_msgs</depend>
 

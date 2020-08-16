@@ -2,7 +2,7 @@ cmake_minimum_required(VERSION 3.0.2)
 project(dynamic_reconfigure)
 
 find_package(catkin REQUIRED COMPONENTS message_generation roscpp std_msgs)
-find_package(Boost REQUIRED COMPONENTS system thread chrono)
+find_package(Boost REQUIRED)
 
 include_directories(include)
 include_directories(SYSTEM ${catkin_INCLUDE_DIRS} ${Boost_INCLUDE_DIRS})
