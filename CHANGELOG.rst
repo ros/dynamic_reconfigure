@@ -2,6 +2,14 @@
 Changelog for package dynamic_reconfigure
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+Forthcoming
+-----------
+* narrow down required boost dependencies (`#160 <https://github.com/ros/dynamic_reconfigure/issues/160>`_)
+* Make Config object pickle-able in Python 3 (`#154 <https://github.com/ros/dynamic_reconfigure/issues/154>`_)
+* Fix python3 issue in a backward compatible way (`#157 <https://github.com/ros/dynamic_reconfigure/issues/157>`_)
+* import setup from setuptools instead of distutils-core (`#153 <https://github.com/ros/dynamic_reconfigure/issues/153>`_)
+* Contributors: Alejandro Hernández Cordero, Mikael Arguedas, Scott K Logan
+
 1.7.0 (2020-03-05)
 ------------------
 * Fixing compile error with cpp client when using -Werror=reorder. (`#118 <https://github.com/ros/dynamic_reconfigure/issues/118>`_)
