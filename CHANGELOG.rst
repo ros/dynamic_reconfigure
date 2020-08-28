@@ -2,8 +2,8 @@
 Changelog for package dynamic_reconfigure
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-Forthcoming
------------
+1.7.1 (2020-08-28)
+------------------
 * narrow down required boost dependencies (`#160 <https://github.com/ros/dynamic_reconfigure/issues/160>`_)
 * Make Config object pickle-able in Python 3 (`#154 <https://github.com/ros/dynamic_reconfigure/issues/154>`_)
 * Fix python3 issue in a backward compatible way (`#157 <https://github.com/ros/dynamic_reconfigure/issues/157>`_)
