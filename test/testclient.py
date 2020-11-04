@@ -32,7 +32,6 @@
 # POSSIBILITY OF SUCH DAMAGE.
 from __future__ import print_function
 
-import roslib; roslib.load_manifest('dynamic_reconfigure')
 import rospy
 from dynamic_reconfigure.client import Client as DynamicReconfigureClient
 import time
