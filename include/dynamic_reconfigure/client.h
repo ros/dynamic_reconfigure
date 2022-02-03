@@ -156,6 +156,8 @@ class Client {
     configuration.__toMessage__(srv.request.config);
     if (set_service_.call(srv)) {
       configuration.__fromMessage__(srv.response.config);
+      latest_configuration_.__fromMessage__(srv.response.config);
+      received_configuration_ = true;
       return true;
     } else {
       ROS_WARN("Could not set configuration");
