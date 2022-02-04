@@ -113,7 +113,7 @@ macro(dynreconf_called)
 
     # make sure we can find generated messages and that they overlay all other includes
     # Use system to skip warnings from these includes
-    include_directories(SYSTEM BEFORE ${CATKIN_DEVEL_PREFIX}/${CATKIN_GLOBAL_INCLUDE_DESTINATION})
+    include_directories(BEFORE ${CATKIN_DEVEL_PREFIX}/${CATKIN_GLOBAL_INCLUDE_DESTINATION})
     # pass the include directory to catkin_package()
     list(APPEND ${PROJECT_NAME}_INCLUDE_DIRS ${CATKIN_DEVEL_PREFIX}/${CATKIN_GLOBAL_INCLUDE_DESTINATION})
     # ensure that the folder exists
