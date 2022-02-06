@@ -46,7 +46,6 @@ import roslib.packages
 from string import Template
 import os
 import inspect
-import string
 import sys
 import re
 
@@ -175,18 +174,18 @@ class ParameterGenerator:
             ret = []
             for x in fld:
                 if x == self.name:
-                    ret.append(string.lower(x))
+                    ret.append(x.lower())
                 else:
-                    ret.append(string.upper(x))
-            return string.join(ret, "::")
+                    ret.append(x.upper())
+            return '::'.join(ret)
 
         def get_class(self, parent=False):
             cls = []
             cls.extend(self.get_parents())
-            cls = [string.upper(x) for x in cls]
+            cls = [x.upper() for x in cls]
             if parent is True:
                 cls.pop()
-            return string.join(cls, "::")
+            return '::'.join(cls)
 
         # dictionary used to create the generated classes
         def to_dict(self):
@@ -212,8 +211,8 @@ class ParameterGenerator:
                 'parentclass': self.get_class(parent=True),
                 'parentname': self.get_group(self.parent).name,
                 'field': self.get_field(),
-                'upper': string.upper(self.name),
-                'lower': string.lower(name)
+                'upper': self.name.upper(),
+                'lower': name.lower(),
             }
 
     def pytype(self, drtype):
@@ -456,9 +455,9 @@ class ParameterGenerator:
             setters.append(Template("        if(\"${name}\"==(*_i)->name){${name} = boost::any_cast<${ctype}>(val);}").substitute(p))
             params.append(Template("${ctype} ${name};").substitute(p))
 
-        subgroups = string.join(subgroups, "\n")
-        setters = string.join(setters, "\n")
-        params = string.join(params, "\n")
+        subgroups = '\n'.join(subgroups)
+        setters = '\n'.join(setters)
+        params = '\n'.join(params)
         grouptemplate = open(os.path.join(self.dynconfpath, "templates", "GroupClass.h.template")).read()
         list.append(Template(grouptemplate).safe_substitute(group.to_dict(), subgroups=subgroups, setters=setters, params=params, configname=self.name))
 
@@ -521,10 +520,10 @@ class ParameterGenerator:
         write_params(self.group)
         self.appendgroup(groups, self.group)
 
-        paramdescr = string.join(paramdescr, '\n')
-        members = string.join(members, '\n')
-        groups = string.join(groups, '\n')
-        constants = string.join(constants, '\n')
+        paramdescr = '\n'.join(paramdescr)
+        members = '\n'.join(members)
+        groups = '\n'.join(groups)
+        constants = '\n'.join(constants)
         f.write(Template(template).substitute(
             uname=self.name.upper(),
             configname=self.name, pkgname=self.pkgname, paramdescr=paramdescr,
