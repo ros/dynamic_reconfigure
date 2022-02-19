@@ -2,6 +2,13 @@
 Changelog for package dynamic_reconfigure
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+Forthcoming
+-----------
+* Remove calls to string.{join,lower,upper} (`#174 <https://github.com/ros/dynamic_reconfigure/issues/174>`_)
+* fix: Race condition on quickly setting and getting config (`#188 <https://github.com/ros/dynamic_reconfigure/issues/188>`_)
+* do not use system for generated messages or configs (`#182 <https://github.com/ros/dynamic_reconfigure/issues/182>`_)
+* Contributors: Gaël Écorchard, Rokus Ottervanger, Shingo Kitagawa
+
 1.7.1 (2020-08-28)
 ------------------
 * narrow down required boost dependencies (`#160 <https://github.com/ros/dynamic_reconfigure/issues/160>`_)
