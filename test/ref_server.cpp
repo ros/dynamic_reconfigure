@@ -46,7 +46,7 @@ int main(int argc, char **argv) {
   dynamic_reconfigure::Server<dynamic_reconfigure_test::TestConfig> server;
   dynamic_reconfigure::Server<dynamic_reconfigure_test::TestConfig>::CallbackType f;
 
-  f = boost::bind(&callback, _1, _2);
+  f = boost::bind(&callback, boost::placeholders::_1, boost::placeholders::_2);
   server.setCallback(f);
 
   ROS_INFO("Spinning node");
