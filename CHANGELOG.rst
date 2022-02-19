@@ -2,6 +2,11 @@
 Changelog for package dynamic_reconfigure
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+Forthcoming
+-----------
+* fix: Race condition on quickly setting and getting config (`#188 <https://github.com/ros/dynamic_reconfigure/issues/188>`_) (`#190 <https://github.com/ros/dynamic_reconfigure/issues/190>`_)
+* Contributors: Rokus Ottervanger
+
 1.6.3 (2020-03-19)
 ------------------
 * Revert `#140 <https://github.com/ros/dynamic_reconfigure/issues/140>`_ (`#152 <https://github.com/ros/dynamic_reconfigure/issues/152>`_)
