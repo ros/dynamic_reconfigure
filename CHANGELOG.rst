@@ -2,8 +2,8 @@
 Changelog for package dynamic_reconfigure
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-Forthcoming
------------
+1.7.3 (2022-05-05)
+------------------
 * Add Loader=yaml.Loader to yaml.load (`#178 <https://github.com/ros/dynamic_reconfigure/issues/178>`_)
 * Switch to new boost/bind/bind.hpp (`#191 <https://github.com/ros/dynamic_reconfigure/issues/191>`_)
 * Contributors: Charles Jenkins, Jochen Sprickerhof
