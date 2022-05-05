@@ -2,6 +2,12 @@
 Changelog for package dynamic_reconfigure
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+Forthcoming
+-----------
+* Add Loader=yaml.Loader to yaml.load (`#178 <https://github.com/ros/dynamic_reconfigure/issues/178>`_)
+* Switch to new boost/bind/bind.hpp (`#191 <https://github.com/ros/dynamic_reconfigure/issues/191>`_)
+* Contributors: Charles Jenkins, Jochen Sprickerhof
+
 1.7.2 (2022-02-19)
 ------------------
 * Remove calls to string.{join,lower,upper} (`#174 <https://github.com/ros/dynamic_reconfigure/issues/174>`_)
