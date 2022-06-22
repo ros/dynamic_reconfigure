@@ -125,7 +125,7 @@ class ParameterGenerator:
             self.groups.append(group)
             return group
 
-        def add(self, name, paramtype, level, description, default=None, min=None, max=None, edit_method=""):
+        def add(self, name, paramtype, level, description, default=None, min=None, max=None, edit_method="", enable_if=""):
             newparam = {
                 'name': name,
                 'type': paramtype,
@@ -137,6 +137,7 @@ class ParameterGenerator:
                 'srcline': inspect.currentframe().f_back.f_lineno,
                 'srcfile': inspect.getsourcefile(inspect.currentframe().f_back.f_code),
                 'edit_method': edit_method,
+                'enable_if': enable_if,
             }
             if type == str_t and (max is not None or min is not None):
                 raise Exception("Max or min specified for %s, which is of string type" % name)
@@ -270,8 +271,8 @@ class ParameterGenerator:
         return repr({'enum': constants, 'enum_description': description})
 
     # Wrap add and add_group for the default group
-    def add(self, name, paramtype, level, description, default=None, min=None, max=None, edit_method=""):
-        self.group.add(name, paramtype, level, description, default, min, max, edit_method)
+    def add(self, name, paramtype, level, description, default=None, min=None, max=None, edit_method="", enable_if=""):
+        self.group.add(name, paramtype, level, description, default, min, max, edit_method, enable_if)
 
     def add_group(self, name, type="", state=True):
         return self.group.add_group(name, type=type, state=state)
@@ -502,11 +503,11 @@ class ParameterGenerator:
                     paramdescr,
                     group.to_dict()['name'] +
                     ".abstract_parameters.push_back(${configname}Config::AbstractParamDescriptionConstPtr(new ${configname}Config::ParamDescription<${ctype}>(\"${name}\", \"${type}\", ${level}, "
-                    "\"${description}\", \"${edit_method}\", &${configname}Config::${name})));", param)
+                    "\"${description}\", \"${edit_method}\", \"${enable_if}\", &${configname}Config::${name})));", param)
                 self.appendline(
                     paramdescr,
                     "__param_descriptions__.push_back(${configname}Config::AbstractParamDescriptionConstPtr(new ${configname}Config::ParamDescription<${ctype}>(\"${name}\", \"${type}\", ${level}, "
-                    "\"${description}\", \"${edit_method}\", &${configname}Config::${name})));", param)
+                    "\"${description}\", \"${edit_method}\", \"${enable_if}\", &${configname}Config::${name})));", param)
 
             for g in group.groups:
                 write_params(g)
