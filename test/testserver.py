@@ -34,7 +34,6 @@
 #********************************************************************/
 from __future__ import print_function
 
-import roslib; roslib.load_manifest('dynamic_reconfigure')
 import rospy
 import dynamic_reconfigure.server
 from dynamic_reconfigure.cfg import TestConfig
