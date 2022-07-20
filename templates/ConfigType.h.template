@@ -246,9 +246,11 @@ ${doline} ${linenum} "${filename}"
         }
       }
 
-      if (count != dynamic_reconfigure::ConfigTools::size(msg))
+      const int msg_count = dynamic_reconfigure::ConfigTools::size(msg);
+      if (count != msg_count)
       {
-        ROS_ERROR("${configname}Config::__fromMessage__ called with an unexpected parameter.");
+        ROS_ERROR("${configname}Config::__fromMessage__ called with an unexpected number of"
+                  " parameters: %d instead of %d.", msg_count, count);
         ROS_ERROR("Booleans:");
         for (unsigned int i = 0; i < msg.bools.size(); i++)
           ROS_ERROR("  %s", msg.bools[i].name.c_str());
