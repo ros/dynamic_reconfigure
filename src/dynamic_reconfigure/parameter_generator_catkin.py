@@ -63,6 +63,20 @@ double_t = "double"
 id = 0
 
 
+def check_default(name, default, min, max):
+    if min is not None and default < min:
+        raise Exception("The default value for {name} ({default}) is smaller than the specified minimum({min}).".format(name=name, min=min, default=default))
+    if max is not None and default > max:
+        raise Exception("The default value for {name} ({default}) is greater than the specified maximum({max}).".format(name=name, max=max, default=default))
+
+
+def check_range(name, min, max):
+    if min is None or max is None:
+        return
+    if min >= max:
+        raise Exception("No valid range specified for {name}. Minimum {min} is equal to or greater than maximum {max}".format(name=name, min=min, max=max))
+
+
 def check_description(description):
     quotes = ['"', "'"]
     for quote in quotes:
@@ -143,6 +157,9 @@ class ParameterGenerator(object):
                 raise Exception(
                     "Max or min specified for %s, which is of '%s' type" % (name, paramtype))
             check_name(name)
+            check_range(name, min, max)
+            check_default(name, default, min, max)
+
             self.gen.fill_type(newparam)
             self.gen.check_type_fill_default(newparam, 'default', self.gen.defval[paramtype])
             self.gen.check_type_fill_default(newparam, 'max', self.gen.maxval[paramtype])
