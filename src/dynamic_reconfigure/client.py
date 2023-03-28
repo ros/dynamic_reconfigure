@@ -76,6 +76,7 @@ class Client(object):
         self.group_description = None
 
         self._param_types = None
+        self._param_types_initialized = False
 
         self._cv = threading.Condition()
 
@@ -128,14 +129,14 @@ class Client(object):
         """
         if timeout is None or timeout == 0.0:
             with self._cv:
-                while self.param_description is None:
+                while self._param_types_initialized is False:
                     if rospy.is_shutdown():
                         return None
                     self._cv.wait()
         else:
             start_time = time.time()
             with self._cv:
-                while self.param_description is None:
+                while self._param_types_initialized is False:
                     if rospy.is_shutdown():
                         return None
                     secs_left = timeout - (time.time() - start_time)
@@ -337,6 +338,7 @@ class Client(object):
             if n is not None and t is not None:
                 self._param_types[n] = self._param_type_from_string(t)
 
+        self._param_types_initialized = True
         with self._cv:
             self._cv.notifyAll()
         if self._description_callback is not None:
