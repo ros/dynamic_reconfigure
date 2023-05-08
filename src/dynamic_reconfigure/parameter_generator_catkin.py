@@ -103,6 +103,7 @@ class ParameterGenerator(object):
 
         def __init__(self, gen, name, type, state, id, parent):
             self.name = name.replace(" ", "_")
+            check_name(self.name)
             self.type = type
             self.groups = []
             self.parameters = []
