@@ -2,6 +2,11 @@
 Changelog for package dynamic_reconfigure
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+Forthcoming
+-----------
+* add sources and dependencies arguments to generate_dynamic_reconfigure_options (`#197 <https://github.com/ros/dynamic_reconfigure/issues/197>`_)
+* Contributors: Boyan Hristov
+
 1.7.3 (2022-05-05)
 ------------------
 * Add Loader=yaml.Loader to yaml.load (`#178 <https://github.com/ros/dynamic_reconfigure/issues/178>`_)

@@ -6,8 +6,23 @@ macro(generate_dynamic_reconfigure_options)
   # ensure that package destination variables are defined
   catkin_destinations()
 
+  _generate_dynamic_reconfigure_options(${ARGN})
+endmacro()
+
+function(_generate_dynamic_reconfigure_options)
+  cmake_parse_arguments(ARG "" "" "SOURCES;DEPENDENCIES" ${ARGN})
+
+  # backwards compatibility with old interface,
+  # i.e. the passed arguments are a list of sources
+  if (NOT ARG_SOURCES AND NOT ARG_DEPENDENCIES)
+    set(ARG_SOURCES ${ARGN})
+    set(ARG_DEPENDENCIES "")
+  elseif(NOT ARG_SOURCES)
+    message(FATAL_ERROR "generate_dynamic_reconfigure_options() called with DEPENDENCIES but no SOURCES argument.")
+  endif()
+
   set(_autogen "")
-  foreach(_cfg ${ARGN})
+  foreach(_cfg ${ARG_SOURCES})
     # Construct the path to the .cfg file
     set(_input ${_cfg})
     if(NOT IS_ABSOLUTE ${_input})
@@ -68,7 +83,7 @@ macro(generate_dynamic_reconfigure_options)
     add_custom_command(OUTPUT
       ${_output_cpp} ${_output_dox} ${_output_usage} ${_output_py} ${_output_wikidoc}
       COMMAND ${_cmd}
-      DEPENDS ${_input} ${gencfg_build_files}
+      DEPENDS ${_input} ${gencfg_build_files} ${ARG_DEPENDENCIES}
       COMMENT "Generating dynamic reconfigure files from ${_cfg}: ${_output_cpp} ${_output_py}"
     )
 
@@ -87,7 +102,7 @@ macro(generate_dynamic_reconfigure_options)
   list(APPEND ${PROJECT_NAME}_EXPORTED_TARGETS ${PROJECT_NAME}_gencfg)
 
   dynreconf_called()
-endmacro()
+endfunction()
 
 macro(dynreconf_called)
   if(NOT dynamic_reconfigure_CALLED)
