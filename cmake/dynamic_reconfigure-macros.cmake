@@ -126,7 +126,7 @@ macro(dynreconf_called)
 
     # compile python code before installing
     find_package(PythonInterp REQUIRED)
-    install(CODE "execute_process(COMMAND \"${PYTHON_EXECUTABLE}\" -m compileall \"${CATKIN_DEVEL_PREFIX}/${CATKIN_PACKAGE_PYTHON_DESTINATION}/cfg\")")
+    install(CODE "execute_process(COMMAND \"${PYTHON_EXECUTABLE}\" -m compileall -d \"${CMAKE_INSTALL_PREFIX}/${CATKIN_PACKAGE_PYTHON_DESTINATION}/cfg\" \"${CATKIN_DEVEL_PREFIX}/${CATKIN_PACKAGE_PYTHON_DESTINATION}/cfg\")")
     install(
       DIRECTORY ${CATKIN_DEVEL_PREFIX}/${CATKIN_PACKAGE_PYTHON_DESTINATION}/cfg
       DESTINATION ${CATKIN_PACKAGE_PYTHON_DESTINATION}
