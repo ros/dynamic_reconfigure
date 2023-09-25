@@ -35,9 +35,6 @@ Python client API for dynamic_reconfigure (L{Client}) as well as
 example server implementation (L{Server}).
 """
 
-import roslib
-
-
 class DynamicReconfigureException(Exception):
     """
     dynamic_reconfigure base exception type
