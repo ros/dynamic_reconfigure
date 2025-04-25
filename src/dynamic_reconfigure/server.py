@@ -37,10 +37,6 @@ example server implementation (L{DynamicReconfigureServer}).
 
 from __future__ import with_statement
 
-try:
-    import roslib; roslib.load_manifest('dynamic_reconfigure')
-except Exception:
-    pass
 import rospy
 import threading
 import copy

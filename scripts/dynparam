@@ -36,7 +36,6 @@
 from __future__ import print_function
 
 NAME='dynparam'
-import roslib; roslib.load_manifest('dynamic_reconfigure')
 import rospy
 import optparse
 import sys
