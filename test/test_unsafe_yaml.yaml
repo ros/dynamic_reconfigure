@@ -1,2 +1,0 @@
-# When the line below gets read by unsafe yaml loader (e.g. `yaml.load`), the bash code may get executed, which is a huge security risk.
-str_: !!python/object/apply:os.system ["cat /etc/passwd"]

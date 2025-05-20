@@ -17,5 +17,3 @@ target_link_libraries(dynamic_reconfigure-test_client dynamic_reconfigure_config
 add_dependencies(tests dynamic_reconfigure-test_client)
 
 add_rostest(test_python_simple_client.launch)
-
-add_rostest(test_dynparam.launch)

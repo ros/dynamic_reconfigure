@@ -37,6 +37,4 @@
   <exec_depend>roslib</exec_depend>
   <exec_depend>rospy</exec_depend>
   <exec_depend>rosservice</exec_depend>
-
-  <test_depend>rosbash</test_depend>
 </package>
