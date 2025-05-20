@@ -5,6 +5,7 @@ import rostest
 import rospy
 import os
 import subprocess
+import tempfile
 
 
 class TestDynparam(unittest.TestCase):
@@ -22,6 +23,13 @@ class TestDynparam(unittest.TestCase):
 
         # check the test failed
         self.assertNotEqual(retcode_unsafe_yaml, 0)
+
+    def test_dynparam_dump_and_load(self):
+        # Dump parameters
+        yaml_file = tempfile.NamedTemporaryFile()
+        subprocess.check_call(['rosrun', 'dynamic_reconfigure', 'dynparam', 'dump', 'ref_server', yaml_file.name])
+        # Load parameters
+        subprocess.check_call(['rosrun', 'dynamic_reconfigure', 'dynparam', 'load', 'ref_server', yaml_file.name])
 
 
 if __name__ == '__main__':
